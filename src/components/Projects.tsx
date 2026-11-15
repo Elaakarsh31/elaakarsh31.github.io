@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react';
 import { portfolio, STAGES, type Project } from '../content/portfolio';
 import { findPublication, yearOf } from '../content/resume';
 import { projectImageUrl } from '../lib/assets';
@@ -6,8 +7,19 @@ import { ExtLink } from './ExtLink';
 import { LinkRow } from './LinkRow';
 import { Schematic } from './Schematic';
 
+/** The sheet in view; a hovered or focused sheet takes over while the pointer is on it. */
+let inView: string | null = null;
+let hovered: string | null = null;
+const listeners = new Set<(id: string | null) => void>();
+function publish() {
+  stage.project = hovered ?? inView;
+  listeners.forEach((l) => l(stage.project));
+}
+
 /** Lights the matching parts of the machine (and plate labels) while a sheet is hovered or focused. */
 function light(p: Project | null) {
+  hovered = p?.id ?? null;
+  publish();
   stage.highlight = p ? { chips: p.chips, plates: p.plates ?? [] } : null;
   document.querySelectorAll<HTMLElement>('.plate-tag').forEach((t) => {
     const lit = !!p && (p.chips.includes('system') || (p.plates ?? []).includes(t.dataset.plate!));
@@ -102,13 +114,61 @@ function Papers() {
   );
 }
 
+/** The project's stack pops up as small tags around the machine while its sheet is in view. */
+function StackPop() {
+  const [id, setId] = useState<string | null>(null);
+  useEffect(() => {
+    listeners.add(setId);
+    return () => {
+      listeners.delete(setId);
+    };
+  }, []);
+  const project = portfolio.projects.find((p) => p.id === id);
+  return (
+    <ul className="stack-pop" data-on={project ? '' : undefined} aria-hidden="true" key={id ?? 'none'}>
+      {Array.from({ length: 6 }, (_, i) => (
+        <li key={i} className="stack-tag" data-hud-anchor={`pop-${i}`} data-side="right" style={{ ['--i' as string]: i }}>
+          {project?.stack[i] && <span>{project.stack[i]}</span>}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/** Tracks which sheet sits in the middle of the viewport. */
+function useSheetInView(list: React.RefObject<HTMLUListElement | null>) {
+  useEffect(() => {
+    const ul = list.current;
+    if (!ul) return;
+    const sheets = [...ul.querySelectorAll<HTMLElement>('.sheet')];
+    const io = new IntersectionObserver(
+      (items) => {
+        for (const it of items) {
+          if (it.isIntersecting) inView = it.target.id.replace('project-', '');
+          else if (inView === it.target.id.replace('project-', '')) inView = null;
+        }
+        publish();
+      },
+      { rootMargin: '-40% 0px -40% 0px' },
+    );
+    sheets.forEach((s) => io.observe(s));
+    return () => {
+      io.disconnect();
+      inView = null;
+      publish();
+    };
+  }, [list]);
+}
+
 export function Projects() {
+  const list = useRef<HTMLUListElement>(null);
+  useSheetInView(list);
   return (
     <section id="projects" className="section projects" aria-labelledby="projects-title">
       <h2 id="projects-title" className="section-title" tabIndex={-1}>
         Projects
       </h2>
-      <ul className="sheets">
+      <ul className="sheets" ref={list}>
         {portfolio.projects.map((p) => (
           <SpecSheet key={p.id} p={p} />
         ))}
@@ -117,6 +177,7 @@ export function Projects() {
         <ExtLink href={portfolio.contact.github}>{portfolio.moreOnGitHub}</ExtLink>
       </p>
       <Papers />
+      <StackPop />
     </section>
   );
 }

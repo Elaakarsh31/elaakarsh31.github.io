@@ -8,6 +8,8 @@ export const stage = {
   p: 0,
   /** Which project sheet is hovered, for lighting the machine. */
   highlight: null as null | { chips: string[]; plates: string[] },
+  /** The project sheet in view (or hovered) in Projects, for the machine's show. */
+  project: null as string | null,
   /** Drag-to-orbit offset in radians, eased back to zero on release. */
   orbit: { yaw: 0, pitch: 0 },
 };

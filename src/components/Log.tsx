@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { portfolio, type LogEntry } from '../content/portfolio';
 import { findEducation, findExperience } from '../content/resume';
-import { Details } from './Details';
 
 const MONTHS = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
 
@@ -124,7 +123,17 @@ export function Log() {
       <h2 id="career-title" className="section-title" tabIndex={-1}>
         Career
       </h2>
-      <p className="log-about">{portfolio.about}</p>
+      <p className="log-about">
+        {portfolio.about.map((part, k) =>
+          typeof part === 'string' ? (
+            part
+          ) : (
+            <strong key={k} className="role-hl">
+              {part.role}
+            </strong>
+          ),
+        )}
+      </p>
       <ol className="log-list" ref={list}>
         {rows.map((r, k) => {
           if (r.type === 'merge') {
@@ -138,7 +147,6 @@ export function Log() {
             );
           }
           const { e } = r;
-          const resumeEntry = e.kind === 'work' ? findExperience(e.resumeCompany!) : undefined;
           return (
             <li key={e.id} id={e.id} className="log-row log-entry" data-lane={r.lane} data-kind={e.kind}>
               <Graph lane={r.lane} branch={r.branch ?? 'none'} first={k === 0} last={k === rows.length - 1} kind={e.kind} />
@@ -164,7 +172,18 @@ export function Log() {
                     ))}
                   </ul>
                 )}
-                {e.showDetails && resumeEntry && <Details bullets={resumeEntry.bullets} label="More" />}
+                {e.showDetails && e.more && (
+                  <details className="details log-more">
+                    <summary>
+                      <span className="details-label">More</span>
+                    </summary>
+                    <ul className="log-more-list">
+                      {e.more.map((m) => (
+                        <li key={m}>{m}</li>
+                      ))}
+                    </ul>
+                  </details>
+                )}
               </div>
             </li>
           );

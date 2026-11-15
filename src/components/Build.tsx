@@ -23,13 +23,19 @@ function Hero() {
         </h1>
         <p className="hero-tagline">{h.tagline}</p>
         <p className="hero-intro">{h.intro}</p>
-        <p className="hero-edu">{h.education}</p>
-        <p className="hero-status">
-          <span className="status-dot" aria-hidden="true" />
-          <span>
-            <strong>{portfolio.availability}</strong> {portfolio.workAuth}
-          </span>
-        </p>
+        <ul className="hero-facts">
+          <li className="hero-edu">{h.education}</li>
+          <li className="hero-fact hero-fact-hot">
+            <span className="status-dot" aria-hidden="true" />
+            {portfolio.availability}
+          </li>
+          <li className="hero-fact">
+            <svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true" focusable="false">
+              <path d="M5 12.5l4.2 4.2L19 7" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            {portfolio.workAuth}
+          </li>
+        </ul>
       </div>
       <Frame name="hero" alt={h.frameAlt} className="hero-frame" />
       <p className="hero-cue" aria-hidden="true">

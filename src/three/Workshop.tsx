@@ -8,7 +8,7 @@ import { BotBrain } from './bot/behaviour';
 import { buildBot } from './bot/buildBot';
 import { buildData } from './data/buildData';
 import { buildMachine } from './machine/buildMachine';
-import { newPlan, planAfterBuild, planBot } from './plan';
+import { newPlan, planAfterBuild, planBot, planProject } from './plan';
 import { currentSection } from '../lib/spy';
 import { BUILD_LENGTH } from '../lib/stage';
 import { createSparks } from './sparks';
@@ -19,6 +19,13 @@ const v = new Vector3();
 const camRight = new Vector3();
 const camUp = new Vector3();
 const local = new Vector3();
+
+/** The scene is faded out (Career, the resume band, a cut, or below the hero on phones). */
+function sceneHidden() {
+  const s = currentSection();
+  const html = document.documentElement;
+  return s === 'career' || s === 'resume' || (html.dataset.mode === 'phone' && s !== 'top') || !!document.querySelector('.webgl[data-cut]');
+}
 
 /** Shows the hovered machine part's name in the HUD and lights its plate label. */
 function showPart(part: { anchor: string; label: string; kind: string } | null) {
@@ -117,6 +124,13 @@ export function Workshop({ motion, sparks: sparksOn, capture }: { motion: boolea
   }, [sparks, dpr, size.height]);
 
   useFrame((state, dt) => {
+    // Nothing on screen to point at: let go of any hover.
+    if (sceneHidden() && (hoverPart.current || document.documentElement.dataset.botHover)) {
+      hoverPart.current = '';
+      machine.setHover(null);
+      showPart(null);
+      delete document.documentElement.dataset.botHover;
+    }
     const p = stage.p;
     const t = state.clock.elapsedTime;
     machine.update(p, t, dt, motion, stage.highlight);
@@ -131,7 +145,13 @@ export function Workshop({ motion, sparks: sparksOn, capture }: { motion: boolea
     }
 
     planBot(p, machine, data, plan);
-    if (p >= BUILD_LENGTH - 0.5) planAfterBuild(currentSection(), plan);
+    let project: string | null = null;
+    if (p >= BUILD_LENGTH - 0.5) {
+      const section = currentSection();
+      project = section === 'projects' || section === 'publications' ? stage.project : null;
+      if (!planProject(project, t, machine, plan)) planAfterBuild(section, plan);
+    }
+    machine.setShow(motion ? project : null);
     v.copy(bot.root.position).project(camera);
     const screenX = (v.x * 0.5 + 0.5) * size.width;
     const screenY = (-v.y * 0.5 + 0.5) * size.height;
@@ -164,12 +184,13 @@ export function Workshop({ motion, sparks: sparksOn, capture }: { motion: boolea
   }, -1);
 
   const onClick = (e: ThreeEvent<MouseEvent>) => {
+    if (sceneHidden()) return;
     e.stopPropagation();
     pokeBot();
   };
 
   const onMachineMove = (e: ThreeEvent<PointerEvent>) => {
-    if (capture) return;
+    if (capture || sceneHidden()) return;
     // The bot is in front: it takes the hover, the machine lets go.
     if (document.documentElement.dataset.botHover) {
       if (hoverPart.current) onMachineOut();
@@ -189,7 +210,7 @@ export function Workshop({ motion, sparks: sparksOn, capture }: { motion: boolea
     showPart(null);
   };
   const onMachineClick = (e: ThreeEvent<MouseEvent>) => {
-    if (capture || e.delta > 6 || document.documentElement.dataset.botHover) return;
+    if (capture || e.delta > 6 || document.documentElement.dataset.botHover || sceneHidden()) return;
     machine.ping();
     brain.react(clock.elapsedTime);
   };
@@ -202,7 +223,9 @@ export function Workshop({ motion, sparks: sparksOn, capture }: { motion: boolea
       <primitive
         object={bot.root}
         onClick={onClick}
-        onPointerOver={() => (document.documentElement.dataset.botHover = '1')}
+        onPointerOver={() => {
+          if (!sceneHidden()) document.documentElement.dataset.botHover = '1';
+        }}
         onPointerOut={() => delete document.documentElement.dataset.botHover}
         name={botName() || 'bot'}
       />

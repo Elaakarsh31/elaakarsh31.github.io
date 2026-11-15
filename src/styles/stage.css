@@ -323,7 +323,7 @@ html[data-mode='live'] .toolbench {
 }
 
 html[data-mode='live'] .bench-wrap {
-  height: 175vh;
+  height: 125vh;
 }
 
 html[data-mode='live'] .bench-stage {
@@ -514,4 +514,60 @@ html[data-mode='phone'] .hero-copy {
 .plate-tag[data-hover] span {
   border-color: var(--holo);
   box-shadow: 0 0 14px rgba(111, 211, 255, 0.45);
+}
+
+/* Projects: the sheet's stack pops up as tags around the machine. */
+.stack-pop {
+  display: none;
+}
+
+html[data-mode='live'] .stack-pop {
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.stack-tag {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate3d(var(--hx, -999px), var(--hy, -999px), 0);
+}
+
+.stack-tag span {
+  position: absolute;
+  top: -12px;
+  white-space: nowrap;
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid rgba(111, 211, 255, 0.5);
+  background: rgba(10, 16, 22, 0.78);
+  box-shadow: 0 0 14px rgba(111, 211, 255, 0.18);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--ice);
+  opacity: 0;
+  scale: 0.6;
+}
+
+.stack-tag[data-side='left'] span {
+  right: 6px;
+}
+
+.stack-tag[data-side='right'] span {
+  left: 6px;
+}
+
+html[data-section='projects'] .stack-pop[data-on] .stack-tag[data-hud-visible='1'] span {
+  animation: stack-pop 0.45s cubic-bezier(0.2, 1.4, 0.4, 1) forwards;
+  animation-delay: calc(0.15s + var(--i) * 0.09s);
+}
+
+@keyframes stack-pop {
+  to {
+    opacity: 1;
+    scale: 1;
+  }
 }

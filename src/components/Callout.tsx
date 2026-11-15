@@ -1,14 +1,11 @@
 import { useId, useState } from 'react';
 import type { Callout as CalloutData } from '../content/portfolio';
-import { bulletFor } from '../content/resume';
 import { ExtLink } from './ExtLink';
-import { Rich } from './Rich';
 
 /** A holographic engineering callout: one real fact, expandable into details and a link. */
 export function Callout({ c }: { c: CalloutData }) {
   const [open, setOpen] = useState(false);
   const detailId = useId();
-  const bullet = c.bullet && bulletFor(c.bullet);
   return (
     <li className="callout" data-callout={c.id} data-anchor={c.anchor} data-open={open || undefined} style={{ order: c.slot }}>
       <button
@@ -25,11 +22,7 @@ export function Callout({ c }: { c: CalloutData }) {
       </button>
       <div id={detailId} className="callout-detail" hidden={!open}>
         <p>{c.detail}</p>
-        {bullet && (
-          <p className="callout-bullet">
-            <Rich nodes={bullet} />
-          </p>
-        )}
+        {c.extra && <p className="callout-bullet">{c.extra}</p>}
         <ul className="callout-links">
           {c.links.map((l) => (
             <li key={l.href}>

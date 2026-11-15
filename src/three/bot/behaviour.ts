@@ -8,6 +8,7 @@ export type BotTask =
   | { kind: 'weld'; point: Vector3; heat: number }
   | { kind: 'carry'; point: Vector3 }
   | { kind: 'bolt'; point: Vector3; twist: number }
+  | { kind: 'look'; point: Vector3 }
   | { kind: 'thumbs' }
   | { kind: 'salute' };
 
@@ -157,7 +158,7 @@ export class BotBrain {
     let pitchT = 0;
     let dx = 0;
     let dy = 0;
-    const working = ctx.task.kind === 'weld' || ctx.task.kind === 'carry' || ctx.task.kind === 'bolt';
+    const working = ctx.task.kind === 'weld' || ctx.task.kind === 'carry' || ctx.task.kind === 'bolt' || ctx.task.kind === 'look';
     if (working && 'point' in ctx.task) {
       const d = ctx.task.point.clone().sub(this.pos);
       // Turn toward the work, but never so far that the face leaves the camera.

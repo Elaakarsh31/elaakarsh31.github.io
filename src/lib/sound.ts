@@ -1,18 +1,32 @@
-// Optional sound, synthesized with Web Audio: a soft click when a plate locks, a faint crackle
-// while the bot welds. Off by default; the choice is remembered per browser.
+// Sound, synthesized with Web Audio: a soft click when a plate locks, a faint crackle while the
+// bot welds. On by default (the toggle turns it off, and the choice is remembered per browser).
+// Browsers only allow audio after a click, tap or key press, so the audio engine starts on the
+// first one; scrolling alone does not count.
 const KEY = 'workshop-sound';
 
-let enabled = false;
+let enabled = true;
 let ctx: AudioContext | null = null;
 let master: GainNode | null = null;
 let crackleGain: GainNode | null = null;
 const listeners = new Set<(on: boolean) => void>();
 
 try {
-  enabled = localStorage.getItem(KEY) === 'on';
+  enabled = localStorage.getItem(KEY) !== 'off';
 } catch {
-  enabled = false;
+  enabled = true;
 }
+
+/** Start (or resume) audio inside the first user gesture, which Safari and Chrome both require. */
+const GESTURES = ['pointerdown', 'mousedown', 'touchend', 'keydown', 'click'] as const;
+function unlock() {
+  // No sound where nothing moves (reduced motion, no WebGL).
+  if (!enabled || document.documentElement.dataset.mode === 'static') return;
+  const c = ensure();
+  if (!c) return;
+  if (c.state !== 'running') void c.resume();
+  if (c.state === 'running') GESTURES.forEach((g) => window.removeEventListener(g, unlock, true));
+}
+GESTURES.forEach((g) => window.addEventListener(g, unlock, true));
 
 export const isSoundOn = () => enabled;
 
@@ -55,8 +69,10 @@ export function setSoundOn(on: boolean) {
   } catch {
     /* storage may be unavailable; the toggle still works for this visit */
   }
-  if (on) void ensure()?.resume();
-  else void ctx?.suspend();
+  if (on) {
+    const c = ensure();
+    if (c && c.state !== 'running') void c.resume();
+  } else void ctx?.suspend();
   listeners.forEach((l) => l(on));
 }
 

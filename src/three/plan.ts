@@ -153,6 +153,50 @@ export function planBot(p: number, m: MachineHandles, d: DataHandles, out: BotPl
 export const BOT_CONTACT = new Vector3(-2.0, 1.42, 3.35);
 export const BOT_BENCH = new Vector3(31.55, 0.62, 0.95);
 
+const SW_CENTER = new Vector3(0, 1.32, 0);
+
+/**
+ * In Projects, the bot acts out the sheet in view while the machine runs its show:
+ * SOP tightens the Gates plate, StoryWeaver sweeps around the front, EcoSurve follows the scan,
+ * GPT-2 welds a seam while the forward pass climbs the layers.
+ */
+export function planProject(project: string | null, t: number, m: MachineHandles, out: BotPlan): BotPlan | null {
+  if (!project) return null;
+  switch (project) {
+    case 'sop': {
+      boltPos(0, m, out.target);
+      m.plateBoltPoint(0, point);
+      out.task = { kind: 'bolt', point: point.clone(), twist: easeInOut((t * 0.55) % 1) };
+      out.tool = 'gripper';
+      return out;
+    }
+    case 'storyweaver': {
+      const a = Math.sin(t * 0.42) * 1.05;
+      out.target.set(Math.sin(a) * 1.3, SW_CENTER.y + Math.sin(t * 1.3) * 0.08, Math.cos(a) * 1.3);
+      out.task = { kind: 'look', point: SW_CENTER };
+      out.tool = 'gripper';
+      return out;
+    }
+    case 'ecosurve': {
+      const a = (50 * Math.PI) / 180;
+      const y = m.scanHeight();
+      out.target.set(Math.sin(a) * 1.12, y + 0.08, Math.cos(a) * 1.12);
+      out.task = { kind: 'look', point: point.set(0, y, 0).clone() };
+      out.tool = 'gripper';
+      return out;
+    }
+    case 'gpt2': {
+      const k = Math.floor(t / 2.6) % 3;
+      seamPos(k, 400, m, out.target);
+      m.seamPoint(k, 400, point);
+      out.task = { kind: 'weld', point: point.clone(), heat: 0.85 };
+      out.tool = 'welder';
+      return out;
+    }
+  }
+  return null;
+}
+
 /** After the build, the bot follows the visitor: beside the machine, over the bench, center stage at Contact. */
 export function planAfterBuild(section: string, out: BotPlan): BotPlan | null {
   if (section === 'toolbench') {

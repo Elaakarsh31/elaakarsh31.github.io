@@ -379,6 +379,32 @@ export function buildMachine() {
   });
 
   // Plate labels need a point that sits on the plate's face.
+  // Project shows (after the build): a Holo scan ring for EcoSurve's retrieval.
+  const scanMat = track(new MeshBasicMaterial({ color: C.holo.clone(), transparent: true, opacity: 0, blending: AdditiveBlending, depthWrite: false }));
+  const scanRing = new Mesh(track(new TorusGeometry(0.74, 0.006, 8, 180)), scanMat);
+  scanRing.rotation.x = Math.PI / 2;
+  const bandMat = track(new MeshBasicMaterial({ color: C.holo.clone(), transparent: true, opacity: 0, blending: AdditiveBlending, depthWrite: false, side: 2 }));
+  const scanBand = new Mesh(track(new CylinderGeometry(0.735, 0.735, 0.14, 96, 1, true)), bandMat);
+  const scan = new Group();
+  scan.add(scanRing, scanBand);
+  scan.visible = false;
+  root.add(scan);
+
+  // Points around the machine where a project's stack pops up in the HUD.
+  const popAnchors = [
+    [-20, 1.86],
+    [38, 1.6],
+    [72, 1.22],
+    [-16, 1.08],
+    [60, 0.74],
+    [14, 0.42],
+  ].map(([a, y]) => {
+    const o = new Object3D();
+    o.position.set(Math.sin(a * deg) * 1.02, y, Math.cos(a * deg) * 1.02);
+    root.add(o);
+    return o;
+  });
+
   const baseAnchor = new Object3D();
   baseAnchor.position.set(Math.sin(-30 * deg) * 0.9, 0.16, Math.cos(-30 * deg) * 0.9);
   root.add(baseAnchor);
@@ -388,12 +414,19 @@ export function buildMachine() {
     crown: crownAnchor,
     base: baseAnchor,
   };
+  popAnchors.forEach((o, i) => (anchors[`pop-${i}`] = o));
   layers.forEach((l, i) => (anchors[`layer-${i + 1}`] = l.anchor));
   plates.forEach((pl) => (anchors[`plate-${pl.spec.slug}`] = pl.anchor));
 
   // --- Interaction: hover a part to outline it, click to send a pulse up the seams ------------
   type Part = { kind: 'base' | 'layer' | 'crown' | 'plate'; index: number; anchor: string; label: string };
   let hover: Part | null = null;
+  // Project shows, eased in and out: one per spec sheet.
+  type Show = 'sop' | 'storyweaver' | 'ecosurve' | 'gpt2';
+  let show: Show | null = null;
+  const showK: Record<Show, number> = { sop: 0, storyweaver: 0, ecosurve: 0, gpt2: 0 };
+  let swSpinVel = 0;
+  let swSpin = 0;
   let pingAt = -10;
   let lastP = 0;
   let lastT = 0;
@@ -422,6 +455,10 @@ export function buildMachine() {
     hover = part;
   }
 
+  function setShow(id: string | null) {
+    show = id && id in showK ? (id as Show) : null;
+  }
+
   /** A pulse of light runs base → crown and the core gives one quick turn. */
   function ping() {
     pingAt = lastT;
@@ -434,6 +471,11 @@ export function buildMachine() {
   function update(p: number, t: number, dt: number, motion: boolean, highlight: { chips: string[]; plates: string[] } | null) {
     lastP = p;
     lastT = t;
+    const ease = 1 - Math.exp(-Math.min(dt, 0.05) * 3);
+    (Object.keys(showK) as Show[]).forEach((k) => (showK[k] += ((show === k ? 1 : 0) - showK[k]) * ease));
+    // StoryWeaver: the layers turn in alternating directions, like scenes generated in parallel.
+    swSpinVel += ((show === 'storyweaver' ? 0.9 : 0) - swSpinVel) * ease;
+    swSpin += swSpinVel * Math.min(dt, 0.05);
     const ex = explode(p);
     const bp = blueprint(p);
     // A click on the machine adds one smooth extra turn of the core.
@@ -468,7 +510,7 @@ export function buildMachine() {
 
     layers.forEach((L, i) => {
       L.group.position.y = layerY(i) + ex * layerLift(i);
-      L.group.rotation.y = spin + ex * (i % 2 ? 0.24 : -0.18);
+      L.group.rotation.y = spin + ex * (i % 2 ? 0.24 : -0.18) + (i % 2 ? 1 : -1) * swSpin;
       const fab = layerFab(i, p);
       L.fab.uFab.value = fab;
       L.fab.uPulse.value = 0;
@@ -483,13 +525,17 @@ export function buildMachine() {
       L.wire.material.opacity = fab >= 0.999 ? (hlModel ? 0.35 : hovered ? 0.6 : 0) : 0.5 * bp + (hovered ? 0.35 : 0);
       L.wire.visible = L.wire.material.opacity > 0.001;
       const heat = Math.max(seamHeat(i, p), 0);
+      // GPT-2: a forward pass climbs the layers, seam by seam.
+      const fwd = showK.gpt2 > 0.01 ? showK.gpt2 * Math.max(0, 1 - Math.abs(((t * 1.6) % 5) - i - 0.5) * 1.6) : 0;
       if (hovered && heat < 0.05) hoverHolo(L.seamM);
+      else if (fwd > 0.02) L.seamM.color.copy(C.holo).multiplyScalar(0.25 + fwd * 1.1);
       else seamColor(L.seamM, heat, pulseAt(layerY(i) + LAYER_H));
+      if (fwd > 0.02) L.seam.visible = true;
       L.seam.visible = fab > 0.98 || heat > 0;
     });
 
     filamentLines.rotation.y = spin;
-    filamentMat.uniforms.uOn.value = Math.max(motion ? filaments(p) : filaments(p) * 0.6, pingGlow * 0.8);
+    filamentMat.uniforms.uOn.value = Math.max(motion ? filaments(p) : filaments(p) * 0.6, pingGlow * 0.8, showK.gpt2 * 0.7);
     filamentMat.uniforms.uTime.value = motion ? t : 0;
     filamentLines.visible = filamentMat.uniforms.uOn.value > 0.001;
 
@@ -510,7 +556,8 @@ export function buildMachine() {
     else seamColor(crownSeamM, 0, pulseAt(CROWN_Y + 0.13));
     const pw = power(p);
     lamps.forEach((l, i) => {
-      const chase = isPowered && motion ? 0.55 + 0.45 * Math.max(0, Math.sin(t * 3 - i * 0.7)) : 1;
+      const chaseSpeed = 3 + showK.storyweaver * 6;
+      const chase = isPowered && motion ? 0.55 + 0.45 * Math.max(0, Math.sin(t * chaseSpeed - i * 0.7)) : 1;
       const on = Math.min(1, Math.max(0, pw * 9 - i)) * chase;
       l.mat.color.setRGB(0.07 + C.molten.r * on * 2.2, 0.075 + C.molten.g * on * 2.2, 0.085 + C.molten.b * on * 2.2);
     });
@@ -540,9 +587,25 @@ export function buildMachine() {
       // The lock click, and the power-on pulse running along the plate's seams.
       const pulse = st.locked ? pulseAt((pl.spec.y0 + pl.spec.y1) / 2) * 0.7 : 0;
       const plateHover = hover?.kind === 'plate' && hover.index === pl.k ? 0.55 : 0;
-      (pl.flash.material as ShaderMaterial).uniforms.uFlash.value = Math.max(st.flash, pulse, plateHover);
-      pl.flash.visible = st.flash > 0.001 || pulse > 0.01 || plateHover > 0;
+      // SOP: each plate lights in turn, like a gate check passing; Gates (k = 0) stays warm.
+      const step = (t * 1.4) % PLATES.length;
+      const check = showK.sop * (Math.max(0, 1 - Math.abs(step - pl.k - 0.5) * 1.8) * 0.9 + (pl.k === 0 ? 0.35 : 0));
+      // EcoSurve: the Retrieval plate glows while the scan runs.
+      const retrieval = pl.spec.name === 'Retrieval' ? showK.ecosurve * 0.6 : 0;
+      const lit = st.locked ? Math.max(check, retrieval) : 0;
+      (pl.flash.material as ShaderMaterial).uniforms.uFlash.value = Math.max(st.flash, pulse, plateHover, lit);
+      pl.flash.visible = st.flash > 0.001 || pulse > 0.01 || plateHover > 0 || lit > 0.01;
     });
+  }
+
+  /** EcoSurve's scan ring sweeps the machine; called at the end of update(). */
+  function updateScan(t: number) {
+    const k = showK.ecosurve;
+    scan.visible = k > 0.01;
+    if (!scan.visible) return;
+    scan.position.y = 0.32 + (Math.sin(t * 1.1) * 0.5 + 0.5) * 1.42;
+    scanMat.opacity = 0.85 * k;
+    bandMat.opacity = 0.12 * k;
   }
 
   /** Where the hero weld happens: on layer 0's fabrication line, front right. */
@@ -578,10 +641,15 @@ export function buildMachine() {
   return {
     root,
     anchors,
-    update,
+    update(...args: Parameters<typeof update>) {
+      update(...args);
+      updateScan(args[1]);
+    },
     pick,
     setHover,
+    setShow,
     ping,
+    scanHeight: () => scan.position.y,
     heroWeldPoint,
     seamPoint,
     plateBoltPoint,

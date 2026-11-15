@@ -384,6 +384,10 @@
 }
 
 .log-tag {
+  display: inline-block;
+  min-width: 82px;
+  text-align: center;
+  margin-right: 4px;
   font-family: var(--font-mono);
   font-size: 12px;
   padding: 1px 7px;
@@ -392,8 +396,44 @@
   color: var(--ice);
 }
 
-.log-tag[data-tag='Improved'] {
-  color: var(--holo);
+.log-tag[data-tag='Raised'] {
+  color: #ffb08f;
+  border-color: rgba(255, 91, 31, 0.45);
+}
+
+/* Job titles in the Career summary. */
+.role-hl {
+  font-weight: 650;
+  color: #fff;
+  background: linear-gradient(transparent 62%, rgba(255, 91, 31, 0.32) 62%, rgba(255, 91, 31, 0.32) 92%, transparent 92%);
+  padding: 0 2px;
+  white-space: nowrap;
+}
+
+/* Curated "More" highlights: short, scannable lines. */
+.log-more-list {
+  margin-top: 12px;
+  display: grid;
+  gap: 8px;
+  max-width: 40rem;
+  font-size: 14.5px;
+  color: var(--text);
+}
+
+.log-more-list li {
+  position: relative;
+  padding-left: 18px;
+}
+
+.log-more-list li::before {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 0.62em;
+  width: 7px;
+  height: 7px;
+  border-radius: 2px;
+  border: 1px solid var(--holo);
 }
 
 .log-entry .details {
@@ -1000,28 +1040,38 @@
   }
 }
 
-.hero-status {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 12px;
-  margin-top: 22px;
-  max-width: 34rem;
-  padding: 11px 16px 11px 14px;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 91, 31, 0.45);
-  background: linear-gradient(180deg, rgba(255, 91, 31, 0.12), rgba(255, 91, 31, 0.04));
-  box-shadow: 0 0 26px rgba(255, 91, 31, 0.12);
-  font-size: 16px;
-  line-height: 1.45;
-  color: var(--text);
+.hero-facts {
+  display: grid;
+  gap: 7px;
+  margin-top: 14px;
 }
 
-.hero-status .status-dot {
-  translate: 0 -1px;
+.hero-facts .hero-edu {
+  margin-top: 0;
 }
 
-.hero-status strong {
-  font-weight: 650;
+.hero-fact {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--ice);
+}
+
+.hero-fact svg {
+  flex: none;
+  color: var(--holo);
+  margin-left: -1px;
+}
+
+.hero-fact .status-dot {
+  width: 7px;
+  height: 7px;
+  margin: 0 2px 0 1px;
+}
+
+.hero-fact-hot {
   color: #fff;
 }
 
@@ -1057,23 +1107,6 @@
   height: 11px;
 }
 
-.availability-auth {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  padding: 6px 14px;
-  border-radius: 999px;
-  border: 1px solid rgba(111, 211, 255, 0.45);
-  background: rgba(111, 211, 255, 0.1);
-  font-family: var(--font-mono);
-  font-size: clamp(13px, 1.2vw, 15px);
-  color: var(--ice);
-}
-
-.availability-auth svg {
-  color: var(--holo);
-}
-
 @media (max-width: 767px) {
   .availability-card {
     padding: 18px 16px;
@@ -1081,8 +1114,5 @@
   .availability-main {
     align-items: baseline;
     text-align: left;
-  }
-  .availability-auth {
-    border-radius: 12px;
   }
 }

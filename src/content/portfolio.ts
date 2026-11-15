@@ -22,11 +22,6 @@ export type Links = {
 /** Where an expanded callout sends the reader. */
 export type CalloutLink = { href: string; label: string; external?: boolean };
 
-/** A resume bullet to quote inside an expanded callout. */
-export type BulletRef =
-  | { source: 'projects'; title: string; index: number }
-  | { source: 'publications'; title: string; index: number }
-  | { source: 'experience'; company: string; index: number };
 
 export type Callout = {
   id: string;
@@ -40,7 +35,8 @@ export type Callout = {
   slot: number;
   /** Shown when the panel is expanded. */
   detail: string;
-  bullet?: BulletRef;
+  /** One short supporting line from the .tex. */
+  extra?: string;
   links: CalloutLink[];
 };
 
@@ -84,7 +80,11 @@ export type Paper = {
   links: Links;
 };
 
-export type LogNote = { tag: 'Added' | 'Improved'; text: string };
+/** A release note: an action verb, then what was done. */
+export type LogNote = { tag: string; text: string };
+
+/** Summary text, with job titles marked to be highlighted. */
+export type RichText = (string | { role: string })[];
 
 export type LogEntry = {
   version: string;
@@ -100,8 +100,10 @@ export type LogEntry = {
   role?: string;
   org: string;
   notes: LogNote[];
-  /** When false, the "More" disclosure is left out. The bullets stay in the generated data. */
+  /** When false, the "More" disclosure is left out. */
   showDetails?: boolean;
+  /** A few short highlights from the .tex for the "More" disclosure. */
+  more?: string[];
 };
 
 export type ToolTag = { name: string; tray: Stage };
@@ -139,12 +141,21 @@ export const portfolio = {
       'A half-built machine in exploded view on a dark workbench. A small hovering robot welds a seam while the unbuilt parts hang as blue hologram wireframes.',
   },
 
-  about:
-    "I'm finishing an MS in Artificial Intelligence at Northeastern in Boston this December. Before that I built LLM evaluation pipelines as a data scientist at Fidelity, worked as an ML engineer at Zingroll, and did computer vision research at KIIT. I've published six papers, first author on each. Where I'm heading: training custom language models on data I refined myself, and building the systems that put them to work.",
+  about: [
+    "I'm finishing an MS in Artificial Intelligence at Northeastern in Boston this December. Before that I built LLM evaluation pipelines as a ",
+    { role: 'Data Scientist' },
+    ' at Fidelity, worked as an ',
+    { role: 'ML Engineer' },
+    ' at Zingroll, built data pipelines over seller-catalog data as a ',
+    { role: 'Software Engineer' },
+    ' at Hexbit, and did computer vision research as a ',
+    { role: 'Research Assistant' },
+    " at KIIT. I've published six papers, first author on each. Where I'm heading: training custom language models on data I refined myself, and building the systems that put them to work.",
+  ] satisfies RichText as RichText,
 
   contact,
   availability: 'Open to full-time roles from January 2027.',
-  /** Shown in the hero, at Contact and in Career v1.0. */
+  /** Shown once, in the hero, under the MS line. */
   workAuth: 'No visa sponsorship needed for 3 years on OPT.',
 
   bot: {
@@ -179,7 +190,7 @@ export const portfolio = {
           slot: 1,
           detail:
             'Pipelines over seller catalog and listing-update data raised the share of records published by the scheduled cutoff from 75% to 90%.',
-          bullet: { source: 'experience', company: 'Hexbit', index: 0 },
+          extra: 'Standardized seller-item identifiers and replayed missed updates to get there.',
           links: [{ href: '#career-v0-3', label: 'Career v0.3, Hexbit' }],
         },
         {
@@ -190,7 +201,7 @@ export const portfolio = {
           slot: 2,
           detail:
             'Collected unstructured social media data, tweets and posts, and fine-tuned Hugging Face models to generate dark-humor memes.',
-          bullet: { source: 'experience', company: 'Zingroll', index: 0 },
+          extra: 'A preprocessing pipeline for 1M+ noisy posts: deduplication, normalization, metadata.',
           links: [{ href: '#career-v0-4', label: 'Career v0.4, Zingroll' }],
         },
         {
@@ -224,7 +235,7 @@ export const portfolio = {
           slot: 4,
           detail:
             'A decoder-only Transformer written from scratch in PyTorch and trained on Tiny Shakespeare, with a hyperparameter grid search and ablations on context length and positional embeddings.',
-          bullet: { source: 'projects', title: 'GPT-2 Shakespeare Text Generator', index: 0 },
+          extra: '4 pre-LayerNorm decoder blocks with 4-head masked causal self-attention.',
           links: [{ href: '#project-gpt2', label: 'GPT-2 spec sheet' }],
         },
         {
@@ -244,7 +255,7 @@ export const portfolio = {
           at: 225,
           slot: 2,
           detail: 'SemEval-2024 Task 7: questions that depend on the numbers in a text.',
-          bullet: { source: 'projects', title: 'Numerical Reasoning with LLMs', index: 1 },
+          extra: 'An encoder-only BERT, an instruction-tuned Flan-T5 and a LoRA-tuned Llama, compared on the same tasks.',
           links: [{ href: links.numericCode, label: 'Code', external: true }],
         },
         {
@@ -416,10 +427,15 @@ export const portfolio = {
       resumeCompany: 'KIIT University',
       org: 'KIIT University, Bhubaneswar',
       notes: [
-        { tag: 'Added', text: 'Medical image segmentation research with Attention U-Net and GAN-based augmentation.' },
-        { tag: 'Added', text: 'Publications in IEEE OITS and Springer ICITA, 2023.' },
+        { tag: 'Researched', text: 'Medical image segmentation with Attention U-Net and GAN-based augmentation.' },
+        { tag: 'Published', text: 'Papers in IEEE OITS and Springer ICITA, 2023.' },
       ],
       showDetails: true,
+      more: [
+        'Attention U-Net for medical image segmentation, 97% F1.',
+        'Boundary F1 from 0.81 to 0.85 by pairing Dice with BCE loss.',
+        'Transformer models for biomedical text: disease prediction accuracy up 20%.',
+      ],
     },
     {
       version: 'v0.3',
@@ -429,10 +445,15 @@ export const portfolio = {
       resumeCompany: 'Hexbit',
       org: 'Hexbit, New Delhi',
       notes: [
-        { tag: 'Added', text: 'Pipelines over seller catalog and listing-update data.' },
-        { tag: 'Improved', text: 'Records published by the scheduled cutoff, from 75% to 90%.' },
+        { tag: 'Built', text: 'Data pipelines over seller catalog and listing-update data.' },
+        { tag: 'Raised', text: 'Records published by the scheduled cutoff from 75% to 90%.' },
       ],
       showDetails: true,
+      more: [
+        'Databricks ETL in Python and SQL over millions of seller-catalog records.',
+        'Schema and null checks before publishing: batch failures from 8% to 3%.',
+        'Incremental PySpark loads into Delta Lake: a catalog refresh from 50 to 20 minutes.',
+      ],
     },
     {
       version: 'v0.4',
@@ -441,10 +462,15 @@ export const portfolio = {
       resumeCompany: 'Zingroll',
       org: 'Zingroll, New Delhi',
       notes: [
-        { tag: 'Added', text: 'Collection of unstructured social media data, tweets and posts.' },
-        { tag: 'Added', text: 'Fine-tuned Hugging Face models to generate dark-humor memes.' },
+        { tag: 'Collected', text: 'Unstructured social media data: tweets and posts.' },
+        { tag: 'Fine-tuned', text: 'Hugging Face models to generate dark-humor memes.' },
       ],
       showDetails: true,
+      more: [
+        'Preprocessing for 1M+ noisy posts: deduplication, normalization, metadata.',
+        'Fine-tuned on Amazon SageMaker, with inference latency down 30%.',
+        'Airflow orchestration: setup per data refresh from 35 to 10 minutes.',
+      ],
     },
     {
       version: 'v0.5',
@@ -464,12 +490,12 @@ export const portfolio = {
       org: 'Fidelity Investments, Boston',
       notes: [
         {
-          tag: 'Added',
-          text: 'LLM document-validation pipeline on AWS (S3, Textract, Claude) for student-debt workitems.',
+          tag: 'Built',
+          text: 'An LLM document-validation pipeline on AWS (S3, Textract, Claude) for student-debt workitems.',
         },
         {
-          tag: 'Added',
-          text: 'An LLM-as-judge returns a verdict, confidence and reason per field, and low-confidence fields go to human review.',
+          tag: 'Routed',
+          text: 'Low-confidence fields to human review, using an LLM-as-judge that returns a verdict, confidence and reason per field.',
         },
       ],
       showDetails: false,
@@ -490,7 +516,7 @@ export const portfolio = {
       dates: 'From January 2027',
       role: '“Ships with your team.”',
       org: 'Open to full-time roles.',
-      notes: [{ tag: 'Added', text: 'No visa sponsorship needed for 3 years on OPT.' }],
+      notes: [],
     },
   ] satisfies LogEntry[] as LogEntry[],
 
