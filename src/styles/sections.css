@@ -202,7 +202,7 @@
   }
 }
 
-/* Log */
+/* Log: release notes with a commit graph */
 .log-about {
   margin-top: 20px;
   max-width: 44rem;
@@ -211,25 +211,129 @@
 }
 
 .log-list {
-  margin-top: 56px;
+  margin-top: 64px;
   display: grid;
+  --lane: rgba(185, 190, 199, 0.28);
 }
 
 .log-row {
   position: relative;
   display: grid;
-  grid-template-columns: 64px minmax(0, 1fr);
+  grid-template-columns: 72px minmax(0, 1fr);
 }
 
 .log-graph {
-  position: relative;
-  grid-row: 1;
-  grid-column: 1;
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 64px;
+}
+
+.lane {
+  position: absolute;
+  width: 2px;
+  background: var(--lane);
+}
+
+.lane-main {
+  left: 19px;
+  top: 0;
+  bottom: 0;
+}
+
+.log-graph[data-first] .lane-main {
+  top: 3px;
+}
+
+.log-graph[data-first] .lane-main::before {
+  content: '';
+  position: absolute;
+  left: -3px;
+  top: -3px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--lane);
+}
+
+.log-graph[data-last] .lane-main {
+  bottom: auto;
+  height: 14px;
+}
+
+.lane-branch {
+  left: 43px;
+  top: 0;
+  bottom: 0;
+  background: rgba(111, 211, 255, 0.35);
+}
+
+.log-graph[data-branch='fork'] .lane-branch {
+  top: 26px;
+}
+
+.log-graph[data-branch='merge'] .lane-branch {
+  display: none;
+}
+
+.curve {
+  position: absolute;
+  left: 0;
+  top: 0;
+  overflow: visible;
+}
+
+.curve path {
+  fill: none;
+  stroke: rgba(111, 211, 255, 0.45);
+  stroke-width: 2;
+}
+
+.node {
+  position: absolute;
+  left: 13px;
+  top: 8px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--graphite);
+  border: 2px solid rgba(207, 227, 242, 0.55);
+  transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
+}
+
+.log-graph[data-lane='1'] .node {
+  left: 37px;
+  top: 20px;
+  border-color: rgba(111, 211, 255, 0.7);
+}
+
+.log-graph[data-lane='merge'] .node {
+  left: 15px;
+  top: 21px;
+  width: 10px;
+  height: 10px;
+  border-width: 2px;
+  border-color: rgba(111, 211, 255, 0.55);
+}
+
+.node[data-kind='next'] {
+  border-style: dashed;
+}
+
+.log-entry[data-current] .node {
+  background: var(--molten);
+  border-color: #ff8a5c;
+  box-shadow: 0 0 0 5px rgba(255, 91, 31, 0.16), 0 0 18px rgba(255, 91, 31, 0.55);
 }
 
 .log-body {
   grid-column: 2;
-  padding: 4px 0 40px;
+  padding: 4px 0 44px;
+}
+
+.log-entry[data-lane='1'] .log-body {
+  padding-top: 14px;
 }
 
 .log-head {
@@ -243,6 +347,11 @@
 
 .log-version {
   color: var(--ice);
+  transition: color 0.3s;
+}
+
+.log-entry[data-current] .log-version {
+  color: #ff8a5c;
 }
 
 .log-branch {
@@ -269,6 +378,12 @@
   gap: 6px;
   font-size: 15px;
   max-width: 44rem;
+  color: var(--muted);
+  transition: color 0.3s;
+}
+
+.log-entry[data-current] .log-notes {
+  color: var(--text);
 }
 
 .log-tag {
@@ -288,16 +403,19 @@
   margin-top: 12px;
 }
 
-.log-merge {
-  grid-column: 1 / -1;
-}
-
 .log-merge-text {
   grid-column: 2;
-  padding: 0 0 32px;
+  padding: 16px 0 30px;
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: 12.5px;
   color: var(--muted);
+}
+
+.log-entry[data-kind='next'] .log-title {
+  font-family: var(--font-display);
+  font-stretch: 112%;
+  font-weight: 700;
+  font-size: 24px;
 }
 
 /* Resume band */
