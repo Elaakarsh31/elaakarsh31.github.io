@@ -4,6 +4,7 @@ import { portfolio, STAGES } from '../content/portfolio';
 import { resume } from '../content/resume';
 import { setBenchSorted } from '../lib/bench';
 import { useMode } from '../lib/env';
+import { DragIcon, Hint } from './Hint';
 
 /**
  * Engraved tool tags on a physics bench (live mode), sorted by magnets into Data, Model and
@@ -46,7 +47,11 @@ export function Toolbench() {
                 {sorted ? t.scatter : t.sort}
               </button>
             )}
-            {live && <p className="bench-hint">Drag a tag to throw it.</p>}
+            {live && (
+              <Hint icon={<DragIcon />} className="bench-hint">
+                Drag a tag to throw it.
+              </Hint>
+            )}
           </div>
           <div className="bench">
             <ul className="trays">

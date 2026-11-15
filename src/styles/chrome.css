@@ -383,21 +383,27 @@ kbd {
   opacity: 1;
 }
 
-/* Cursor (Cursor.tsx): a small dot, a neon Holo ring gliding after it with a faint spotlight,
-   and a disc that swells over text and links and flips the colours under it. Fine pointers only. */
+/* Cursor (Cursor.tsx): a smooth Figma-style pointer (dark, white-edged; Molten over anything
+   clickable), with a neon Holo ring gliding after it under a faint spotlight, and a disc that
+   swells a little over text and links and flips the colours under it. Fine pointers only. */
 html.has-cursor,
-html.has-cursor * {
-  cursor: none !important;
+html.has-cursor body,
+html.has-cursor .stage-drag {
+  cursor: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2226%22%20height%3D%2226%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cdefs%3E%3Cfilter%20id%3D%22s%22%20x%3D%22-30%25%22%20y%3D%22-30%25%22%20width%3D%22160%25%22%20height%3D%22160%25%22%3E%3CfeDropShadow%20dx%3D%220%22%20dy%3D%221%22%20stdDeviation%3D%220.9%22%20flood-color%3D%22%23000%22%20flood-opacity%3D%220.5%22%2F%3E%3C%2Ffilter%3E%3C%2Fdefs%3E%3Cpath%20filter%3D%22url%28%23s%29%22%20d%3D%22M3.7%202.9%2020.1%209.5c.9.4.8%201.6-.1%201.8l-6.7%201.7c-.3.1-.5.3-.6.6l-1.7%206.7c-.2.9-1.5%201-1.8.1L2.9%203.7c-.2-.6.3-1.1.8-.8Z%22%20fill%3D%22%23121418%22%20stroke%3D%22%23FFFFFF%22%20stroke-width%3D%221.5%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E") 4 3, auto;
+  cursor: image-set(url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2226%22%20height%3D%2226%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cdefs%3E%3Cfilter%20id%3D%22s%22%20x%3D%22-30%25%22%20y%3D%22-30%25%22%20width%3D%22160%25%22%20height%3D%22160%25%22%3E%3CfeDropShadow%20dx%3D%220%22%20dy%3D%221%22%20stdDeviation%3D%220.9%22%20flood-color%3D%22%23000%22%20flood-opacity%3D%220.5%22%2F%3E%3C%2Ffilter%3E%3C%2Fdefs%3E%3Cpath%20filter%3D%22url%28%23s%29%22%20d%3D%22M3.7%202.9%2020.1%209.5c.9.4.8%201.6-.1%201.8l-6.7%201.7c-.3.1-.5.3-.6.6l-1.7%206.7c-.2.9-1.5%201-1.8.1L2.9%203.7c-.2-.6.3-1.1.8-.8Z%22%20fill%3D%22%23121418%22%20stroke%3D%22%23FFFFFF%22%20stroke-width%3D%221.5%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E") 1x, url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2252%22%20height%3D%2252%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cdefs%3E%3Cfilter%20id%3D%22s%22%20x%3D%22-30%25%22%20y%3D%22-30%25%22%20width%3D%22160%25%22%20height%3D%22160%25%22%3E%3CfeDropShadow%20dx%3D%220%22%20dy%3D%221%22%20stdDeviation%3D%220.9%22%20flood-color%3D%22%23000%22%20flood-opacity%3D%220.5%22%2F%3E%3C%2Ffilter%3E%3C%2Fdefs%3E%3Cpath%20filter%3D%22url%28%23s%29%22%20d%3D%22M3.7%202.9%2020.1%209.5c.9.4.8%201.6-.1%201.8l-6.7%201.7c-.3.1-.5.3-.6.6l-1.7%206.7c-.2.9-1.5%201-1.8.1L2.9%203.7c-.2-.6.3-1.1.8-.8Z%22%20fill%3D%22%23121418%22%20stroke%3D%22%23FFFFFF%22%20stroke-width%3D%221.5%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E") 2x) 4 3, auto;
 }
 
-html.has-cursor :is(input, textarea),
-html.has-cursor dialog[open],
-html.has-cursor dialog[open] * {
-  cursor: auto !important;
+html.has-cursor :is(a[href], button, summary, label, [role='option'], .callout-face, .sch-part),
+html.has-cursor[data-bot-hover] body,
+html.has-cursor[data-machine-hover] body,
+html.has-cursor[data-grab] body,
+html.has-cursor[data-grabbing] body {
+  cursor: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2226%22%20height%3D%2226%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cdefs%3E%3Cfilter%20id%3D%22s%22%20x%3D%22-30%25%22%20y%3D%22-30%25%22%20width%3D%22160%25%22%20height%3D%22160%25%22%3E%3CfeDropShadow%20dx%3D%220%22%20dy%3D%221%22%20stdDeviation%3D%220.9%22%20flood-color%3D%22%23000%22%20flood-opacity%3D%220.5%22%2F%3E%3C%2Ffilter%3E%3C%2Fdefs%3E%3Cpath%20filter%3D%22url%28%23s%29%22%20d%3D%22M3.7%202.9%2020.1%209.5c.9.4.8%201.6-.1%201.8l-6.7%201.7c-.3.1-.5.3-.6.6l-1.7%206.7c-.2.9-1.5%201-1.8.1L2.9%203.7c-.2-.6.3-1.1.8-.8Z%22%20fill%3D%22%23FF5B1F%22%20stroke%3D%22%23FFFFFF%22%20stroke-width%3D%221.5%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E") 4 3, pointer;
+  cursor: image-set(url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2226%22%20height%3D%2226%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cdefs%3E%3Cfilter%20id%3D%22s%22%20x%3D%22-30%25%22%20y%3D%22-30%25%22%20width%3D%22160%25%22%20height%3D%22160%25%22%3E%3CfeDropShadow%20dx%3D%220%22%20dy%3D%221%22%20stdDeviation%3D%220.9%22%20flood-color%3D%22%23000%22%20flood-opacity%3D%220.5%22%2F%3E%3C%2Ffilter%3E%3C%2Fdefs%3E%3Cpath%20filter%3D%22url%28%23s%29%22%20d%3D%22M3.7%202.9%2020.1%209.5c.9.4.8%201.6-.1%201.8l-6.7%201.7c-.3.1-.5.3-.6.6l-1.7%206.7c-.2.9-1.5%201-1.8.1L2.9%203.7c-.2-.6.3-1.1.8-.8Z%22%20fill%3D%22%23FF5B1F%22%20stroke%3D%22%23FFFFFF%22%20stroke-width%3D%221.5%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E") 1x, url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2252%22%20height%3D%2252%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cdefs%3E%3Cfilter%20id%3D%22s%22%20x%3D%22-30%25%22%20y%3D%22-30%25%22%20width%3D%22160%25%22%20height%3D%22160%25%22%3E%3CfeDropShadow%20dx%3D%220%22%20dy%3D%221%22%20stdDeviation%3D%220.9%22%20flood-color%3D%22%23000%22%20flood-opacity%3D%220.5%22%2F%3E%3C%2Ffilter%3E%3C%2Fdefs%3E%3Cpath%20filter%3D%22url%28%23s%29%22%20d%3D%22M3.7%202.9%2020.1%209.5c.9.4.8%201.6-.1%201.8l-6.7%201.7c-.3.1-.5.3-.6.6l-1.7%206.7c-.2.9-1.5%201-1.8.1L2.9%203.7c-.2-.6.3-1.1.8-.8Z%22%20fill%3D%22%23FF5B1F%22%20stroke%3D%22%23FFFFFF%22%20stroke-width%3D%221.5%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E") 2x) 4 3, pointer;
 }
 
-html.has-cursor dialog[open] :is([role='option'], button) {
-  cursor: pointer !important;
+html.has-cursor :is(input, textarea) {
+  cursor: text;
 }
 
 .cur {
@@ -412,18 +418,9 @@ html.has-cursor dialog[open] :is([role='option'], button) {
   will-change: transform;
 }
 
-html[data-cursor-on] .cur-dot,
 html[data-cursor-on] .cur-ring,
 html[data-cursor-on] .cur-spot {
   opacity: 1;
-}
-
-.cur-dot {
-  width: 6px;
-  height: 6px;
-  margin: -3px 0 0 -3px;
-  background: #fff;
-  mix-blend-mode: difference;
 }
 
 /* The disc that recolours what it covers: Holo over the dark page, deep ember inside white text. */

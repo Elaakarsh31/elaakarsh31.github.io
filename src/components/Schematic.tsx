@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, type ReactNode } from 'react';
+import { Hint, PointerIcon } from './Hint';
 
 // Exploded mini-diagrams for the spec sheets, drawn in code like a technical drawing. Every label
 // and caption comes from the project's own summary, key result or resume entry.
@@ -303,10 +304,16 @@ export function Schematic({ id }: { id: string }) {
           <rect width={W} height={H} fill="url(#sch-grid)" />
           <Body />
         </svg>
-        <p className="sch-caption" aria-hidden="true" data-on={active ? '' : undefined}>
-          <span className="sch-caption-mark" />
-          {active?.caption ?? HINT}
-        </p>
+        <div className="sch-caption" aria-hidden="true">
+          {active ? (
+            <p className="sch-explain">
+              <span className="sch-explain-mark" />
+              {active.caption}
+            </p>
+          ) : (
+            <Hint icon={<PointerIcon />}>{HINT}</Hint>
+          )}
+        </div>
       </div>
     </Ctx.Provider>
   );
