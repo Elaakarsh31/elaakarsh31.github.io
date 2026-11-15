@@ -119,7 +119,7 @@ export class BotBrain {
     }
 
     // Position: critically damped follow, a gentle bob, lean into the motion.
-    if (!Number.isFinite(this.pos.x) || ctx.capture) {
+    if (!Number.isFinite(this.pos.x) || ctx.capture || this.pos.distanceTo(ctx.target) > 6) {
       this.pos.copy(ctx.target);
       this.vel.set(0, 0, 0);
     } else {

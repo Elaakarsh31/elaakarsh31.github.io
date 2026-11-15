@@ -8,7 +8,9 @@ import { BotBrain } from './bot/behaviour';
 import { buildBot } from './bot/buildBot';
 import { buildData } from './data/buildData';
 import { buildMachine } from './machine/buildMachine';
-import { newPlan, planBot } from './plan';
+import { newPlan, planAfterBuild, planBot } from './plan';
+import { currentSection } from '../lib/spy';
+import { BUILD_LENGTH } from '../lib/stage';
 import { createSparks } from './sparks';
 
 const v = new Vector3();
@@ -50,6 +52,18 @@ export function Workshop({ motion, capture }: { motion: boolean; capture: boolea
     };
   }, [machine, bot, sparks, data]);
 
+  // At Contact the bot comes to centre stage and salutes, once each time the section is entered.
+  useEffect(() => {
+    let last = '';
+    const on = () => {
+      const s = currentSection();
+      if (s === 'contact' && last !== 'contact') window.setTimeout(() => brain.salute(clock.elapsedTime), 700);
+      last = s;
+    };
+    window.addEventListener('section', on);
+    return () => window.removeEventListener('section', on);
+  }, [brain, clock]);
+
   useEffect(() => {
     const onPoke = () => brain.poke(clock.elapsedTime);
     window.addEventListener('bot:poke', onPoke);
@@ -75,6 +89,7 @@ export function Workshop({ motion, capture }: { motion: boolean; capture: boolea
     }
 
     planBot(p, machine, data, plan);
+    if (p >= BUILD_LENGTH - 0.5) planAfterBuild(currentSection(), plan);
     v.copy(bot.root.position).project(camera);
     const screenX = (v.x * 0.5 + 0.5) * size.width;
     const screenY = (-v.y * 0.5 + 0.5) * size.height;

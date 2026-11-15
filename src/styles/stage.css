@@ -306,3 +306,123 @@ html[data-mode='live'] .projects > .more-github,
 html[data-mode='live'] .projects > .papers {
   width: min(880px, 62vw);
 }
+
+/* Toolbench: the bench stays in view while you scroll far enough to sort it. */
+html[data-mode='live'] .toolbench {
+  max-width: none;
+  margin: 0;
+  padding: 0 0 40px;
+}
+
+html[data-mode='live'] .bench-wrap {
+  height: 175vh;
+}
+
+html[data-mode='live'] .bench-stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  pointer-events: none;
+}
+
+html[data-mode='live'] .bench-head {
+  position: absolute;
+  left: var(--copy-left);
+  top: calc(var(--nav-h) + 36px);
+  width: min(30vw, 440px);
+  pointer-events: auto;
+}
+
+html[data-mode='live'] .bench-sort {
+  margin-top: 20px;
+}
+
+.bench-hint {
+  display: none;
+}
+
+html[data-mode='live'] .bench-hint {
+  display: block;
+  margin-top: 10px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* In live mode the trays are drawn in 3D: the DOM keeps the tag list for reading, and the tray
+   titles become labels pinned under each tray. */
+html[data-mode='live'] .bench {
+  margin: 0;
+}
+
+html[data-mode='live'] .trays {
+  display: block;
+}
+
+html[data-mode='live'] .tray {
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+html[data-mode='live'] .tray .tags {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+html[data-mode='live'] .tray-title {
+  position: fixed;
+  left: 0;
+  top: 0;
+  transform: translate3d(var(--hx, -999px), var(--hy, -999px), 0);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+html[data-mode='live'][data-section='toolbench'] .tray-title[data-hud-visible='1'] {
+  opacity: 1;
+}
+
+html[data-mode='live'] .tray-title span {
+  position: absolute;
+  left: 0;
+  top: 8px;
+  transform: translateX(-50%);
+  padding: 3px 9px;
+  border-radius: 5px;
+  border: 1px solid rgba(111, 211, 255, 0.45);
+  background: rgba(10, 16, 22, 0.75);
+  white-space: nowrap;
+}
+
+html[data-mode='live'] .all-skills {
+  margin: 0 auto;
+  max-width: var(--maxw);
+  padding: 0 var(--gutter);
+}
+
+html[data-grab] .cursor-ring,
+html[data-grabbing] .cursor-ring {
+  border-color: var(--holo);
+  scale: 1.35;
+}
+
+html[data-grabbing] .cursor-ring {
+  border-color: var(--molten);
+  scale: 0.8;
+}
+
+/* Contact: the bot salutes from centre stage, above the copy. */
+html[data-mode='live'] .contact {
+  min-height: 100vh;
+  align-content: end;
+  padding-bottom: 14vh;
+}
+
+html[data-grabbing],
+html[data-grabbing] * {
+  user-select: none;
+}

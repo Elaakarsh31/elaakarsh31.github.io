@@ -13,6 +13,8 @@ export const SHOTS: Record<string, Shot> = {
   model: { pos: [0.95, 1.9, 6.7], target: [0.12, 1.1, 0], shift: 0.15 },
   system: { pos: [0.75, 1.75, 7.4], target: [0.1, 1.06, 0], shift: 0.15 },
   projects: { pos: [0.1, 1.7, 9.6], target: [0.08, 1.08, 0], shift: 0.31 },
+  toolbench: { pos: [30, 3.15, 3.55], target: [30, 0, 0.12], shift: 0.06, lift: 0.07 },
+  contact: { pos: [-2.0, 1.62, 5.8], target: [-2.0, 1.4, 3.35], shift: 0, lift: -0.2 },
   heroPhone: { pos: [0.2, 1.55, 7.4], target: [0.15, 0.95, 0], shift: 0, lift: 0.17, fov: 34 },
 };
 

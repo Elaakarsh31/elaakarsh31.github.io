@@ -150,4 +150,24 @@ export function planBot(p: number, m: MachineHandles, d: DataHandles, out: BotPl
   return out;
 }
 
+export const BOT_CONTACT = new Vector3(-2.0, 1.42, 3.35);
+export const BOT_BENCH = new Vector3(31.55, 0.62, 0.95);
+
+/** After the build, the bot follows the visitor: beside the machine, over the bench, center stage at Contact. */
+export function planAfterBuild(section: string, out: BotPlan): BotPlan | null {
+  if (section === 'toolbench') {
+    out.target.copy(BOT_BENCH);
+    out.task = { kind: 'idle' };
+    out.tool = 'gripper';
+    return out;
+  }
+  if (section === 'contact') {
+    out.target.copy(BOT_CONTACT);
+    out.task = { kind: 'idle' };
+    out.tool = 'gripper';
+    return out;
+  }
+  return null;
+}
+
 export const newPlan = (): BotPlan => ({ target: new Vector3(), task: { kind: 'idle' }, tool: 'welder' });

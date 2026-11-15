@@ -1,7 +1,7 @@
 import { Canvas, useThree } from '@react-three/fiber';
 import { Bloom, EffectComposer, ToneMapping } from '@react-three/postprocessing';
 import { ToneMappingMode } from 'postprocessing';
-import { useEffect, useMemo } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import { markContextLost, type Mode } from '../lib/env';
 import { currentSection } from '../lib/spy';
 import { BUILD_LENGTH, stage } from '../lib/stage';
@@ -14,6 +14,31 @@ import { HudSync } from './HudSync';
 import { startInput } from './input';
 import { Studio } from './Studio';
 import { Workshop } from './Workshop';
+
+const Bench = lazy(() => import('./toolbench/Bench'));
+
+/** Mounts the physics bench once the visitor is near it, and runs it only while it is on screen. */
+function BenchLoader() {
+  const [mounted, setMounted] = useState(false);
+  const [active, setActive] = useState(false);
+  useEffect(() => {
+    const near = new Set(['log', 'resume', 'toolbench', 'contact']);
+    const on = () => {
+      const s = currentSection();
+      if (near.has(s)) setMounted(true);
+      setActive(s === 'toolbench');
+    };
+    on();
+    window.addEventListener('section', on);
+    return () => window.removeEventListener('section', on);
+  }, []);
+  if (!mounted) return null;
+  return (
+    <Suspense fallback={null}>
+      <Bench active={active} />
+    </Suspense>
+  );
+}
 
 /** Sections where the scene is faded out, so rendering pauses. */
 const NO_SCENE = new Set(['log', 'resume']);
@@ -123,6 +148,7 @@ export default function WorkshopCanvas({ mode }: { mode: Mode }) {
         <Lifecycle />
         <Studio reflect={!phone} shadows={!phone} />
         <Workshop motion={motion} capture={isCapture} />
+        {!phone && !isCapture && <BenchLoader />}
         <CameraRig resolve={resolve} immediate={isCapture} />
         <HudSync />
         {!noPost && (
