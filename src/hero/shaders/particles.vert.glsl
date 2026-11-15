@@ -8,6 +8,13 @@ uniform float uScale;      // drawing-buffer height / (2 * tan(fov / 2))
 uniform vec3 uLightDir;    // key light, view space
 uniform float uOccScale;   // occluder pass: sprite size multiplier
 
+// Cursor turbulence: a short trail of recent pointer samples.
+#define TRAIL 8
+uniform vec4 uTrail[TRAIL]; // xy: pointer in aspect-corrected NDC, z: timestamp, w: strength
+uniform float uAspect;
+uniform float uRadius;      // influence radius in the same space (screen height = 2)
+uniform float uPush;        // displacement scale
+
 attribute vec3 aDispersed;
 attribute float aSeed;
 attribute float aLum;
@@ -32,6 +39,28 @@ void main() {
   );
 
   vec4 mv = modelViewMatrix * vec4(p, 1.0);
+
+  // Compare particle and pointer in the same aspect-corrected screen space, then push the
+  // particle radially and swirl it tangentially; each trail sample fades over ~1.5 s.
+  vec4 clip = projectionMatrix * mv;
+  vec2 sp = clip.xy / clip.w;
+  sp.x *= uAspect;
+  vec2 push = vec2(0.0);
+  for (int i = 0; i < TRAIL; i++) {
+    vec4 tr = uTrail[i];
+    float age = uTime - tr.z;
+    if (age < 0.0 || age > 2.0) continue;
+    vec2 d = sp - tr.xy;
+    float dist = length(d);
+    float r = smoothstep(uRadius, 0.0, dist);
+    float k = exp(-age * 3.0) * r * r * tr.w * (0.45 + aSeed);
+    vec2 dir = d / max(dist, 1e-4);
+    push += (dir * 0.65 + vec2(-dir.y, dir.x) * 0.5) * k;
+  }
+  // Screen offset back to view space at this depth.
+  mv.xy += push * uPush * (-mv.z) / projectionMatrix[1][1];
+  mv.z += length(push) * uPush * 0.6 * (aSeed - 0.5);
+
   vec3 n = normalize(normalMatrix * normal);
   vec3 v = normalize(-mv.xyz);
   float facing = dot(n, v);

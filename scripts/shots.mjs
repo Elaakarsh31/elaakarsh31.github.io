@@ -109,7 +109,7 @@ function want(name) {
 // ---------------------------------------------------------------------------
 
 async function captureSize(browser, size, viewport, hasTouch) {
-  if (!['p0', 'p05', 'p1', 'work', 'reverse-p0'].some((t) => want(`${size}-${t}`))) return;
+  if (!['p0', 'p05', 'p1', 'work', 'reverse-p0', 'pointer'].some((t) => want(`${size}-${t}`))) return;
   const page = await openPage(browser, size, { viewport, hasTouch });
   for (const [p, tag] of [
     [0, 'p0'],
@@ -122,6 +122,21 @@ async function captureSize(browser, size, viewport, hasTouch) {
   await page.evaluate(() => document.getElementById('work').scrollIntoView({ behavior: 'instant' }));
   await page.waitForTimeout(400);
   await shot(page, `${size}-work`);
+  if (!hasTouch && (want(`${size}-pointer`))) {
+    // Sweep the pointer across the face, capture the disturbance, then confirm it settles.
+    await scrollToProgress(page, 0);
+    const { width, height } = viewport;
+    await page.mouse.move(width * 0.36, height * 0.3);
+    for (let k = 0; k <= 24; k++) {
+      await page.mouse.move(width * (0.36 + 0.22 * (k / 24)), height * (0.3 + 0.18 * Math.sin(k / 4)));
+      await page.waitForTimeout(16);
+    }
+    await page.waitForTimeout(120);
+    await shot(page, `${size}-pointer`);
+    await page.mouse.move(width * 0.95, height * 0.95);
+    await page.waitForTimeout(2200);
+    await shot(page, `${size}-pointer-settled`);
+  }
   // Reverse scroll: the bust must reassemble.
   await scrollToProgress(page, 0.5);
   await scrollToProgress(page, 0);

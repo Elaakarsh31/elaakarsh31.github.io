@@ -21,6 +21,7 @@ export type SceneOptions = {
 export type SceneHandle = { dispose: () => void };
 
 const FOV = 26;
+const TRAIL = 8;
 
 function dispersedTargets(cloud: PointCloud) {
   const rng = createRng(HERO.seed ^ 0x9e3779b9);
@@ -83,6 +84,10 @@ export function createScene(opts: SceneOptions): SceneHandle {
     uScale: { value: 1 },
     uOpacity: { value: 1 },
     uLightDir: { value: new THREE.Vector3(-0.5, 0.45, 0.74).normalize() },
+    uTrail: { value: Array.from({ length: TRAIL }, () => new THREE.Vector4(0, 0, -100, 0)) },
+    uAspect: { value: 1 },
+    uRadius: { value: 0.26 },
+    uPush: { value: 0.05 },
   };
   const material = new THREE.ShaderMaterial({
     vertexShader,
@@ -119,6 +124,7 @@ export function createScene(opts: SceneOptions): SceneHandle {
   function frame(width: number, height: number) {
     const aspect = width / height;
     camera.aspect = aspect;
+    uniforms.uAspect.value = aspect;
     const tanHalf = Math.tan(THREE.MathUtils.degToRad(FOV / 2));
     const byHeight = (bustH * 0.98) / 2 / tanHalf;
     const byWidth = 1.75 / 2 / (tanHalf * aspect); // head plus a little shoulder
@@ -171,6 +177,42 @@ export function createScene(opts: SceneOptions): SceneHandle {
   let progress = readProgress();
 
   const clock = new THREE.Clock();
+
+  // Pointer: a ring buffer of recent samples for turbulence, plus a damped gaze offset.
+  // Mouse only; touch keeps native scrolling and skips the effect.
+  const pointer = { x: 0, y: 0, active: false };
+  const gaze = { x: 0, y: 0 };
+  let trailHead = 0;
+  let lastSample = { x: 0, y: 0, t: -1 };
+  function onPointerMove(e: PointerEvent) {
+    if (e.pointerType !== 'mouse') return;
+    const rect = canvas.getBoundingClientRect();
+    if (e.clientY < rect.top || e.clientY > rect.bottom || !rect.width) {
+      pointer.active = false;
+      return;
+    }
+    const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    const ny = 1 - ((e.clientY - rect.top) / rect.height) * 2;
+    pointer.x = nx;
+    pointer.y = ny;
+    pointer.active = true;
+    const x = nx * (rect.width / rect.height);
+    const t = clock.getElapsedTime();
+    const moved = Math.hypot(x - lastSample.x, ny - lastSample.y);
+    if (lastSample.t < 0 || moved > 0.03 || t - lastSample.t > 0.08) {
+      const dt = Math.max(1 / 120, t - lastSample.t);
+      const speed = lastSample.t < 0 ? 0.3 : Math.min(1, moved / dt / 2.5);
+      uniforms.uTrail.value[trailHead].set(x, ny, t, 0.3 + 0.7 * speed);
+      trailHead = (trailHead + 1) % TRAIL;
+      lastSample = { x, y: ny, t };
+    }
+  }
+  function onPointerOut(e: PointerEvent) {
+    if (!e.relatedTarget) pointer.active = false;
+  }
+  window.addEventListener('pointermove', onPointerMove, { passive: true });
+  document.addEventListener('pointerout', onPointerOut, { passive: true });
+
   let last = 0;
   let raf = 0;
   let readySent = false;
@@ -188,8 +230,12 @@ export function createScene(opts: SceneOptions): SceneHandle {
     uniforms.uProgress.value = progress;
     // A gentle turn toward the viewer, then away as it dissolves.
     const turn = Math.sin(Math.min(progress / 0.7, 1) * Math.PI * 0.5);
-    points.rotation.y = HERO.baseYaw + turn * 0.75;
-    points.rotation.x = progress * 0.08;
+    // Damped gaze toward the pointer: a few degrees at most.
+    const damp = 1 - Math.exp(-dt * 2.5);
+    gaze.x += ((pointer.active ? pointer.x : 0) - gaze.x) * damp;
+    gaze.y += ((pointer.active ? pointer.y : 0) - gaze.y) * damp;
+    points.rotation.y = HERO.baseYaw + turn * 0.75 + gaze.x * 0.07;
+    points.rotation.x = progress * 0.08 - gaze.y * 0.045;
     renderer.clear();
     points.material = occluder;
     renderer.render(scene, camera);
@@ -207,6 +253,8 @@ export function createScene(opts: SceneOptions): SceneHandle {
       disposed = true;
       cancelAnimationFrame(raf);
       ro.disconnect();
+      window.removeEventListener('pointermove', onPointerMove);
+      document.removeEventListener('pointerout', onPointerOut);
       geometry.dispose();
       material.dispose();
       occluder.dispose();
