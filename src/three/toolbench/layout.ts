@@ -1,7 +1,8 @@
 import type { Stage } from '../../content/portfolio';
 
-// The toolbench lives in its own corner of the scene, far from the machine.
-export const BENCH = { x: 30, z: 0 };
+// The toolbench sits to the right of the machine, out of every build framing and clear of the
+// Contact framing between them, so the camera and the bot glide there from Career.
+export const BENCH = { x: 9.6, z: 0.3 };
 export const TRAY = { w: 1.12, d: 0.86, gap: 0.18, wall: 0.035, h: 0.07 };
 export const TRAY_ORDER: Stage[] = ['data', 'model', 'system'];
 

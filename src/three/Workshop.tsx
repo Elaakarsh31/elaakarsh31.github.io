@@ -8,7 +8,8 @@ import { BotBrain } from './bot/behaviour';
 import { buildBot } from './bot/buildBot';
 import { buildData } from './data/buildData';
 import { buildMachine } from './machine/buildMachine';
-import { newPlan, planAfterBuild, planBot, planProject } from './plan';
+import { blendAt } from './afterBuild';
+import { newPlan, planBot, planSpot } from './plan';
 import { currentSection } from '../lib/spy';
 import { BUILD_LENGTH } from '../lib/stage';
 import { createSparks } from './sparks';
@@ -20,11 +21,9 @@ const camRight = new Vector3();
 const camUp = new Vector3();
 const local = new Vector3();
 
-/** The scene is faded out (Career, the resume band, a cut, or below the hero on phones). */
+/** The scene is off screen (below the hero on phones, where the acts use still frames). */
 function sceneHidden() {
-  const s = currentSection();
-  const html = document.documentElement;
-  return (html.dataset.mode === 'phone' && s !== 'top') || !!document.querySelector('.webgl[data-cut]');
+  return document.documentElement.dataset.mode === 'phone' && currentSection() !== 'top';
 }
 
 /** Shows the hovered machine part's name in the HUD and lights its plate label. */
@@ -51,7 +50,7 @@ function showPart(part: { anchor: string; label: string; kind: string } | null) 
   }
 }
 /** The bot's size relative to the machine: palm-sized, big enough to read its face. */
-export const BOT_SCALE = 1.35;
+export const BOT_SCALE = 1.3;
 
 /** The machine, the bot and the sparks, driven every frame from the build timeline. */
 export function Workshop({ motion, sparks: sparksOn, capture }: { motion: boolean; sparks: boolean; capture: boolean }) {
@@ -76,6 +75,7 @@ export function Workshop({ motion, sparks: sparksOn, capture }: { motion: boolea
   }, []);
   const hoverPart = useRef<string>('');
   const plan = useMemo(newPlan, []);
+  const planB = useMemo(newPlan, []);
   const turntable = useRef<Group>(null);
   const camera = useThree((s) => s.camera);
   const size = useThree((s) => s.size);
@@ -85,8 +85,7 @@ export function Workshop({ motion, sparks: sparksOn, capture }: { motion: boolea
   useEffect(() => {
     const all = { ...machine.anchors, ...data.anchors };
     for (const [name, obj] of Object.entries(all)) registerAnchor(name, obj);
-    const head = bot.body.children[0];
-    registerAnchor('bot', head);
+    registerAnchor('bot', bot.anchor);
     setBotPresent(true);
     return () => {
       for (const name of Object.keys(all)) registerAnchor(name, null);
@@ -130,7 +129,7 @@ export function Workshop({ motion, sparks: sparksOn, capture }: { motion: boolea
     };
   }, [brain, clock]);
 
-  // At Contact the bot comes to centre stage and salutes, once each time the section is entered.
+  // At Contact the bot salutes once each time the section is entered, then strikes its pose.
   useEffect(() => {
     let last = '';
     const on = () => {
@@ -173,18 +172,29 @@ export function Workshop({ motion, sparks: sparksOn, capture }: { motion: boolea
       tt.rotation.x += (stage.orbit.pitch - tt.rotation.x) * k;
     }
 
-    planBot(p, machine, data, plan);
     let project: string | null = null;
     if (p >= BUILD_LENGTH - 0.5) {
+      // After the build the bot moves with the scroll between its spots, like the camera, and
+      // takes up the task of whichever spot it is closer to.
       const section = currentSection();
       project = section === 'projects' || section === 'publications' ? stage.project : null;
-      if (!planProject(project, t, machine, plan)) planAfterBuild(section, plan);
-    }
+      const { a, b, k } = blendAt(window.scrollY);
+      planSpot(a, project, t, machine, data, plan);
+      if (b !== a && k > 0) {
+        planSpot(b, project, t, machine, data, planB);
+        plan.target.lerp(planB.target, k);
+        if (k >= 0.5) {
+          plan.task = planB.task;
+          plan.tool = planB.tool;
+        }
+      }
+    } else planBot(p, machine, data, plan);
     machine.setShow(motion ? project : null);
     v.copy(bot.root.position).project(camera);
     const screenX = (v.x * 0.5 + 0.5) * size.width;
     const screenY = (-v.y * 0.5 + 0.5) * size.height;
     const hover = !!document.documentElement.dataset.botHover;
+    const viewPitch = Math.atan2(camera.position.y - bot.root.position.y, Math.hypot(camera.position.x - bot.root.position.x, camera.position.z - bot.root.position.z));
     // Curious: when the pointer comes near and the bot is free, it drifts a little toward it.
     if (motion && input.hasPointer && plan.task.kind === 'idle') {
       const dx = input.x - screenX;
@@ -198,7 +208,7 @@ export function Workshop({ motion, sparks: sparksOn, capture }: { motion: boolea
         plan.target.addScaledVector(camUp, Math.max(-0.1, Math.min(0.1, -dy * k)));
       }
     }
-    const tr = brain.update(dt, t, { ...plan, screenX, screenY, motion, capture, hover }, (world, out) =>
+    const tr = brain.update(dt, t, { ...plan, screenX, screenY, motion, capture, hover, viewPitch }, (world, out) =>
       bot.body.worldToLocal(out.copy(world)),
     );
     bot.root.position.set(tr.x, tr.y, tr.z);

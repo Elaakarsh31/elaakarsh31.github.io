@@ -11,6 +11,9 @@ import {
   ConeGeometry,
   CylinderGeometry,
   Group,
+  LatheGeometry,
+  TorusGeometry,
+  Vector2,
   Mesh,
   MeshBasicMaterial,
   MeshPhysicalMaterial,
@@ -25,15 +28,24 @@ import { C } from '../palette';
 import { createFace, roundedMask, type EyeState } from './face';
 import { solveTwoBone } from './ik';
 
-// Half extents and exponent of the body's superellipsoid: a squat, rounded pebble, wider than tall.
-export const BODY = { a: 0.165, b: 0.112, c: 0.13, n: 3.4 };
+// The bot: a wide visor head on a short neck over a barrel torso. Body-local origin is the
+// torso's centre; the head turns, tilts and nods on its own around the top of the neck.
+export const HEAD = { a: 0.172, b: 0.104, c: 0.124, n: 4.2 };
+export const LAYOUT = {
+  /** Where the neck meets the head: the head's pivot. */
+  neckTop: 0.1,
+  /** Head centre above the neck pivot. */
+  headUp: 0.098,
+  shoulderX: 0.14,
+  shoulderY: 0.03,
+};
 
 /** Unit sphere pushed onto |x/a|^n + |y/b|^n + |z/c|^n = 1. */
-function superellipsoid(seg = 64) {
+function superellipsoid(dims: { a: number; b: number; c: number; n: number }, seg = 64) {
   const g = new SphereGeometry(1, seg, Math.round(seg * 0.75));
   const pos = g.attributes.position;
   const v = new Vector3();
-  const { a, b, c, n } = BODY;
+  const { a, b, c, n } = dims;
   for (let i = 0; i < pos.count; i++) {
     v.fromBufferAttribute(pos, i).normalize();
     const r = Math.pow(Math.pow(Math.abs(v.x / a), n) + Math.pow(Math.abs(v.y / b), n) + Math.pow(Math.abs(v.z / c), n), -1 / n);
@@ -44,34 +56,14 @@ function superellipsoid(seg = 64) {
   return g;
 }
 
-/** Height of the body's front surface at (x, y). */
+/** Height of the head's front surface at (x, y). */
 function frontZ(x: number, y: number) {
-  const { a, b, c, n } = BODY;
+  const { a, b, c, n } = HEAD;
   const k = 1 - Math.pow(Math.abs(x / a), n) - Math.pow(Math.abs(y / b), n);
   return k <= 0 ? 0 : c * Math.pow(k, 1 / n);
 }
 
-/** Distance of the body's side surface from the centre at (y, z). */
-function sideX(y: number, z: number) {
-  const { a, b, c, n } = BODY;
-  const k = 1 - Math.pow(Math.abs(y / b), n) - Math.pow(Math.abs(z / c), n);
-  return k <= 0 ? 0 : a * Math.pow(k, 1 / n);
-}
-
-/** A titanium cheek panel bent onto the body's side (side = ±1). */
-function sidePatch(d: number, h: number, side: number, lift: number) {
-  const g = new PlaneGeometry(d, h, 16, 12);
-  const pos = g.attributes.position;
-  for (let i = 0; i < pos.count; i++) {
-    const z = pos.getX(i);
-    const y = pos.getY(i) - 0.004;
-    pos.setXYZ(i, side * (sideX(y, z) + lift), y, -side * z);
-  }
-  g.computeVertexNormals();
-  return g;
-}
-
-/** A plane bent onto the body's front, for the screen and its bezel. */
+/** A plane bent onto the head's front, for the screen and its bezel. */
 function frontPatch(w: number, h: number, cy: number, lift: number) {
   const g = new PlaneGeometry(w, h, 24, 12);
   const pos = g.attributes.position;
@@ -111,6 +103,8 @@ export type BotPose = {
   weld: number;
   left: ArmPose;
   right: ArmPose;
+  /** Head rotation on the neck, radians. */
+  head: { yaw: number; pitch: number; roll: number };
 };
 
 const Y = new Vector3(0, 1, 0);
@@ -155,115 +149,168 @@ export function buildBot() {
   const jointMat = track(new MeshPhysicalMaterial({ color: '#1c1e22', metalness: 0.6, roughness: 0.4 }));
   const screwMat = track(new MeshPhysicalMaterial({ color: '#8e949d', metalness: 1, roughness: 0.35 }));
 
-  const shell = new Mesh(track(superellipsoid()), shellMat);
-  shell.castShadow = true;
-  body.add(shell);
-
-  // Face: titanium bezel, then dark glass with the LED eyes.
-  const SW = 0.205;
-  const SH = 0.1;
-  const SCY = 0.014;
-  const bezelMask = track(roundedMask(SW + 0.016, SH + 0.016, 0.03));
-  const bezel = new Mesh(
-    track(frontPatch(SW + 0.016, SH + 0.016, SCY, 0.0016)),
-    track(new MeshPhysicalMaterial({ color: '#9ea4ad', metalness: 1, roughness: 0.3, alphaMap: bezelMask, alphaTest: 0.5 })),
-  );
-  body.add(bezel);
-  const face = createFace();
-  track(face.texture);
-  const screenMask = track(roundedMask(SW, SH, 0.024));
-  const screen = new Mesh(
-    track(frontPatch(SW, SH, SCY, 0.0032)),
-    track(
-      new MeshPhysicalMaterial({
-        color: '#05070a',
-        metalness: 0,
-        roughness: 0.08,
-        clearcoat: 1,
-        clearcoatRoughness: 0.04,
-        emissive: C.ice.clone(),
-        emissiveMap: face.texture,
-        emissiveIntensity: 1.15,
-        alphaMap: screenMask,
-        alphaTest: 0.5,
-      }),
-    ),
-  );
-  body.add(screen);
-
-  // Brushed titanium cheek panels on both sides, under the shoulder hubs.
-  const cheekMask = track(roundedMask(0.17, 0.15, 0.04));
-  const cheekMat = track(
-    new MeshPhysicalMaterial({ color: '#b8bdc6', metalness: 1, roughness: 0.55, roughnessMap: ti, alphaMap: cheekMask, alphaTest: 0.5, side: 2 }),
-  );
-  for (const s of [-1, 1]) body.add(new Mesh(track(sidePatch(0.17, 0.15, s, 0.0018)), cheekMat));
-
-  // Titanium spine plate across the top, with a status lamp at the front.
-  const topPlate = new Mesh(track(new RoundedBoxGeometry(0.078, 0.01, 0.13, 3, 0.004)), titanium);
-  topPlate.position.y = BODY.b - 0.0015;
-  topPlate.castShadow = true;
-  body.add(topPlate);
-  const ledMat = track(new MeshBasicMaterial({ color: '#000', toneMapped: false }));
-  const led = new Mesh(track(new SphereGeometry(0.0065, 12, 8)), ledMat);
-  led.position.set(0, BODY.b + 0.005, 0.05);
-  body.add(led);
-
-  // Rear vent grille.
-  const ventGeo = track(new RoundedBoxGeometry(0.09, 0.007, 0.01, 2, 0.003));
-  for (let i = 0; i < 4; i++) {
+  // Torso: a turned barrel with a titanium chest plate, a belt ring and a rear vent.
+  const torsoProfile: [number, number][] = [
+    [0, -0.105],
+    [0.06, -0.105],
+    [0.094, -0.09],
+    [0.112, -0.05],
+    [0.118, 0],
+    [0.112, 0.042],
+    [0.09, 0.064],
+    [0.05, 0.072],
+    [0, 0.072],
+  ];
+  const torso = new Mesh(track(new LatheGeometry(torsoProfile.map(([r, y]) => new Vector2(r, y)), 56)), shellMat);
+  torso.castShadow = true;
+  body.add(torso);
+  const shell = torso;
+  const chest = new Mesh(track(new RoundedBoxGeometry(0.086, 0.062, 0.014, 3, 0.006)), titanium);
+  chest.position.set(0, 0.004, 0.11);
+  chest.castShadow = true;
+  body.add(chest);
+  const belt = new Mesh(track(new TorusGeometry(0.111, 0.0055, 8, 64)), titanium);
+  belt.rotation.x = Math.PI / 2;
+  belt.position.y = -0.05;
+  body.add(belt);
+  const ventGeo = track(new RoundedBoxGeometry(0.06, 0.006, 0.01, 2, 0.003));
+  for (let i = 0; i < 3; i++) {
     const v = new Mesh(ventGeo, titanium);
-    v.position.set(0, -0.03 + i * 0.018, -BODY.c + 0.006);
+    v.position.set(0, -0.02 + i * 0.016, -0.114);
     body.add(v);
   }
+  // Status lamp on the chest plate: Molten while working, Ice when idle, off when asleep.
+  const ledMat = track(new MeshBasicMaterial({ color: '#000', toneMapped: false }));
+  const led = new Mesh(track(new SphereGeometry(0.0068, 12, 8)), ledMat);
+  led.position.set(0, -0.012, 0.119);
+  body.add(led);
 
-  // Shoulder hubs with three screws each.
-  const hubGeo = track(new CylinderGeometry(0.044, 0.044, 0.02, 40));
-  const screwGeo = track(new CylinderGeometry(0.0045, 0.0045, 0.004, 10));
-  for (const s of [-1, 1]) {
+  // Neck and head. The head pivots at the top of the neck.
+  const neck = new Mesh(track(new CylinderGeometry(0.026, 0.032, 0.05, 24)), titanium);
+  neck.position.y = 0.078;
+  body.add(neck);
+  const head = new Group();
+  head.position.y = LAYOUT.neckTop;
+  body.add(head);
+  const headShell = new Mesh(track(superellipsoid(HEAD)), shellMat);
+  headShell.position.y = LAYOUT.headUp;
+  headShell.castShadow = true;
+  head.add(headShell);
+  const face = createFace();
+  track(face.texture);
+  const SW = 0.22;
+  const SH = 0.1;
+  const SCY = 0.004;
+  const faceGroup = new Group();
+  faceGroup.position.y = LAYOUT.headUp;
+  head.add(faceGroup);
+  const bezelMask = track(roundedMask(SW + 0.018, SH + 0.018, 0.03));
+  faceGroup.add(
+    new Mesh(
+      track(frontPatch(SW + 0.018, SH + 0.018, SCY, 0.0016)),
+      track(new MeshPhysicalMaterial({ color: '#9ea4ad', metalness: 1, roughness: 0.3, alphaMap: bezelMask, alphaTest: 0.5 })),
+    ),
+  );
+  const screenMask = track(roundedMask(SW, SH, 0.024));
+  faceGroup.add(
+    new Mesh(
+      track(frontPatch(SW, SH, SCY, 0.0032)),
+      track(
+        new MeshPhysicalMaterial({
+          color: '#05070a',
+          metalness: 0,
+          roughness: 0.08,
+          clearcoat: 1,
+          clearcoatRoughness: 0.04,
+          emissive: C.ice.clone(),
+          emissiveMap: face.texture,
+          emissiveIntensity: 1.15,
+          alphaMap: screenMask,
+          alphaTest: 0.5,
+        }),
+      ),
+    ),
+  );
+  // Ear pods with brushed caps, and a short antenna with a lamp.
+  const earGeo = track(new CylinderGeometry(0.034, 0.034, 0.024, 32));
+  const earCapGeo = track(new CylinderGeometry(0.024, 0.024, 0.004, 32));
+  const ringMat = track(new MeshBasicMaterial({ color: C.holo.clone().multiplyScalar(0.7), toneMapped: false }));
+  const earRingGeo = track(new TorusGeometry(0.028, 0.0022, 6, 40));
+  for (const sd of [-1, 1]) {
+    const ear = new Mesh(earGeo, jointMat);
+    ear.rotation.z = Math.PI / 2;
+    ear.position.set(sd * (HEAD.a + 0.006), LAYOUT.headUp - 0.004, -0.004);
+    ear.castShadow = true;
+    head.add(ear);
+    const cap = new Mesh(earCapGeo, hubMat);
+    cap.rotation.z = Math.PI / 2;
+    cap.position.set(sd * (HEAD.a + 0.019), LAYOUT.headUp - 0.004, -0.004);
+    head.add(cap);
+    const ring = new Mesh(earRingGeo, ringMat);
+    ring.rotation.y = Math.PI / 2;
+    ring.position.set(sd * (HEAD.a + 0.019), LAYOUT.headUp - 0.004, -0.004);
+    head.add(ring);
+  }
+  const mast = new Mesh(track(new CylinderGeometry(0.0045, 0.006, 0.05, 10)), titanium);
+  mast.position.set(0.07, LAYOUT.headUp + HEAD.b + 0.018, -0.02);
+  mast.rotation.z = -0.25;
+  head.add(mast);
+  const mastTip = new Mesh(track(new SphereGeometry(0.0095, 12, 8)), ringMat);
+  mastTip.position.set(0.077, LAYOUT.headUp + HEAD.b + 0.045, -0.02);
+  head.add(mastTip);
+  // The HUD's anchor for the bot: just above the head.
+  const anchor = new Group();
+  anchor.position.y = LAYOUT.headUp + HEAD.b + 0.03;
+  head.add(anchor);
+
+  // Shoulder sockets on the torso sides.
+  const hubGeo = track(new CylinderGeometry(0.03, 0.03, 0.026, 32));
+  const screwGeo = track(new CylinderGeometry(0.0038, 0.0038, 0.004, 10));
+  for (const sd of [-1, 1]) {
     const hub = new Mesh(hubGeo, hubMat);
     hub.rotation.z = Math.PI / 2;
-    hub.position.set(s * (BODY.a - 0.002), -0.006, 0);
+    hub.position.set(sd * 0.118, LAYOUT.shoulderY, 0);
     hub.castShadow = true;
     body.add(hub);
     for (let k = 0; k < 3; k++) {
       const a = (k / 3) * Math.PI * 2 + Math.PI / 6;
       const sc = new Mesh(screwGeo, screwMat);
       sc.rotation.z = Math.PI / 2;
-      sc.position.set(s * (BODY.a + 0.0095), -0.006 + Math.sin(a) * 0.028, Math.cos(a) * 0.028);
+      sc.position.set(sd * 0.132, LAYOUT.shoulderY + Math.sin(a) * 0.019, Math.cos(a) * 0.019);
       body.add(sc);
     }
   }
 
-  // Thrusters: two nozzle pods underneath with a soft downward glow.
-  const podGeo = track(new CylinderGeometry(0.024, 0.02, 0.028, 24));
+  // Thrusters: two nozzle pods under the torso with a soft downward glow.
+  const podGeo = track(new CylinderGeometry(0.026, 0.021, 0.03, 24));
   const nozzleMat = track(new MeshBasicMaterial({ color: '#000', toneMapped: false }));
-  const nozzleGeo = track(new CircleGeometry(0.015, 20));
+  const nozzleGeo = track(new CircleGeometry(0.016, 20));
   const glowTex = track(radialGlow());
   const glowMat = track(
     new SpriteMaterial({ map: glowTex, color: C.molten.clone().multiplyScalar(1.6), blending: AdditiveBlending, depthWrite: false, transparent: true }),
   );
-  for (const s of [-1, 1]) {
+  for (const sd of [-1, 1]) {
     const pod = new Mesh(podGeo, jointMat);
-    pod.position.set(s * 0.07, -BODY.b + 0.012, -0.01);
+    pod.position.set(sd * 0.05, -0.112, 0);
     body.add(pod);
     const nozzle = new Mesh(nozzleGeo, nozzleMat);
     nozzle.rotation.x = Math.PI / 2;
-    nozzle.position.set(s * 0.07, -BODY.b - 0.0025, -0.01);
+    nozzle.position.set(sd * 0.05, -0.128, 0);
     body.add(nozzle);
     const glow = new Sprite(glowMat);
-    glow.position.set(s * 0.07, -BODY.b - 0.022, -0.01);
-    glow.scale.set(0.048, 0.064, 1);
+    glow.position.set(sd * 0.05, -0.148, 0);
+    glow.scale.set(0.05, 0.066, 1);
     glow.renderOrder = 6;
     body.add(glow);
   }
 
   // Arms -----------------------------------------------------------------------------------------
-  const L1 = 0.1;
-  const L2 = 0.095;
-  const upperGeo = track(new CapsuleGeometry(0.0145, L1 - 0.024, 4, 14));
-  const foreGeo = track(new CapsuleGeometry(0.0128, L2 - 0.022, 4, 14));
-  const jointGeo = track(new SphereGeometry(0.018, 16, 12));
-  const shoulderGeo = track(new SphereGeometry(0.02, 16, 12));
+  const L1 = 0.11;
+  const L2 = 0.105;
+  const upperGeo = track(new CapsuleGeometry(0.015, L1 - 0.026, 4, 14));
+  const foreGeo = track(new CapsuleGeometry(0.0135, L2 - 0.024, 4, 14));
+  const jointGeo = track(new SphereGeometry(0.019, 16, 12));
+  const shoulderGeo = track(new SphereGeometry(0.022, 16, 12));
   const fingerGeo = track(new RoundedBoxGeometry(0.0065, 0.032, 0.012, 2, 0.002));
   const gripBaseGeo = track(new CylinderGeometry(0.014, 0.012, 0.016, 20));
   const welderBodyGeo = track(new CylinderGeometry(0.012, 0.012, 0.02, 20));
@@ -272,7 +319,7 @@ export function buildBot() {
   const tipGeo = track(new SphereGeometry(0.0042, 12, 8));
 
   function makeArm(side: -1 | 1) {
-    const S = new Vector3(side * 0.19, -0.006, 0);
+    const S = new Vector3(side * LAYOUT.shoulderX, LAYOUT.shoulderY, 0);
     const shoulder = new Mesh(shoulderGeo, jointMat);
     shoulder.position.copy(S);
     const upper = new Mesh(upperGeo, titanium);
@@ -357,6 +404,7 @@ export function buildBot() {
 
   function setPose(pose: BotPose) {
     face.draw(pose.eyes, pose.dx, pose.dy, pose.frame, pose.icon);
+    head.rotation.set(pose.head.pitch, pose.head.yaw, pose.head.roll, 'YXZ');
     ledMat.color.copy(ledColors[pose.led]);
     nozzleMat.color.copy(C.molten).multiplyScalar(0.3 + pose.thruster * 3);
     glowMat.opacity = Math.min(1, pose.thruster * 0.6);
@@ -373,6 +421,8 @@ export function buildBot() {
   return {
     root,
     body,
+    head,
+    anchor,
     shell,
     setPose,
     weldTip,

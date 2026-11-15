@@ -2,6 +2,8 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { useEffect } from 'react';
 import { PerspectiveCamera, Vector3 } from 'three';
 import { easeInOut, seg } from './choreo';
+import { BENCH } from './toolbench/layout';
+import { CONTACT_CAM } from './afterBuild';
 
 type Shot = { pos: [number, number, number]; target: [number, number, number]; shift: number; lift?: number; fov?: number };
 
@@ -14,9 +16,11 @@ export const SHOTS: Record<string, Shot> = {
   system: { pos: [0.75, 1.75, 7.4], target: [0.1, 1.06, 0], shift: 0.15 },
   projects: { pos: [0.1, 1.7, 9.6], target: [0.08, 1.08, 0], shift: 0.31 },
   // Career: the bot on its own, close and large on the right, beside the timeline.
-  career: { pos: [-1.95, 1.52, 5.5], target: [-2.0, 1.42, 3.35], shift: 0.27 },
-  toolbench: { pos: [30, 3.15, 3.55], target: [30, 0, 0.12], shift: 0.06, lift: 0.07 },
-  contact: { pos: [-2.0, 1.62, 6.3], target: [-2.0, 1.4, 3.35], shift: 0, lift: -0.35 },
+  career: { pos: [-1.95, 1.64, 5.75], target: [-2.0, 1.54, 3.35], shift: 0.27 },
+  toolbench: { pos: [BENCH.x, 3.15, BENCH.z + 3.55], target: [BENCH.x, 0, BENCH.z + 0.12], shift: 0.06, lift: 0.07 },
+  // Contact: straight on, in the gap between the machine and the bench; the bot stands beside the
+  // title (afterBuild.contactBotPoint places it from the title's position on screen).
+  contact: { pos: [CONTACT_CAM.x, CONTACT_CAM.y, CONTACT_CAM.z], target: [CONTACT_CAM.x, CONTACT_CAM.y, CONTACT_CAM.z - 3], shift: 0, lift: 0 },
   // Still frames: centred, for the phone, reduced-motion and no-WebGL layouts.
   frameHero: { pos: [0.4, 1.75, 7.4], target: [0.12, 1.02, 0], shift: 0 },
   frameData: { pos: [-1.75, 1.5, 5.0], target: [-2.05, 0.6, 0.25], shift: 0 },

@@ -7,6 +7,8 @@ import { easeInOut, fragWindow, heroWeld, plateStart, seg, weldWindow } from './
 import type { DataHandles } from './data/buildData';
 import type { MachineHandles } from './machine/buildMachine';
 import { PLATES } from './machine/parts';
+import { BENCH } from './toolbench/layout';
+import { contactBotPoint, type Spot } from './afterBuild';
 
 export type BotPlan = { target: Vector3; task: BotTask; tool: ToolName };
 
@@ -150,8 +152,8 @@ export function planBot(p: number, m: MachineHandles, d: DataHandles, out: BotPl
   return out;
 }
 
-export const BOT_CONTACT = new Vector3(-2.0, 1.42, 3.35);
-export const BOT_BENCH = new Vector3(31.55, 0.62, 0.95);
+// Over the System tray, watching the tags.
+export const BOT_BENCH = new Vector3(BENCH.x + 1.05, 0.5, BENCH.z - 0.05);
 export const BOT_CAREER = new Vector3(-2.0, 1.42, 3.35);
 
 const SW_CENTER = new Vector3(0, 1.32, 0);
@@ -198,27 +200,29 @@ export function planProject(project: string | null, t: number, m: MachineHandles
   return null;
 }
 
-/** After the build, the bot follows the visitor: beside the machine, over the bench, center stage at Contact. */
-export function planAfterBuild(section: string, out: BotPlan): BotPlan | null {
-  if (section === 'toolbench') {
-    out.target.copy(BOT_BENCH);
-    out.task = { kind: 'idle' };
-    out.tool = 'gripper';
-    return out;
+/** Where the bot is, and what it does, at each after-build spot. */
+export function planSpot(spot: Spot, project: string | null, t: number, m: MachineHandles, d: DataHandles, out: BotPlan): BotPlan {
+  switch (spot) {
+    case 'exit':
+      return planBot(400, m, d, out);
+    case 'projects':
+      return planProject(project, t, m, out) ?? planBot(400, m, d, out);
+    case 'career':
+      out.target.copy(BOT_CAREER);
+      out.task = { kind: 'idle' };
+      out.tool = 'gripper';
+      return out;
+    case 'toolbench':
+      out.target.copy(BOT_BENCH);
+      out.task = { kind: 'idle' };
+      out.tool = 'gripper';
+      return out;
+    case 'contact':
+      contactBotPoint(out.target);
+      out.task = { kind: 'cool' };
+      out.tool = 'gripper';
+      return out;
   }
-  if (section === 'career' || section === 'resume') {
-    out.target.copy(BOT_CAREER);
-    out.task = { kind: 'idle' };
-    out.tool = 'gripper';
-    return out;
-  }
-  if (section === 'contact') {
-    out.target.copy(BOT_CONTACT);
-    out.task = { kind: 'idle' };
-    out.tool = 'gripper';
-    return out;
-  }
-  return null;
 }
 
 export const newPlan = (): BotPlan => ({ target: new Vector3(), task: { kind: 'idle' }, tool: 'welder' });

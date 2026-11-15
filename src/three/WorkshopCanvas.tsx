@@ -2,15 +2,11 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Bloom, EffectComposer, ToneMapping } from '@react-three/postprocessing';
 import { ToneMappingMode } from 'postprocessing';
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
-import { Vector3 } from 'three';
 import { markContextLost, type Mode } from '../lib/env';
 import { currentSection } from '../lib/spy';
 import { BUILD_LENGTH, stage } from '../lib/stage';
-
-/** Sections after the build that frame the scene with their own camera shot. */
-const SECTION_SHOTS = new Set(['career', 'resume', 'toolbench', 'contact']);
-import { CameraRig, SHOTS, newShot, shotAt, snapCamera, type ShotState } from './CameraRig';
-import { easeInOut } from './timing';
+import { blendAt, type Spot } from './afterBuild';
+import { CameraRig, SHOTS, newShot, shotAt, type ShotState } from './CameraRig';
 import { captureFrame, debugCam, fixedP, isCapture, noPost } from './capture';
 import { HudSync } from './HudSync';
 import { startInput } from './input';
@@ -52,11 +48,8 @@ function CaptureReady() {
   return null;
 }
 
-/** Sections where the scene is faded out, so rendering pauses. */
-const NO_SCENE = new Set<string>();
-
 /**
- * Pauses rendering when the tab is hidden or the current section shows no scene, and falls back
+ * Pauses rendering when the tab is hidden (or below the hero on phones), and falls back
  * to still frames if the WebGL context is lost.
  */
 function Lifecycle({ phone }: { phone: boolean }) {
@@ -74,7 +67,7 @@ function Lifecycle({ phone }: { phone: boolean }) {
       clearTimeout(pauseTimer);
       const section = currentSection();
       // On phones only the hero is live; the acts below use still frames.
-      const offstage = phone ? section !== 'top' : NO_SCENE.has(section);
+      const offstage = phone && section !== 'top';
       const run = (on: boolean) => {
         setFrameloop(on ? 'always' : 'never');
         canvas.dataset.running = on ? '1' : '0';
@@ -107,48 +100,16 @@ export default function WorkshopCanvas({ mode }: { mode: Mode }) {
 
   const resolve = useMemo(() => {
     const tmp = newShot();
-    const held = newShot();
-    const a = new Vector3();
-    const b = new Vector3();
-    let region = '';
-    let cutUntil = 0;
-    /**
-     * Moving between the machine and the toolbench (two corners of the scene) would whip the
-     * camera across the room, so the canvas dips out, the camera cuts, and it fades back in.
-     */
-    const regionCut = (out: ShotState) => {
-      const now = performance.now();
-      const next = out.target.x > 15 ? 'bench' : 'machine';
-      const canvas = document.querySelector<HTMLElement>('.webgl');
-      if (region && next !== region && now > cutUntil) {
-        const hidden = NO_SCENE.has(currentSection());
-        cutUntil = hidden ? now : now + 240;
-        if (!hidden) canvas?.setAttribute('data-cut', '');
-      }
-      region = next;
-      if (now < cutUntil) {
-        // Hold the old framing until the canvas has faded out.
-        out.pos.copy(held.pos);
-        out.target.copy(held.target);
-        out.shift = held.shift;
-        out.lift = held.lift;
-        out.fov = held.fov;
-        return out;
-      }
-      if (cutUntil && canvas?.hasAttribute('data-cut')) {
-        snapCamera();
-        cutUntil = 0;
-        requestAnimationFrame(() => requestAnimationFrame(() => canvas.removeAttribute('data-cut')));
-      } else if (cutUntil) {
-        snapCamera();
-        cutUntil = 0;
-      }
-      held.pos.copy(out.pos);
-      held.target.copy(out.target);
-      held.shift = out.shift;
-      held.lift = out.lift;
-      held.fov = out.fov;
-      return out;
+    const tmpB = newShot();
+    const fill = (spot: Spot, o: ShotState) => {
+      if (spot === 'exit') return shotAt(BUILD_LENGTH, o);
+      const s = SHOTS[spot];
+      o.pos.fromArray(s.pos);
+      o.target.fromArray(s.target);
+      o.shift = s.shift;
+      o.lift = s.lift ?? 0;
+      o.fov = s.fov ?? 30;
+      return o;
     };
     return (out: ShotState) => {
       out.rate = 7;
@@ -169,33 +130,18 @@ export default function WorkshopCanvas({ mode }: { mode: Mode }) {
         out.fov = s.fov ?? 30;
         return out;
       }
-      const section = currentSection();
-      const done = stage.p >= BUILD_LENGTH - 0.5;
-      // Leaving the build: as the pinned stage scrolls away, glide from the System framing to the
-      // Projects framing with the scroll, so it plays both ways instead of cutting.
-      if (done && !SECTION_SHOTS.has(section)) {
-        const build = document.getElementById('build');
-        const end = build ? build.offsetTop + build.offsetHeight - window.innerHeight : 0;
-        const k = easeInOut(Math.min(1, Math.max(0, (window.scrollY - end) / (window.innerHeight * 0.95))));
-        shotAt(BUILD_LENGTH, tmp);
-        const s = SHOTS.projects;
-        out.pos.copy(tmp.pos).lerp(a.fromArray(s.pos), k);
-        out.target.copy(tmp.target).lerp(b.fromArray(s.target), k);
-        out.shift = tmp.shift + (s.shift - tmp.shift) * k;
-        out.lift = tmp.lift + ((s.lift ?? 0) - tmp.lift) * k;
-        out.fov = tmp.fov + ((s.fov ?? 30) - tmp.fov) * k;
-        return regionCut(out);
-      }
-      if (done) {
-        // Section shots glide in more slowly than the scroll-driven build framing.
-        const s = SHOTS[section === 'resume' ? 'career' : section];
-        out.rate = 2.6;
-        out.pos.fromArray(s.pos);
-        out.target.fromArray(s.target);
-        out.shift = s.shift;
-        out.lift = s.lift ?? 0;
-        out.fov = s.fov ?? 30;
-        return regionCut(out);
+      // After the build the framing follows the scroll from section to section (exit → Projects
+      // → Career → Toolbench → Contact), so every move glides and plays back in reverse.
+      if (stage.p >= BUILD_LENGTH - 0.5) {
+        const { a: sa, b: sb, k } = blendAt(window.scrollY);
+        fill(sa, tmp);
+        fill(sb, tmpB);
+        out.pos.copy(tmp.pos).lerp(tmpB.pos, k);
+        out.target.copy(tmp.target).lerp(tmpB.target, k);
+        out.shift = tmp.shift + (tmpB.shift - tmp.shift) * k;
+        out.lift = tmp.lift + (tmpB.lift - tmp.lift) * k;
+        out.fov = tmp.fov + (tmpB.fov - tmp.fov) * k;
+        return out;
       }
       shotAt(stage.p, tmp);
       out.pos.copy(tmp.pos);

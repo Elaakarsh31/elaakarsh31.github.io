@@ -443,12 +443,6 @@ html[data-mode='phone'] .hero-copy {
   text-shadow: 0 1px 12px rgba(15, 16, 19, 0.9);
 }
 
-/* A quick dip to hide the cut between the machine and the toolbench. */
-.webgl[data-cut] {
-  opacity: 0 !important;
-  transition: opacity 0.22s ease;
-}
-
 /* Machine part under the pointer */
 .part-tag {
   position: fixed;
@@ -585,7 +579,7 @@ html[data-section='career'] .career-holo-anchor[data-hud-visible='1'] {
 .career-holo {
   position: absolute;
   left: 0;
-  bottom: 150px;
+  bottom: 40px;
   transform: translateX(-50%);
   width: max-content;
   max-width: 300px;

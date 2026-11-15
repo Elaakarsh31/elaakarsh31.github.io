@@ -599,7 +599,7 @@ main,
 .bot-speech {
   position: absolute;
   left: 0;
-  bottom: 64px;
+  bottom: 26px;
   transform: translateX(-50%);
   width: max-content;
   max-width: 260px;

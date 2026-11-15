@@ -9,6 +9,16 @@ export type EyeState = 'open' | 'blink' | 'closed' | 'happy' | 'spiral' | 'start
 
 /** Full-screen pixel icons (16×8) the bot shows while it walks through the Career timeline. */
 const ICONS: Record<string, string[]> = {
+  shades: [
+    '................',
+    'XXXXXXXXXXXXXXXX',
+    '.XXXXXX..XXXXXX.',
+    '.XXXXXX..XXXXXX.',
+    '..XXXX....XXXX..',
+    '................',
+    '.........XXXX...',
+    '................',
+  ],
   cap: [
     '................',
     '.......XX.......',

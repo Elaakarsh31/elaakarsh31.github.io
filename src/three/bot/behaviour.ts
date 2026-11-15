@@ -1,6 +1,6 @@
 import { Vector3 } from 'three';
 import { input } from '../input';
-import type { ArmPose, BotPose, ToolName } from './buildBot';
+import { LAYOUT, type ArmPose, type BotPose, type ToolName } from './buildBot';
 import type { EyeState } from './face';
 
 export type BotTask =
@@ -9,6 +9,8 @@ export type BotTask =
   | { kind: 'carry'; point: Vector3 }
   | { kind: 'bolt'; point: Vector3; twist: number }
   | { kind: 'look'; point: Vector3 }
+  /** Contact: arms crossed, leaning back a little, shades on. */
+  | { kind: 'cool' }
   | { kind: 'thumbs' }
   | { kind: 'salute' };
 
@@ -24,6 +26,8 @@ export type BotContext = {
   motion: boolean;
   /** Deterministic pose for still-frame captures: no blinking, sleeping or wobble. */
   capture: boolean;
+  /** How far above the bot the camera is (radians): when free, it tips back to face the lens. */
+  viewPitch?: number;
   /** The pointer is over the bot. */
   hover?: boolean;
 };
@@ -71,13 +75,19 @@ export class BotBrain {
   private swapStart = -10;
   private swapTo: ToolName = 'welder';
   private local = new Vector3();
-  private shoulderL = new Vector3(-0.19, -0.006, 0);
-  private shoulderR = new Vector3(0.19, -0.006, 0);
+  private shoulderL = new Vector3(-LAYOUT.shoulderX, LAYOUT.shoulderY, 0);
+  private shoulderR = new Vector3(LAYOUT.shoulderX, LAYOUT.shoulderY, 0);
+  private headYaw = 0;
+  private headPitch = 0;
+  /** 0..1, eased: how far into the cool pose (arms crossed, shades, head cocked). */
+  private coolK = 0;
+  private armL = new Vector3(Infinity, 0, 0);
+  private armR = new Vector3();
   readonly pose: BotPose;
 
   constructor() {
     const arm = (side: number): ArmPose => ({
-      target: new Vector3(side * 0.21, -0.07, 0.13),
+      target: new Vector3(side * 0.19, -0.05, 0.12),
       tool: side < 0 ? 'welder' : 'gripper',
       retract: 0,
       open: 0.3,
@@ -95,6 +105,7 @@ export class BotBrain {
       weld: 0,
       left: arm(-1),
       right: arm(1),
+      head: { yaw: 0, pitch: 0, roll: 0 },
     };
   }
 
@@ -150,7 +161,7 @@ export class BotBrain {
     }
 
     // Position: critically damped follow, a gentle bob, lean into the motion.
-    if (!Number.isFinite(this.pos.x) || ctx.capture || this.pos.distanceTo(ctx.target) > 6) {
+    if (!Number.isFinite(this.pos.x) || ctx.capture || this.pos.distanceTo(ctx.target) > 16) {
       this.pos.copy(ctx.target);
       this.vel.set(0, 0, 0);
     } else {
@@ -189,6 +200,7 @@ export class BotBrain {
       dx = nx > 0.08 ? 1 : nx < -0.08 ? -1 : 0;
       dy = ny > 0.12 ? 1 : ny < -0.12 ? -1 : 0;
     }
+    if (!working) pitchT = clamp(pitchT - (ctx.viewPitch ?? 0) * 0.7, -0.55, 0.22);
     if (this.asleep) {
       yawT = 0;
       pitchT = 0.18;
@@ -232,6 +244,10 @@ export class BotBrain {
         icon = this.glyph;
       }
     }
+    if (this.coolK > 0.5 && !this.glyph) {
+      eyes = 'icon';
+      icon = 'shades';
+    }
     // Hovered: pixel hearts, whatever the bot was doing.
     if (ctx.hover) eyes = 'heart';
     if (t < this.startleUntil) eyes = 'startle';
@@ -257,7 +273,7 @@ export class BotBrain {
 
     // Arms: the left arm holds the tool and does the work; the right gripper steadies or carries.
     const rest = (side: number, out: Vector3) =>
-      out.set(side * 0.215, this.asleep ? -0.13 : -0.075 + (ctx.motion && !ctx.capture ? Math.sin(t * 2.1 + side) * 0.008 : 0), this.asleep ? 0.06 : 0.135);
+      out.set(side * 0.19, this.asleep ? -0.1 : -0.05 + (ctx.motion && !ctx.capture ? Math.sin(t * 2.1 + side) * 0.008 : 0), this.asleep ? 0.06 : 0.12);
     rest(-1, pose.left.target);
     rest(1, pose.right.target);
     pose.left.open = 0.3;
@@ -272,7 +288,7 @@ export class BotBrain {
         reachFor(toLocal(ctx.task.point, this.local), this.shoulderL, 0.055);
         pose.left.target.copy(this.local);
         pose.weld = ctx.task.heat * (ctx.capture ? 1 : 0.75 + Math.random() * 0.25);
-        pose.right.target.set(0.16, -0.06, 0.16);
+        pose.right.target.set(0.16, -0.04, 0.15);
         break;
       }
       case 'carry': {
@@ -291,21 +307,31 @@ export class BotBrain {
         arm.target.copy(this.local);
         arm.open = 0.05;
         arm.roll = ctx.task.twist * Math.PI * 2;
-        other.target.set(useRight ? -0.17 : 0.17, -0.02, 0.15);
+        other.target.set(useRight ? -0.16 : 0.16, 0, 0.14);
         other.open = 0.6;
         break;
       }
       case 'thumbs': {
-        pose.right.target.set(0.17, 0.1, 0.1);
+        pose.right.target.set(0.17, 0.15, 0.09);
         pose.right.open = 0;
         pose.right.thumb = 1;
         break;
       }
     }
+    // Cool: arms crossed in front of the chest, eased in and out.
+    const coolOn = ctx.task.kind === 'cool' && !this.asleep;
+    this.coolK += ((coolOn ? 1 : 0) - this.coolK) * (ctx.capture ? 1 : 1 - Math.exp(-dt * 3.2));
+    if (this.coolK > 0.001) {
+      const c = easeInOut(this.coolK);
+      pose.left.target.lerp(this.local.set(0.06, -0.012, 0.155), c);
+      pose.right.target.lerp(this.local.set(-0.06, 0.012, 0.165), c);
+      pose.left.open += (0.05 - pose.left.open) * c;
+      pose.right.open += (0.05 - pose.right.open) * c;
+    }
     // Hovered: grippers drift together under the face, as if pleased to be noticed.
     if (this.hoverK > 0.001 && !working) {
-      pose.left.target.lerp(this.tuckL.set(-0.075, -0.1, 0.17), this.hoverK);
-      pose.right.target.lerp(this.tuckR.set(0.075, -0.1, 0.17), this.hoverK);
+      pose.left.target.lerp(this.tuckL.set(-0.06, -0.045, 0.16), this.hoverK);
+      pose.right.target.lerp(this.tuckR.set(0.06, -0.045, 0.16), this.hoverK);
       pose.left.open += (0.08 - pose.left.open) * this.hoverK;
       pose.right.open += (0.08 - pose.right.open) * this.hoverK;
     }
@@ -313,17 +339,39 @@ export class BotBrain {
     const st = t - this.saluteStart;
     if (st >= 0 && st < 1.6) {
       const up = st < 0.25 ? easeInOut(st / 0.25) : st < 1.15 ? 1 : 1 - easeInOut((st - 1.15) / 0.45);
-      pose.right.target.lerp(this.local.set(0.115, 0.1, 0.13), up);
+      pose.right.target.lerp(this.local.set(0.13, 0.22, 0.12), up);
       pose.right.open = 0;
     }
+
+    // Arm targets glide rather than jump when the task changes.
+    if (!Number.isFinite(this.armL.x) || ctx.capture) {
+      this.armL.copy(pose.left.target);
+      this.armR.copy(pose.right.target);
+    } else {
+      const ka = 1 - Math.exp(-dt * 11);
+      this.armL.lerp(pose.left.target, ka);
+      this.armR.lerp(pose.right.target, ka);
+      pose.left.target.copy(this.armL);
+      pose.right.target.copy(this.armR);
+    }
+
+    // The head looks a little further than the body, nods and tilts on its own, and droops asleep.
+    const cool = easeInOut(this.coolK);
+    const headYawT = this.asleep ? 0 : clamp(yawT * 0.7, -0.4, 0.4) + cool * 0.12;
+    const headPitchT = this.asleep ? 0.32 : clamp(pitchT * 0.6, -0.2, 0.2);
+    this.headYaw += (headYawT - this.headYaw) * k;
+    this.headPitch += (headPitchT - this.headPitch) * k;
+    pose.head.yaw = this.headYaw;
+    pose.head.pitch = this.headPitch + nod;
+    pose.head.roll = this.tilt + cool * 0.14;
 
     return {
       x: this.pos.x,
       y: this.pos.y + bob + bounce,
       z: this.pos.z,
       yaw: this.yaw + this.spinAngle(t),
-      pitch: this.pitch + leanX + nod,
-      roll: this.roll + this.tilt,
+      pitch: this.pitch + leanX - cool * 0.1,
+      roll: this.roll - cool * 0.08,
     };
   }
 }
