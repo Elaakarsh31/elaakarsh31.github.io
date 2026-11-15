@@ -16,6 +16,8 @@ export type SceneOptions = {
   onReady: () => void;
   /** Called if WebGL fails or the context is lost. */
   onFail: (reason: string) => void;
+  /** Static portrait: no loop, no scroll animation, no pointer effects. */
+  reducedMotion: boolean;
 };
 
 export type SceneHandle = { dispose: () => void };
@@ -58,7 +60,7 @@ function buildGeometry(cloud: PointCloud) {
 }
 
 export function createScene(opts: SceneOptions): SceneHandle {
-  const { canvas, stage } = opts;
+  const { canvas, stage, reducedMotion } = opts;
   const isMobile = window.innerWidth <= HERO.mobileMaxWidth;
   const count = isMobile ? HERO.points.mobile : HERO.points.desktop;
   const dprCap = isMobile ? HERO.dprCap.mobile : HERO.dprCap.desktop;
@@ -71,7 +73,6 @@ export function createScene(opts: SceneOptions): SceneHandle {
   });
   renderer.setClearColor(0x000000, 0);
   renderer.autoClear = false;
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, dprCap));
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(FOV, 1, 0.1, 60);
@@ -142,27 +143,11 @@ export function createScene(opts: SceneOptions): SceneHandle {
     const w = stage.clientWidth;
     const h = stage.clientHeight;
     if (!w || !h) return;
+    // Re-read the device pixel ratio too: windows move between displays.
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, dprCap));
     renderer.setSize(w, h, false);
     frame(w, h);
-  }
-  resize();
-  const ro = new ResizeObserver(resize);
-  ro.observe(stage);
-
-  // Optional GLB portrait, known at build time so a missing file never causes a request.
-  let disposed = false;
-  if (__HAS_MODEL__) {
-    import('./glb')
-      .then(({ loadGlbCloud }) => loadGlbCloud(`${import.meta.env.BASE_URL}models/portrait.glb`, count))
-      .then((glbCloud) => {
-        if (!glbCloud || disposed) return;
-        canvas.dataset.info = glbCloud.info;
-        const next = buildGeometry(glbCloud);
-        points.geometry = next;
-        geometry.dispose();
-        geometry = next;
-      })
-      .catch((err) => console.warn('[portrait] could not load portrait.glb, using the procedural bust.', err));
+    if (reducedMotion) draw();
   }
 
   // Scroll progress through the hero section, read from layout each frame (no scroll
@@ -174,9 +159,10 @@ export function createScene(opts: SceneOptions): SceneHandle {
     if (travel <= 1) return rect.top < 0 ? Math.min(1, -rect.top / window.innerHeight) : 0;
     return Math.min(1, Math.max(0, -rect.top / travel));
   }
-  let progress = readProgress();
+  let progress = reducedMotion ? 0 : readProgress();
 
-  const clock = new THREE.Clock();
+  const t0 = performance.now();
+  const elapsed = () => (performance.now() - t0) / 1000;
 
   // Pointer: a ring buffer of recent samples for turbulence, plus a damped gaze offset.
   // Mouse only; touch keeps native scrolling and skips the effect.
@@ -197,7 +183,7 @@ export function createScene(opts: SceneOptions): SceneHandle {
     pointer.y = ny;
     pointer.active = true;
     const x = nx * (rect.width / rect.height);
-    const t = clock.getElapsedTime();
+    const t = elapsed();
     const moved = Math.hypot(x - lastSample.x, ny - lastSample.y);
     if (lastSample.t < 0 || moved > 0.03 || t - lastSample.t > 0.08) {
       const dt = Math.max(1 / 120, t - lastSample.t);
@@ -210,15 +196,25 @@ export function createScene(opts: SceneOptions): SceneHandle {
   function onPointerOut(e: PointerEvent) {
     if (!e.relatedTarget) pointer.active = false;
   }
-  window.addEventListener('pointermove', onPointerMove, { passive: true });
-  document.addEventListener('pointerout', onPointerOut, { passive: true });
 
-  let last = 0;
+  function draw() {
+    renderer.clear();
+    points.material = occluder;
+    renderer.render(scene, camera);
+    points.material = material;
+    renderer.render(scene, camera);
+    if (!readySent) {
+      readySent = true;
+      opts.onReady();
+    }
+  }
+
+  let last = elapsed();
   let raf = 0;
   let readySent = false;
   function tick() {
     raf = requestAnimationFrame(tick);
-    const now = clock.getElapsedTime();
+    const now = elapsed();
     const dt = Math.min(0.1, now - last);
     last = now;
     uniforms.uTime.value = now;
@@ -236,23 +232,76 @@ export function createScene(opts: SceneOptions): SceneHandle {
     gaze.y += ((pointer.active ? pointer.y : 0) - gaze.y) * damp;
     points.rotation.y = HERO.baseYaw + turn * 0.75 + gaze.x * 0.07;
     points.rotation.x = progress * 0.08 - gaze.y * 0.045;
-    renderer.clear();
-    points.material = occluder;
-    renderer.render(scene, camera);
-    points.material = material;
-    renderer.render(scene, camera);
-    if (!readySent) {
-      readySent = true;
-      opts.onReady();
+    draw();
+  }
+
+  // Run the loop only while the stage is on screen and the tab is visible.
+  let onScreen = true;
+  let running = false;
+  function update() {
+    const should = !reducedMotion && !disposed && onScreen && !document.hidden;
+    if (should === running) return;
+    running = should;
+    canvas.dataset.running = should ? '1' : '0';
+    if (should) {
+      last = elapsed();
+      raf = requestAnimationFrame(tick);
+    } else {
+      cancelAnimationFrame(raf);
     }
   }
-  raf = requestAnimationFrame(tick);
+  const io = new IntersectionObserver((entries) => {
+    onScreen = entries.some((e) => e.isIntersecting);
+    update();
+  });
+  io.observe(stage);
+  document.addEventListener('visibilitychange', update);
+
+  // Context loss: hand over to the static hero.
+  function onContextLost(e: Event) {
+    e.preventDefault();
+    cancelAnimationFrame(raf);
+    running = false;
+    opts.onFail('webgl context lost');
+  }
+  canvas.addEventListener('webglcontextlost', onContextLost);
+
+  if (!reducedMotion) {
+    window.addEventListener('pointermove', onPointerMove, { passive: true });
+    document.addEventListener('pointerout', onPointerOut, { passive: true });
+  }
+
+  // Optional GLB portrait, known at build time so a missing file never causes a request.
+  let disposed = false;
+  if (__HAS_MODEL__) {
+    import('./glb')
+      .then(({ loadGlbCloud }) => loadGlbCloud(`${import.meta.env.BASE_URL}models/portrait.glb`, count))
+      .then((glbCloud) => {
+        if (!glbCloud || disposed) return;
+        canvas.dataset.info = glbCloud.info;
+        const next = buildGeometry(glbCloud);
+        points.geometry = next;
+        geometry.dispose();
+        geometry = next;
+        if (reducedMotion) draw();
+      })
+      .catch((err) => console.warn('[portrait] could not load portrait.glb, using the procedural bust.', err));
+  }
+
+  const ro = new ResizeObserver(resize);
+  ro.observe(stage);
+  resize();
+  if (reducedMotion) draw();
+  else update();
 
   return {
     dispose() {
       disposed = true;
       cancelAnimationFrame(raf);
       ro.disconnect();
+      io.disconnect();
+      document.removeEventListener('visibilitychange', update);
+      canvas.removeEventListener('webglcontextlost', onContextLost);
       window.removeEventListener('pointermove', onPointerMove);
       document.removeEventListener('pointerout', onPointerOut);
       geometry.dispose();

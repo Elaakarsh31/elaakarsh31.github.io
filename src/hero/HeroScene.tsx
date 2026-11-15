@@ -1,10 +1,25 @@
 import { useEffect, useRef, useState } from 'react';
 import { createScene } from './scene';
 
+const REDUCED = '(prefers-reduced-motion: reduce)';
+
+function useReducedMotion() {
+  const [reduced, setReduced] = useState(() => window.matchMedia(REDUCED).matches);
+  useEffect(() => {
+    const mq = window.matchMedia(REDUCED);
+    const on = () => setReduced(mq.matches);
+    mq.addEventListener('change', on);
+    return () => mq.removeEventListener('change', on);
+  }, []);
+  return reduced;
+}
+
 function hasWebGL() {
   try {
     const c = document.createElement('canvas');
-    return !!(c.getContext('webgl2') || c.getContext('webgl'));
+    const gl = c.getContext('webgl2') || c.getContext('webgl');
+    gl?.getExtension('WEBGL_lose_context')?.loseContext(); // release the probe context
+    return !!gl;
   } catch {
     return false;
   }
@@ -14,6 +29,7 @@ function hasWebGL() {
 export function HeroScene({ stageRef }: { stageRef: React.RefObject<HTMLDivElement | null> }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [failed, setFailed] = useState(false);
+  const reducedMotion = useReducedMotion();
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -30,10 +46,12 @@ export function HeroScene({ stageRef }: { stageRef: React.RefObject<HTMLDivEleme
       handle = createScene({
         canvas,
         stage,
+        reducedMotion,
         onReady: () => {
           root.dataset.hero = 'webgl';
         },
-        onFail: () => {
+        onFail: (reason) => {
+          console.warn(`[portrait] ${reason}, showing the static hero.`);
           root.dataset.hero = 'fallback';
           setFailed(true);
         },
@@ -44,7 +62,7 @@ export function HeroScene({ stageRef }: { stageRef: React.RefObject<HTMLDivEleme
       setFailed(true);
     }
     return () => handle?.dispose();
-  }, [stageRef]);
+  }, [stageRef, reducedMotion]);
 
   if (failed) return null;
   return <canvas ref={canvasRef} className="hero-canvas" aria-hidden="true" />;

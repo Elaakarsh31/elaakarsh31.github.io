@@ -102,3 +102,15 @@
     margin-top: 0;
   }
 }
+
+/* Reduced motion: a short, non-sticky hero with a static portrait. */
+@media (prefers-reduced-motion: reduce) {
+  .hero {
+    height: 100vh;
+    height: 100svh;
+  }
+
+  .hero-stage {
+    position: relative;
+  }
+}

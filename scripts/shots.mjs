@@ -231,6 +231,63 @@ try {
   if (want('reduced-motion')) {
     const page = await openPage(browser, 'reduced-motion', { viewport: DESKTOP, reducedMotion: 'reduce' });
     await shot(page, 'reduced-motion');
+    const r = await page.evaluate(() => ({
+      heroH: document.getElementById('top').offsetHeight,
+      vh: window.innerHeight,
+      sticky: getComputedStyle(document.querySelector('.hero-stage')).position,
+      running: document.querySelector('.hero-canvas')?.dataset.running ?? 'never',
+    }));
+    if (r.heroH > r.vh + 1) errors.push(`[reduced-motion] hero is ${r.heroH}px tall, viewport ${r.vh}px`);
+    if (r.sticky === 'sticky') errors.push('[reduced-motion] hero stage is still sticky');
+    if (r.running === '1') errors.push('[reduced-motion] animation loop is running');
+    console.log(`[reduced-motion] hero ${r.heroH}px (viewport ${r.vh}px), stage ${r.sticky}, loop ${r.running}`);
+    await page.context().close();
+  }
+
+  if (!only || want('context-lost')) {
+    const page = await openPage(browser, 'lifecycle', { viewport: DESKTOP });
+    const state = () => page.evaluate(() => document.querySelector('.hero-canvas')?.dataset.running);
+    const log = [];
+    log.push(`start ${await state()}`);
+    // Offscreen: scroll well past the hero.
+    await page.evaluate(() => document.getElementById('experience').scrollIntoView({ behavior: 'instant' }));
+    await page.waitForTimeout(400);
+    const off = await state();
+    log.push(`offscreen ${off}`);
+    if (off !== '0') errors.push(`[lifecycle] loop still running offscreen (${off})`);
+    await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+    await page.waitForTimeout(400);
+    const back = await state();
+    log.push(`back ${back}`);
+    if (back !== '1') errors.push(`[lifecycle] loop did not resume (${back})`);
+    // Hidden tab.
+    await page.evaluate(() => {
+      Object.defineProperty(document, 'hidden', { configurable: true, get: () => true });
+      document.dispatchEvent(new Event('visibilitychange'));
+    });
+    const hidden = await state();
+    log.push(`hidden ${hidden}`);
+    if (hidden !== '0') errors.push(`[lifecycle] loop still running in a hidden tab (${hidden})`);
+    await page.evaluate(() => {
+      Object.defineProperty(document, 'hidden', { configurable: true, get: () => false });
+      document.dispatchEvent(new Event('visibilitychange'));
+    });
+    log.push(`visible ${await state()}`);
+    // Context loss → static hero.
+    await page.evaluate(() => {
+      const c = document.querySelector('.hero-canvas');
+      const gl = c.getContext('webgl2') || c.getContext('webgl');
+      gl.getExtension('WEBGL_lose_context').loseContext();
+    });
+    await page.waitForTimeout(500);
+    const after = await page.evaluate(() => ({
+      hero: document.documentElement.dataset.hero,
+      canvas: !!document.querySelector('.hero-canvas'),
+    }));
+    log.push(`context lost → ${after.hero}, canvas ${after.canvas ? 'present' : 'removed'}`);
+    if (after.hero !== 'fallback' || after.canvas) errors.push('[lifecycle] context loss did not fall back');
+    await shot(page, 'context-lost');
+    console.log(`[lifecycle] ${log.join(', ')}`);
     await page.context().close();
   }
 
