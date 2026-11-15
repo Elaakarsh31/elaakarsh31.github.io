@@ -159,12 +159,37 @@ export function createScene(opts: SceneOptions): SceneHandle {
       .catch((err) => console.warn('[portrait] could not load portrait.glb, using the procedural bust.', err));
   }
 
+  // Scroll progress through the hero section, read from layout each frame (no scroll
+  // listeners, no React state). 0 = top of the page, 1 = the Work section entering the viewport.
+  const hero = (stage.closest('.hero') as HTMLElement | null) ?? stage;
+  function readProgress() {
+    const rect = hero.getBoundingClientRect();
+    const travel = rect.height - window.innerHeight;
+    if (travel <= 1) return rect.top < 0 ? Math.min(1, -rect.top / window.innerHeight) : 0;
+    return Math.min(1, Math.max(0, -rect.top / travel));
+  }
+  let progress = readProgress();
+
   const clock = new THREE.Clock();
+  let last = 0;
   let raf = 0;
   let readySent = false;
   function tick() {
     raf = requestAnimationFrame(tick);
-    uniforms.uTime.value = clock.getElapsedTime();
+    const now = clock.getElapsedTime();
+    const dt = Math.min(0.1, now - last);
+    last = now;
+    uniforms.uTime.value = now;
+
+    // Ease toward the scroll position so fast scrolls and anchor jumps still animate smoothly.
+    const target = readProgress();
+    progress += (target - progress) * (1 - Math.exp(-dt * 7));
+    if (Math.abs(target - progress) < 1e-4) progress = target;
+    uniforms.uProgress.value = progress;
+    // A gentle turn toward the viewer, then away as it dissolves.
+    const turn = Math.sin(Math.min(progress / 0.7, 1) * Math.PI * 0.5);
+    points.rotation.y = HERO.baseYaw + turn * 0.75;
+    points.rotation.x = progress * 0.08;
     renderer.clear();
     points.material = occluder;
     renderer.render(scene, camera);

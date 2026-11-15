@@ -1,7 +1,8 @@
+/* The hero is taller than the viewport; its stage sticks while the bust turns and dissolves. */
 .hero {
   position: relative;
-  height: 100vh;
-  height: 100svh;
+  height: 160vh;
+  height: 160svh;
 }
 
 .hero-stage {
@@ -83,6 +84,13 @@
   text-decoration: none;
   border-bottom: 1px solid var(--lavender);
   padding-bottom: 2px;
+}
+
+@media (max-width: 760px) {
+  .hero {
+    height: 120vh;
+    height: 120svh;
+  }
 }
 
 @media (max-width: 640px) {

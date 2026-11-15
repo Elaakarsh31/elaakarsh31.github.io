@@ -109,7 +109,7 @@ function want(name) {
 // ---------------------------------------------------------------------------
 
 async function captureSize(browser, size, viewport, hasTouch) {
-  if (!['p0', 'p05', 'p1', 'work'].some((t) => want(`${size}-${t}`))) return;
+  if (!['p0', 'p05', 'p1', 'work', 'reverse-p0'].some((t) => want(`${size}-${t}`))) return;
   const page = await openPage(browser, size, { viewport, hasTouch });
   for (const [p, tag] of [
     [0, 'p0'],
@@ -122,6 +122,11 @@ async function captureSize(browser, size, viewport, hasTouch) {
   await page.evaluate(() => document.getElementById('work').scrollIntoView({ behavior: 'instant' }));
   await page.waitForTimeout(400);
   await shot(page, `${size}-work`);
+  // Reverse scroll: the bust must reassemble.
+  await scrollToProgress(page, 0.5);
+  await scrollToProgress(page, 0);
+  await page.waitForTimeout(800);
+  await shot(page, `${size}-reverse-p0`);
   await page.context().close();
 }
 

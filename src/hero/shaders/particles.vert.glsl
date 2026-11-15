@@ -19,8 +19,8 @@ const vec3 WARM = vec3(1.0, 0.93, 0.84);
 const vec3 LAVENDER = vec3(0.70, 0.63, 0.96);
 
 void main() {
-  // Staggered dissolve so the bust comes apart from the outside in, not all at once.
-  float t = clamp((uProgress - aSeed * 0.35) / 0.65, 0.0, 1.0);
+  // Staggered dissolve: the bust turns first, then points leave at slightly different moments.
+  float t = clamp((uProgress - 0.12 - aSeed * 0.38) / 0.5, 0.0, 1.0);
   t = t * t * (3.0 - 2.0 * t);
 
   vec3 p = mix(position, aDispersed, t);
@@ -55,7 +55,8 @@ void main() {
 
 #ifdef OCCLUDER
   // Dark silhouette pass drawn first: large soft sprites that hide the greeting behind the bust.
-  vAlpha = mix(base, 1.0, t) * (1.0 - t);
+  // The silhouette only exists while the bust is assembled; it never travels with the cloud.
+  vAlpha = base * (1.0 - smoothstep(0.0, 0.08, t)) * (1.0 - smoothstep(0.2, 0.5, uProgress));
   gl_PointSize = max(2.0, uSize * uOccScale * uScale / -mv.z);
 #endif
 
