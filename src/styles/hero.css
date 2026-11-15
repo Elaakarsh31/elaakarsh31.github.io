@@ -89,6 +89,8 @@
   .greeting {
     flex-direction: column;
     font-size: 25vw;
-    margin-top: -10vh;
+    justify-content: flex-start;
+    padding-top: calc(var(--nav-h) + 6vh);
+    margin-top: 0;
   }
 }

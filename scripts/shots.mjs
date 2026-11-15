@@ -80,6 +80,8 @@ async function openPage(browser, label, { viewport, reducedMotion = 'no-preferen
   await page.goto(URL, { waitUntil: 'networkidle' });
   await page.waitForFunction(() => document.documentElement.dataset.hero, null, { timeout: 30000 });
   await page.evaluate(() => document.fonts.ready);
+  const info = await page.evaluate(() => document.querySelector('.hero-canvas')?.dataset.info);
+  if (info) console.log(`[${label}] ${info}`);
   return page;
 }
 
@@ -107,7 +109,7 @@ function want(name) {
 // ---------------------------------------------------------------------------
 
 async function captureSize(browser, size, viewport, hasTouch) {
-  if (!want(size)) return;
+  if (!['p0', 'p05', 'p1', 'work'].some((t) => want(`${size}-${t}`))) return;
   const page = await openPage(browser, size, { viewport, hasTouch });
   for (const [p, tag] of [
     [0, 'p0'],
