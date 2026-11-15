@@ -52,6 +52,10 @@ html[data-mode='live'] .frame {
   display: none;
 }
 
+html[data-mode='live'] .hero-name {
+  font-size: clamp(56px, 7.2vw, 108px);
+}
+
 html[data-mode='live'] .hero-copy,
 html[data-mode='live'] .act-copy {
   position: absolute;
@@ -425,4 +429,22 @@ html[data-mode='live'] .contact {
 html[data-grabbing],
 html[data-grabbing] * {
   user-select: none;
+}
+
+/* Phones: the scene is live behind the hero only; the acts use still frames. */
+html[data-mode='phone']:not([data-section='top']) .webgl {
+  opacity: 0;
+}
+
+html[data-mode='phone'] .hero-frame {
+  display: none;
+}
+
+html[data-mode='phone'] .hero {
+  align-content: start;
+  padding-top: calc(var(--nav-h) + 28px);
+}
+
+html[data-mode='phone'] .hero-copy {
+  text-shadow: 0 1px 12px rgba(15, 16, 19, 0.9);
 }

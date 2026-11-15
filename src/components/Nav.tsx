@@ -34,8 +34,11 @@ export function Nav() {
         aria-label="Open command palette"
         aria-keyshortcuts={mac ? 'Meta+K /' : 'Control+K /'}
       >
-        <kbd>{mac ? '⌘' : 'Ctrl'}</kbd>
-        <kbd>K</kbd>
+        <span className="nav-k-keys">
+          <kbd>{mac ? '⌘' : 'Ctrl'}</kbd>
+          <kbd>K</kbd>
+        </span>
+        <span className="nav-k-label">Menu</span>
       </button>
     </header>
   );

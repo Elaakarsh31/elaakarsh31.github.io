@@ -18,7 +18,7 @@ const v = new Vector3();
 export const BOT_SCALE = 1.35;
 
 /** The machine, the bot and the sparks, driven every frame from the build timeline. */
-export function Workshop({ motion, capture }: { motion: boolean; capture: boolean }) {
+export function Workshop({ motion, sparks: sparksOn, capture }: { motion: boolean; sparks: boolean; capture: boolean }) {
   const machine = useMemo(buildMachine, []);
   const bot = useMemo(() => {
     const b = buildBot();
@@ -101,8 +101,8 @@ export function Workshop({ motion, capture }: { motion: boolean; capture: boolea
     bot.root.updateMatrixWorld(true);
     bot.setPose(brain.pose);
 
-    if (motion && brain.pose.weld > 0.05) sparks.emit(bot.weldTip(), 260 * brain.pose.weld, dt);
-    if (motion) sparks.update(Math.min(dt, 0.05));
+    if (sparksOn && brain.pose.weld > 0.05) sparks.emit(bot.weldTip(), 260 * brain.pose.weld, dt);
+    if (sparksOn) sparks.update(Math.min(dt, 0.05));
     else sparks.clear();
   }, -1);
 

@@ -1,6 +1,6 @@
 import { Environment, Lightformer, MeshReflectorMaterial } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
-import { useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { AdditiveBlending, CylinderGeometry, DoubleSide, Object3D, ShaderMaterial, type SpotLight } from 'three';
 import { stage } from '../lib/stage';
 import { blueprint } from './choreo';
@@ -41,6 +41,13 @@ function LightCone() {
     [],
   );
   const geo = useMemo(() => new CylinderGeometry(0.12, 2.3, 6.2, 64, 1, true).translate(0, 3.1, 0), []);
+  useEffect(
+    () => () => {
+      geo.dispose();
+      mat.dispose();
+    },
+    [geo, mat],
+  );
   return <mesh geometry={geo} material={mat} position={[0.25, 0, 0.3]} renderOrder={1} />;
 }
 
@@ -90,6 +97,7 @@ function Projector() {
       }),
     [],
   );
+  useEffect(() => () => mat.dispose(), [mat]);
   useFrame(({ clock }) => {
     mat.uniforms.uTime.value = clock.elapsedTime;
     const lit = stage.highlight?.chips.includes('data') ? 0.7 : 0;

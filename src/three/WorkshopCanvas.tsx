@@ -1,7 +1,7 @@
-import { Canvas, useThree } from '@react-three/fiber';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Bloom, EffectComposer, ToneMapping } from '@react-three/postprocessing';
 import { ToneMappingMode } from 'postprocessing';
-import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { markContextLost, type Mode } from '../lib/env';
 import { currentSection } from '../lib/spy';
 import { BUILD_LENGTH, stage } from '../lib/stage';
@@ -9,7 +9,7 @@ import { BUILD_LENGTH, stage } from '../lib/stage';
 /** Sections after the build that frame the scene with their own camera shot. */
 const AFTER_BUILD = new Set(['projects', 'papers', 'log', 'resume', 'toolbench', 'contact']);
 import { CameraRig, SHOTS, newShot, shotAt, type ShotState } from './CameraRig';
-import { debugCam, fixedP, isCapture, noPost } from './capture';
+import { captureFrame, debugCam, fixedP, isCapture, noPost } from './capture';
 import { HudSync } from './HudSync';
 import { startInput } from './input';
 import { Studio } from './Studio';
@@ -40,6 +40,16 @@ function BenchLoader() {
   );
 }
 
+/** Signals that a still-frame capture has rendered long enough for shadows and sparks to settle. */
+function CaptureReady() {
+  const frames = useRef(0);
+  useFrame(() => {
+    frames.current++;
+    if (frames.current === 90) (window as unknown as { __frameReady: boolean }).__frameReady = true;
+  });
+  return null;
+}
+
 /** Sections where the scene is faded out, so rendering pauses. */
 const NO_SCENE = new Set(['log', 'resume']);
 
@@ -47,7 +57,7 @@ const NO_SCENE = new Set(['log', 'resume']);
  * Pauses rendering when the tab is hidden or the current section shows no scene, and falls back
  * to still frames if the WebGL context is lost.
  */
-function Lifecycle() {
+function Lifecycle({ phone }: { phone: boolean }) {
   const gl = useThree((s) => s.gl);
   const setFrameloop = useThree((s) => s.setFrameloop);
   useEffect(() => {
@@ -60,7 +70,9 @@ function Lifecycle() {
     canvas.addEventListener('webglcontextlost', lost);
     const apply = () => {
       clearTimeout(pauseTimer);
-      const offstage = NO_SCENE.has(currentSection());
+      const section = currentSection();
+      // On phones only the hero is live; the acts below use still frames.
+      const offstage = phone ? section !== 'top' : NO_SCENE.has(section);
       const run = (on: boolean) => {
         setFrameloop(on ? 'always' : 'never');
         canvas.dataset.running = on ? '1' : '0';
@@ -78,7 +90,7 @@ function Lifecycle() {
       document.removeEventListener('visibilitychange', apply);
       window.removeEventListener('section', apply);
     };
-  }, [gl, setFrameloop]);
+  }, [gl, setFrameloop, phone]);
   return null;
 }
 
@@ -102,8 +114,8 @@ export default function WorkshopCanvas({ mode }: { mode: Mode }) {
         out.fov = debugCam[6] ?? 30;
         return out;
       }
-      if (phone) {
-        const s = SHOTS.heroPhone;
+      if (isCapture || phone) {
+        const s = isCapture ? SHOTS[`frame${captureFrame![0].toUpperCase()}${captureFrame!.slice(1)}`] : SHOTS.heroPhone;
         out.pos.fromArray(s.pos);
         out.target.fromArray(s.target);
         out.shift = s.shift;
@@ -145,9 +157,9 @@ export default function WorkshopCanvas({ mode }: { mode: Mode }) {
           if (import.meta.env.DEV) (window as unknown as { __r3f: unknown }).__r3f = state;
         }}
       >
-        <Lifecycle />
+        {isCapture ? <CaptureReady /> : <Lifecycle phone={phone} />}
         <Studio reflect={!phone} shadows={!phone} />
-        <Workshop motion={motion} capture={isCapture} />
+        <Workshop motion={motion} sparks={motion || isCapture} capture={isCapture} />
         {!phone && !isCapture && <BenchLoader />}
         <CameraRig resolve={resolve} immediate={isCapture} />
         <HudSync />

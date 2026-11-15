@@ -10,7 +10,7 @@ export function Callout({ c }: { c: CalloutData }) {
   const detailId = useId();
   const bullet = c.bullet && bulletFor(c.bullet);
   return (
-    <li className="callout hud-glass" data-callout={c.id} data-anchor={c.anchor} data-open={open || undefined}>
+    <li className="callout" data-callout={c.id} data-anchor={c.anchor} data-open={open || undefined}>
       <button
         type="button"
         className="callout-face"

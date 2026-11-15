@@ -24,7 +24,7 @@
   font-family: var(--font-display);
   font-weight: 800;
   font-stretch: 125%;
-  font-size: clamp(44px, 7.4vw, 104px);
+  font-size: clamp(44px, 6.4vw, 104px);
   line-height: 0.92;
   letter-spacing: -0.01em;
 }
@@ -190,9 +190,13 @@
   font-size: 14px;
 }
 
+html[data-mode='static'] .hero-cue {
+  display: none;
+}
+
 @media (min-width: 900px) {
   .hero {
-    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    grid-template-columns: minmax(0, 6fr) minmax(0, 6fr);
     align-items: center;
   }
   .act {

@@ -476,9 +476,29 @@ kbd {
   background: var(--molten);
 }
 
+.nav-k-keys {
+  display: inline-flex;
+  gap: 3px;
+}
+
+.nav-k-label {
+  display: none;
+  font-size: 14px;
+  font-weight: 600;
+}
+
 @media (max-width: 767px) {
   .nav-list {
     display: none;
+  }
+  .nav-k-keys {
+    display: none;
+  }
+  .nav-k-label {
+    display: inline;
+  }
+  .nav-k {
+    padding: 8px 14px;
   }
 }
 
@@ -576,4 +596,47 @@ html[data-bot-hover] .cursor-ring {
   from {
     translate: 0 6px;
   }
+}
+
+/* Still-frame capture page */
+.capture {
+  position: fixed;
+  inset: 0;
+  background: var(--graphite);
+}
+
+.og-copy {
+  position: absolute;
+  left: 64px;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  z-index: 2;
+}
+
+.og-name {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-stretch: 125%;
+  font-size: 76px;
+  line-height: 0.95;
+  width: 6.2em;
+}
+
+.og-role {
+  margin-top: 22px;
+  font-family: var(--font-mono);
+  font-size: 18px;
+  color: var(--ice);
+}
+
+.og-tagline {
+  margin-top: 10px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-stretch: 112%;
+  font-size: 26px;
+  color: var(--text);
 }

@@ -13,13 +13,40 @@ import { ResumeButton } from './components/ResumeButton';
 import { SocialDock } from './components/SocialDock';
 import { Toolbench } from './components/Toolbench';
 import { portfolio } from './content/portfolio';
+import { captureFrame, isCapture } from './three/capture';
 import { hasFinePointer, useMode } from './lib/env';
 import { interceptHashLinks, scrollToTarget, startSmoothScroll } from './lib/scroll';
 import { startSpy } from './lib/spy';
 
 const WorkshopCanvas = lazy(() => import('./three/WorkshopCanvas'));
 
+/**
+ * Still-frame capture (?frame=…): only the scene, for public/frames/*.png and the OG image.
+ * The OG frame adds the name and title over the scene.
+ */
+function CaptureApp({ frame }: { frame: string }) {
+  return (
+    <div className="capture" data-frame={frame}>
+      <Suspense fallback={null}>
+        <WorkshopCanvas mode="live" />
+      </Suspense>
+      {frame === 'og' && (
+        <div className="og-copy">
+          <p className="og-name">{portfolio.site.name}</p>
+          <p className="og-role">Data Scientist, ML Researcher, AI Engineer</p>
+          <p className="og-tagline">{portfolio.hero.tagline}</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function App() {
+  if (isCapture) return <CaptureApp frame={captureFrame!} />;
+  return <Site />;
+}
+
+function Site() {
   const mode = useMode();
   const [finePointer] = useState(hasFinePointer);
 
