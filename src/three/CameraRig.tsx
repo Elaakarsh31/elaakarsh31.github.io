@@ -14,14 +14,14 @@ export const SHOTS: Record<string, Shot> = {
   system: { pos: [0.75, 1.75, 7.4], target: [0.1, 1.06, 0], shift: 0.15 },
   projects: { pos: [0.1, 1.7, 9.6], target: [0.08, 1.08, 0], shift: 0.31 },
   toolbench: { pos: [30, 3.15, 3.55], target: [30, 0, 0.12], shift: 0.06, lift: 0.07 },
-  contact: { pos: [-2.0, 1.62, 5.8], target: [-2.0, 1.4, 3.35], shift: 0, lift: -0.2 },
+  contact: { pos: [-2.0, 1.62, 6.3], target: [-2.0, 1.4, 3.35], shift: 0, lift: -0.35 },
   // Still frames: centred, for the phone, reduced-motion and no-WebGL layouts.
   frameHero: { pos: [0.4, 1.75, 7.4], target: [0.12, 1.02, 0], shift: 0 },
   frameData: { pos: [-1.75, 1.5, 5.0], target: [-2.05, 0.6, 0.25], shift: 0 },
   frameModel: { pos: [0.95, 1.9, 6.3], target: [0.12, 1.1, 0], shift: 0 },
   frameSystem: { pos: [0.55, 1.75, 6.9], target: [-0.1, 1.06, 0], shift: 0 },
   frameOg: { pos: [0.7, 1.68, 6.9], target: [0.02, 1.08, 0], shift: 0.16 },
-  heroPhone: { pos: [0.35, 1.7, 9.6], target: [0.15, 1.0, 0], shift: 0, lift: 0.27, fov: 34 },
+  heroPhone: { pos: [0.35, 1.7, 11.2], target: [0.15, 1.0, 0], shift: 0, lift: 0.36, fov: 34 },
 };
 
 /** Camera keyframes along the build: [p, shot]. */

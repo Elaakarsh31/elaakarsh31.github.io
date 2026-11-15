@@ -24,6 +24,12 @@ function Hero() {
         <p className="hero-tagline">{h.tagline}</p>
         <p className="hero-intro">{h.intro}</p>
         <p className="hero-edu">{h.education}</p>
+        <p className="hero-status">
+          <span className="status-dot" aria-hidden="true" />
+          <span>
+            <strong>{portfolio.availability}</strong> {portfolio.workAuth}
+          </span>
+        </p>
       </div>
       <Frame name="hero" alt={h.frameAlt} className="hero-frame" />
       <p className="hero-cue" aria-hidden="true">

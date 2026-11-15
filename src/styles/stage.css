@@ -411,10 +411,19 @@ html[data-mode='live'] .all-skills {
 }
 
 /* Contact: the bot salutes from centre stage, above the copy. */
+/* Contact plus the footer fill exactly one screen, so the end of the page frames the same way as
+   jumping to Contact: the bot above, the copy below. */
 html[data-mode='live'] .contact {
-  min-height: 100vh;
+  min-height: calc(100vh - var(--footer-h));
   align-content: end;
-  padding-bottom: 14vh;
+  padding-bottom: 3vh;
+  gap: 16px;
+}
+
+html[data-mode='live'] .footer {
+  height: var(--footer-h);
+  padding-top: 22px;
+  padding-bottom: 0;
 }
 
 html[data-grabbing],

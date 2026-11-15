@@ -144,6 +144,8 @@ export const portfolio = {
 
   contact,
   availability: 'Open to full-time roles from January 2027.',
+  /** Shown in the hero, at Contact and in Career v1.0. */
+  workAuth: 'No visa sponsorship needed for 3 years on OPT.',
 
   bot: {
     /** Fill this in to give the bot a name. Left empty, no name is shown anywhere. */
@@ -488,7 +490,7 @@ export const portfolio = {
       dates: 'From January 2027',
       role: '“Ships with your team.”',
       org: 'Open to full-time roles.',
-      notes: [],
+      notes: [{ tag: 'Added', text: 'No visa sponsorship needed for 3 years on OPT.' }],
     },
   ] satisfies LogEntry[] as LogEntry[],
 

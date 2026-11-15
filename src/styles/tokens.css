@@ -24,6 +24,7 @@
   --gutter: clamp(16px, 4vw, 64px);
   --maxw: 1240px;
   --nav-h: 60px;
+  --footer-h: 110px;
   --radius: 10px;
   color-scheme: dark;
 }

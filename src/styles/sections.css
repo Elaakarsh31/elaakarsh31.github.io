@@ -558,11 +558,6 @@
   gap: 8px 26px;
 }
 
-.contact-availability {
-  font-family: var(--font-mono);
-  font-size: 14px;
-  color: var(--ice);
-}
 
 /* Schematics: technical drawing in Ice and Holo, Molten for the one thing that matters. */
 .schematic {
@@ -970,5 +965,124 @@
   100% {
     opacity: 0;
     scale: 1.7;
+  }
+}
+
+/* Availability: the status recruiters look for, in the hero and as a card at Contact. */
+.status-dot {
+  position: relative;
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--molten);
+  box-shadow: 0 0 10px rgba(255, 91, 31, 0.9);
+}
+
+.status-dot::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 91, 31, 0.7);
+  animation: status-ping 2s ease-out infinite;
+}
+
+@keyframes status-ping {
+  0% {
+    opacity: 0.9;
+    scale: 0.6;
+  }
+  80%,
+  100% {
+    opacity: 0;
+    scale: 1.9;
+  }
+}
+
+.hero-status {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-top: 22px;
+  max-width: 34rem;
+  padding: 11px 16px 11px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 91, 31, 0.45);
+  background: linear-gradient(180deg, rgba(255, 91, 31, 0.12), rgba(255, 91, 31, 0.04));
+  box-shadow: 0 0 26px rgba(255, 91, 31, 0.12);
+  font-size: 16px;
+  line-height: 1.45;
+  color: var(--text);
+}
+
+.hero-status .status-dot {
+  translate: 0 -1px;
+}
+
+.hero-status strong {
+  font-weight: 650;
+  color: #fff;
+}
+
+.availability-card {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  margin: 6px 0 4px;
+  padding: 22px 30px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 91, 31, 0.5);
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(255, 91, 31, 0.18), transparent 70%),
+    linear-gradient(180deg, rgba(26, 28, 33, 0.9), rgba(18, 20, 24, 0.9));
+  box-shadow: 0 0 0 1px rgba(255, 91, 31, 0.08) inset, 0 0 40px rgba(255, 91, 31, 0.16), 0 20px 50px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(6px);
+}
+
+.availability-main {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-stretch: 112%;
+  font-size: clamp(20px, 2.4vw, 30px);
+  line-height: 1.2;
+  color: #fff;
+}
+
+.availability-main .status-dot {
+  width: 11px;
+  height: 11px;
+}
+
+.availability-auth {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(111, 211, 255, 0.45);
+  background: rgba(111, 211, 255, 0.1);
+  font-family: var(--font-mono);
+  font-size: clamp(13px, 1.2vw, 15px);
+  color: var(--ice);
+}
+
+.availability-auth svg {
+  color: var(--holo);
+}
+
+@media (max-width: 767px) {
+  .availability-card {
+    padding: 18px 16px;
+  }
+  .availability-main {
+    align-items: baseline;
+    text-align: left;
+  }
+  .availability-auth {
+    border-radius: 12px;
   }
 }

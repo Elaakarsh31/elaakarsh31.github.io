@@ -9,6 +9,18 @@ export function Contact() {
       <h2 id="contact-title" className="contact-title" tabIndex={-1}>
         {portfolio.contactSection.title}
       </h2>
+      <div className="availability-card">
+        <p className="availability-main">
+          <span className="status-dot" aria-hidden="true" />
+          {portfolio.availability}
+        </p>
+        <p className="availability-auth">
+          <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false">
+            <path d="M5 12.5l4.2 4.2L19 7" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          {portfolio.workAuth}
+        </p>
+      </div>
       <p className="contact-email">
         <a href={`mailto:${c.email}`}>{c.email}</a>
       </p>
@@ -26,7 +38,6 @@ export function Contact() {
           <ExtLink href={c.scholar}>Google Scholar</ExtLink>
         </li>
       </ul>
-      <p className="contact-availability">{portfolio.availability}</p>
     </section>
   );
 }

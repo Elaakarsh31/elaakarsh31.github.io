@@ -56,6 +56,13 @@ export class BotBrain {
   private asleep = false;
   private saluteStart = -10;
   private happyUntil = -1;
+  /** 0..1, eased: how much the hover reaction is showing. */
+  private hoverK = 0;
+  private wasHover = false;
+  private nodStart = -10;
+  private tilt = 0;
+  private tuckL = new Vector3();
+  private tuckR = new Vector3();
   private tool: ToolName = 'welder';
   private swapStart = -10;
   private swapTo: ToolName = 'welder';
@@ -173,6 +180,19 @@ export class BotBrain {
     const k = 1 - Math.exp(-dt * 6);
     this.yaw += (yawT - this.yaw) * k;
     this.pitch += (pitchT - this.pitch) * k;
+
+    // Hover reaction, eased in and out: one small nod, then a curious head tilt toward the
+    // pointer, grippers tucked together, a soft bounce.
+    const hovering = !!ctx.hover && !working && !this.asleep && ctx.motion;
+    if (hovering && !this.wasHover) this.nodStart = t;
+    this.wasHover = hovering;
+    this.hoverK += ((hovering ? 1 : 0) - this.hoverK) * (1 - Math.exp(-dt * 5));
+    const side = input.x >= ctx.screenX ? -1 : 1;
+    this.tilt += (side * 0.2 * this.hoverK - this.tilt) * (1 - Math.exp(-dt * 4));
+    const nodU = (t - this.nodStart) / 0.6;
+    const nod = nodU >= 0 && nodU <= 1 ? Math.sin(Math.PI * nodU) * 0.26 : 0;
+    const bounce = this.hoverK * (1 - Math.cos(t * 4.2)) * 0.006;
+
     const leanZ = clamp(-this.vel.x * 0.55, -0.4, 0.4);
     const leanX = clamp(this.vel.z * 0.45, -0.3, 0.3) + clamp(-this.vel.y * 0.2, -0.15, 0.15);
     const wobble = dizzy ? Math.sin(t * 9) * 0.18 : 0;
@@ -196,7 +216,7 @@ export class BotBrain {
     pose.dy = eyes === 'open' || eyes === 'focus' ? dy : 0;
     pose.frame = Math.floor(t * 10);
     pose.led = this.asleep ? 'off' : working ? 'work' : 'idle';
-    pose.thruster = this.asleep ? 0.35 : 0.85 + (ctx.motion && !ctx.capture ? Math.sin(t * 31) * 0.08 + Math.sin(t * 17) * 0.07 : 0);
+    pose.thruster = this.asleep ? 0.35 : 0.85 + this.hoverK * 0.2 + (ctx.motion && !ctx.capture ? Math.sin(t * 31) * 0.08 + Math.sin(t * 17) * 0.07 : 0);
 
     // Tool swap: retract the old tool into the wrist, extend the new one.
     if (ctx.tool !== this.swapTo) {
@@ -255,11 +275,12 @@ export class BotBrain {
         break;
       }
     }
-    // Hovered: a friendly wave with the right gripper.
-    if (ctx.hover && !working && !this.asleep) {
-      pose.right.target.set(0.2, 0.12 + Math.sin(t * 11) * 0.035, 0.11);
-      pose.right.open = 0.55;
-      pose.right.roll = Math.sin(t * 11) * 0.4;
+    // Hovered: grippers drift together under the face, as if pleased to be noticed.
+    if (this.hoverK > 0.001 && !working) {
+      pose.left.target.lerp(this.tuckL.set(-0.075, -0.1, 0.17), this.hoverK);
+      pose.right.target.lerp(this.tuckR.set(0.075, -0.1, 0.17), this.hoverK);
+      pose.left.open += (0.08 - pose.left.open) * this.hoverK;
+      pose.right.open += (0.08 - pose.right.open) * this.hoverK;
     }
     // Salute: right hand up to the top corner of the screen, hold, then snap out.
     const st = t - this.saluteStart;
@@ -271,11 +292,11 @@ export class BotBrain {
 
     return {
       x: this.pos.x,
-      y: this.pos.y + bob,
+      y: this.pos.y + bob + bounce,
       z: this.pos.z,
       yaw: this.yaw + this.spinAngle(t),
-      pitch: this.pitch + leanX,
-      roll: this.roll,
+      pitch: this.pitch + leanX + nod,
+      roll: this.roll + this.tilt,
     };
   }
 }
