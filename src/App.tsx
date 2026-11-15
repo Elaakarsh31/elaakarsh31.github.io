@@ -1,33 +1,32 @@
+import { Build } from './components/Build';
+import { Contact } from './components/Contact';
+import { Log } from './components/Log';
 import { Nav } from './components/Nav';
-import { Hero } from './components/Hero';
-import { Work } from './components/Work';
-import { About, Contact, Education, Experience, Publications, Skills } from './components/Sections';
+import { Projects } from './components/Projects';
+import { ResumeBand } from './components/ResumeBand';
+import { Toolbench } from './components/Toolbench';
 import { portfolio } from './content/portfolio';
 
 export function App() {
   return (
     <>
-      <a className="skip" href="#work">
+      <a className="skip" href="#projects">
         Skip to projects
       </a>
       <Nav />
       <main>
-        <Hero />
-        <div className="content">
-          <Work />
-          <Publications />
-          <Experience />
-          <Skills />
-          <Education />
-          <About />
+        <Build />
+        <div className="after-build">
+          <Projects />
+          <Log />
+          <ResumeBand />
+          <Toolbench />
           <Contact />
         </div>
       </main>
       <footer className="footer">
-        <div className="footer-inner">
-          <span>{portfolio.site.name}</span>
-          <a href="#top">Back to top</a>
-        </div>
+        <span>{portfolio.site.name}</span>
+        <a href="#top">Back to top</a>
       </footer>
     </>
   );

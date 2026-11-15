@@ -1,0 +1,29 @@
+:root {
+  /* Surfaces */
+  --graphite: #0f1013;
+  --gunmetal: #1a1c21;
+  --gunmetal-2: #22252b;
+  --titanium: #b9bec7;
+  /* Type */
+  --text: #eef0f3;
+  --muted: #8d929c; /* 5.9:1 on graphite */
+  /* Heat: the only hot color */
+  --molten: #ff5b1f; /* 5.9:1 on graphite; use graphite text on it */
+  --molten-soft: rgba(255, 91, 31, 0.16);
+  /* Light */
+  --holo: #6fd3ff;
+  --holo-soft: rgba(111, 211, 255, 0.12);
+  --holo-line: rgba(111, 211, 255, 0.42);
+  --ice: #cfe3f2;
+  --rule: rgba(185, 190, 199, 0.14);
+
+  --font-display: 'Archivo Variable', 'Archivo', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-body: 'Archivo Variable', 'Archivo', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+  --gutter: clamp(16px, 4vw, 64px);
+  --maxw: 1240px;
+  --nav-h: 60px;
+  --radius: 10px;
+  color-scheme: dark;
+}

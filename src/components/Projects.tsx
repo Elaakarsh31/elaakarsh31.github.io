@@ -1,0 +1,105 @@
+import { portfolio, STAGES, type Project } from '../content/portfolio';
+import { findPublication, yearOf } from '../content/resume';
+import { projectImageUrl } from '../lib/assets';
+import { ExtLink } from './ExtLink';
+import { LinkRow } from './LinkRow';
+import { Schematic } from './Schematic';
+
+function SpecSheet({ p }: { p: Project }) {
+  const img = projectImageUrl(p.id);
+  return (
+    <li>
+      <article
+        id={`project-${p.id}`}
+        className="sheet"
+        data-chips={p.chips.join(' ')}
+        data-plates={p.plates?.join('|')}
+        aria-labelledby={`project-${p.id}-title`}
+      >
+        <div className="sheet-preview">
+          {img ? <img src={img} alt="" loading="lazy" decoding="async" /> : <Schematic id={p.id} />}
+        </div>
+        <div className="sheet-body">
+          <header className="sheet-head">
+            <h3 id={`project-${p.id}-title`} className="sheet-title">
+              {p.title}
+            </h3>
+            <p className="sheet-meta">
+              <span>{p.year}</span>
+              {p.note && <span>{p.note}</span>}
+            </p>
+          </header>
+          <p className="sheet-summary">{p.summary}</p>
+          <ul className="chips" aria-label="Pipeline stages">
+            {STAGES.map((s) => {
+              const on = p.chips.includes(s.id);
+              return (
+                <li key={s.id} className="chip" data-on={on || undefined}>
+                  {s.label}
+                  <span className="sr-only">{on ? ': covered' : ': not covered'}</span>
+                </li>
+              );
+            })}
+          </ul>
+          <p className="sheet-result">
+            <span className="sheet-result-label">Key result</span> {p.keyResult}
+          </p>
+          <ul className="stack" aria-label="Stack">
+            {p.stack.map((t) => (
+              <li key={t}>{t}</li>
+            ))}
+          </ul>
+          <LinkRow links={p.links} />
+        </div>
+      </article>
+    </li>
+  );
+}
+
+function Papers() {
+  return (
+    <section id="papers" className="papers" aria-labelledby="papers-title">
+      <h3 id="papers-title" className="papers-title">
+        Papers
+      </h3>
+      <ul className="papers-list">
+        {portfolio.papers.map((paper) => {
+          const entry = findPublication(paper.resumeTitle);
+          if (!entry) return null;
+          return (
+            <li key={paper.resumeTitle} className="paper">
+              <p className="paper-title">{paper.title ?? entry.title}</p>
+              <p className="paper-meta">
+                <span>{entry.venue}</span>
+                <span>{yearOf(entry.date)}</span>
+              </p>
+              <LinkRow links={paper.links} />
+            </li>
+          );
+        })}
+      </ul>
+      <p className="papers-note">
+        <ExtLink href={portfolio.contact.scholar}>{portfolio.papersNote}</ExtLink>
+      </p>
+    </section>
+  );
+}
+
+export function Projects() {
+  return (
+    <section id="projects" className="section projects" aria-labelledby="projects-title">
+      <h2 id="projects-title" className="section-title" tabIndex={-1}>
+        Projects
+      </h2>
+      <ul className="sheets">
+        {portfolio.projects.map((p) => (
+          <SpecSheet key={p.id} p={p} />
+        ))}
+      </ul>
+      <p className="more-github">
+        <ExtLink href={portfolio.contact.github}>{portfolio.moreOnGitHub}</ExtLink>
+      </p>
+      <Papers />
+    </section>
+  );
+}

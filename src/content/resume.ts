@@ -60,3 +60,26 @@ export function findPublication(title: string) {
 export function findExperience(company: string) {
   return resume.experience.find((e) => norm(e.company) === norm(company));
 }
+
+export function findEducation(institution: string) {
+  return resume.education.find((e) => norm(e.institution) === norm(institution));
+}
+
+/** Last four-digit year in a date string such as "Mar 2026". */
+export function yearOf(date: string) {
+  return date.match(/\d{4}(?!.*\d{4})/)?.[0] ?? date;
+}
+
+export function isSkill(name: string) {
+  return resume.skills.some((s) => s.items.includes(name));
+}
+
+type BulletRef =
+  | { source: 'projects'; title: string; index: number }
+  | { source: 'publications'; title: string; index: number }
+  | { source: 'experience'; company: string; index: number };
+
+export function bulletFor(ref: BulletRef): Bullet | undefined {
+  if (ref.source === 'experience') return findExperience(ref.company)?.bullets[ref.index];
+  return findProject(ref.title, ref.source)?.bullets[ref.index];
+}

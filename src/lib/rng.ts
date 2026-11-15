@@ -1,4 +1,4 @@
-/** Small seeded PRNG (mulberry32) so the portrait is identical on every load. */
+/** Small seeded PRNG (mulberry32), so procedural scenes are identical on every load. */
 export function createRng(seed: number) {
   let a = seed >>> 0;
   return () => {
