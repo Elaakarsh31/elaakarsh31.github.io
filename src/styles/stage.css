@@ -73,6 +73,10 @@ html[data-mode='live'] .act[data-live] .act-copy {
   pointer-events: auto;
 }
 
+html[data-mode='live'] .act-copy > * {
+  align-self: flex-start;
+}
+
 html[data-mode='live'] .act-copy {
   opacity: 0;
   width: min(36vw, 520px);
@@ -436,4 +440,71 @@ html[data-mode='phone'] .hero {
 
 html[data-mode='phone'] .hero-copy {
   text-shadow: 0 1px 12px rgba(15, 16, 19, 0.9);
+}
+
+/* A quick dip to hide the cut between the machine and the toolbench. */
+.webgl[data-cut] {
+  opacity: 0 !important;
+  transition: opacity 0.22s ease;
+}
+
+/* Machine part under the pointer */
+.part-tag {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 3;
+  pointer-events: none;
+  transform: translate3d(var(--hx, -999px), var(--hy, -999px), 0);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.part-tag[data-on][data-hud-visible='1'] {
+  opacity: 1;
+}
+
+.part-tag::before {
+  content: '';
+  position: absolute;
+  left: -4px;
+  top: -4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1px solid var(--holo);
+  box-shadow: 0 0 10px rgba(111, 211, 255, 0.7);
+}
+
+.part-tag .part-name,
+.part-tag .part-hint {
+  position: absolute;
+  left: 14px;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+}
+
+.part-tag .part-name {
+  top: -22px;
+  padding: 3px 8px;
+  border-radius: 5px;
+  border: 1px solid rgba(111, 211, 255, 0.5);
+  background: rgba(10, 16, 22, 0.8);
+  font-size: 11.5px;
+  color: var(--ice);
+}
+
+.part-tag .part-hint {
+  top: 6px;
+  font-size: 10.5px;
+  color: var(--muted);
+}
+
+.plate-tag[data-hover][data-hud-visible='1'] {
+  opacity: 1;
+}
+
+.plate-tag[data-hover] span {
+  border-color: var(--holo);
+  box-shadow: 0 0 14px rgba(111, 211, 255, 0.45);
 }

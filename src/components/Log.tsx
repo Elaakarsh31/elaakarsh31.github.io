@@ -2,7 +2,6 @@ import { useEffect, useRef } from 'react';
 import { portfolio, type LogEntry } from '../content/portfolio';
 import { findEducation, findExperience } from '../content/resume';
 import { Details } from './Details';
-import { HoverText } from './HoverText';
 
 const MONTHS = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
 
@@ -123,7 +122,7 @@ export function Log() {
   return (
     <section id="career" className="section log" aria-labelledby="career-title">
       <h2 id="career-title" className="section-title" tabIndex={-1}>
-        <HoverText text="Career" />
+        Career
       </h2>
       <p className="log-about">{portfolio.about}</p>
       <ol className="log-list" ref={list}>

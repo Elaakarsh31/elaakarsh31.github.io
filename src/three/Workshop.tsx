@@ -1,6 +1,6 @@
 import { useFrame, useThree, type ThreeEvent } from '@react-three/fiber';
 import { useEffect, useMemo, useRef } from 'react';
-import { Group, Vector3 } from 'three';
+import { CylinderGeometry, Group, Mesh, MeshBasicMaterial, Vector3 } from 'three';
 import { botName, pokeBot, setBotPresent } from '../lib/bot-bus';
 import { stage } from '../lib/stage';
 import { registerAnchor } from './anchors';
@@ -13,8 +13,36 @@ import { currentSection } from '../lib/spy';
 import { BUILD_LENGTH } from '../lib/stage';
 import { createSparks } from './sparks';
 import { setCrackle } from '../lib/sound';
+import { input } from './input';
 
 const v = new Vector3();
+const camRight = new Vector3();
+const camUp = new Vector3();
+const local = new Vector3();
+
+/** Shows the hovered machine part's name in the HUD and lights its plate label. */
+function showPart(part: { anchor: string; label: string; kind: string } | null) {
+  const html = document.documentElement;
+  const tag = document.querySelector<HTMLElement>('.part-tag');
+  document.querySelectorAll<HTMLElement>('.plate-tag[data-hover]').forEach((t) => delete t.dataset.hover);
+  if (!part) {
+    delete html.dataset.machineHover;
+    if (tag) delete tag.dataset.on;
+    return;
+  }
+  html.dataset.machineHover = '1';
+  if (part.kind === 'plate') {
+    const pt = document.querySelector<HTMLElement>(`.plate-tag[data-plate="${part.label}"]`);
+    if (pt) pt.dataset.hover = '1';
+    if (tag) delete tag.dataset.on;
+    return;
+  }
+  if (tag) {
+    tag.dataset.hudAnchor = part.anchor;
+    tag.querySelector('.part-name')!.textContent = part.label;
+    tag.dataset.on = '1';
+  }
+}
 /** The bot's size relative to the machine: palm-sized, big enough to read its face. */
 export const BOT_SCALE = 1.35;
 
@@ -29,6 +57,17 @@ export function Workshop({ motion, sparks: sparksOn, capture }: { motion: boolea
   const brain = useMemo(() => new BotBrain(), []);
   const sparks = useMemo(createSparks, []);
   const data = useMemo(buildData, []);
+  // An invisible cylinder around the machine: one cheap raycast for hover and click.
+  const proxy = useMemo(() => {
+    const m = new Mesh(
+      new CylinderGeometry(0.98, 0.98, 2.45, 32),
+      new MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false, colorWrite: false }),
+    );
+    m.position.y = 1.22;
+    m.name = 'machine-proxy';
+    return m;
+  }, []);
+  const hoverPart = useRef<string>('');
   const plan = useMemo(newPlan, []);
   const turntable = useRef<Group>(null);
   const camera = useThree((s) => s.camera);
@@ -48,10 +87,12 @@ export function Workshop({ motion, sparks: sparksOn, capture }: { motion: boolea
       setBotPresent(false);
       machine.dispose();
       data.dispose();
+      proxy.geometry.dispose();
+      (proxy.material as MeshBasicMaterial).dispose();
       bot.dispose();
       sparks.dispose();
     };
-  }, [machine, bot, sparks, data]);
+  }, [machine, bot, sparks, data, proxy]);
 
   // At Contact the bot comes to centre stage and salutes, once each time the section is entered.
   useEffect(() => {
@@ -94,7 +135,21 @@ export function Workshop({ motion, sparks: sparksOn, capture }: { motion: boolea
     v.copy(bot.root.position).project(camera);
     const screenX = (v.x * 0.5 + 0.5) * size.width;
     const screenY = (-v.y * 0.5 + 0.5) * size.height;
-    const tr = brain.update(dt, t, { ...plan, screenX, screenY, motion, capture }, (world, out) =>
+    const hover = !!document.documentElement.dataset.botHover;
+    // Curious: when the pointer comes near and the bot is free, it drifts a little toward it.
+    if (motion && input.hasPointer && plan.task.kind === 'idle') {
+      const dx = input.x - screenX;
+      const dy = input.y - screenY;
+      const near = 1 - Math.min(1, Math.hypot(dx, dy) / 280);
+      if (near > 0) {
+        camRight.setFromMatrixColumn(camera.matrixWorld, 0);
+        camUp.setFromMatrixColumn(camera.matrixWorld, 1);
+        const k = near * 0.0006;
+        plan.target.addScaledVector(camRight, Math.max(-0.14, Math.min(0.14, dx * k)));
+        plan.target.addScaledVector(camUp, Math.max(-0.1, Math.min(0.1, -dy * k)));
+      }
+    }
+    const tr = brain.update(dt, t, { ...plan, screenX, screenY, motion, capture, hover }, (world, out) =>
       bot.body.worldToLocal(out.copy(world)),
     );
     bot.root.position.set(tr.x, tr.y, tr.z);
@@ -113,9 +168,36 @@ export function Workshop({ motion, sparks: sparksOn, capture }: { motion: boolea
     pokeBot();
   };
 
+  const onMachineMove = (e: ThreeEvent<PointerEvent>) => {
+    if (capture) return;
+    // The bot is in front: it takes the hover, the machine lets go.
+    if (document.documentElement.dataset.botHover) {
+      if (hoverPart.current) onMachineOut();
+      return;
+    }
+    machine.root.worldToLocal(local.copy(e.point));
+    const part = machine.pick(local);
+    const key = part ? `${part.kind}:${part.index}` : '';
+    if (key === hoverPart.current) return;
+    hoverPart.current = key;
+    machine.setHover(part);
+    showPart(part);
+  };
+  const onMachineOut = () => {
+    hoverPart.current = '';
+    machine.setHover(null);
+    showPart(null);
+  };
+  const onMachineClick = (e: ThreeEvent<MouseEvent>) => {
+    if (capture || e.delta > 6 || document.documentElement.dataset.botHover) return;
+    machine.ping();
+    brain.react(clock.elapsedTime);
+  };
+
   return (
     <group ref={turntable}>
       <primitive object={machine.root} />
+      <primitive object={proxy} onPointerMove={onMachineMove} onPointerOut={onMachineOut} onClick={onMachineClick} />
       <primitive object={data.root} />
       <primitive
         object={bot.root}

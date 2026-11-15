@@ -4,7 +4,6 @@ import { portfolio, STAGES } from '../content/portfolio';
 import { resume } from '../content/resume';
 import { setBenchSorted } from '../lib/bench';
 import { useMode } from '../lib/env';
-import { HoverText } from './HoverText';
 
 /**
  * Engraved tool tags on a physics bench (live mode), sorted by magnets into Data, Model and
@@ -39,7 +38,7 @@ export function Toolbench() {
         <div className="bench-stage">
           <div className="bench-head">
             <h2 id="toolbench-title" className="section-title" tabIndex={-1}>
-              <HoverText text={t.title} />
+              {t.title}
             </h2>
             <p className="section-line">{t.line}</p>
             {live && (

@@ -147,10 +147,7 @@
   }
 }
 
-.sheet-preview .schematic {
-  max-width: 620px;
-  margin: 0 auto;
-}
+
 
 /* Papers strip */
 .papers {
@@ -795,4 +792,128 @@
 
 .contact-email a:hover {
   text-shadow: 0 0 24px rgba(111, 211, 255, 0.35);
+}
+
+/* Interactive schematics: lift the part you point at, dim the rest, explain it underneath. */
+.schematic-wrap {
+  width: 100%;
+  max-width: 620px;
+  margin: 0 auto;
+}
+
+.sch-part {
+  cursor: pointer;
+  transition: opacity 0.25s ease, transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.25s;
+}
+
+.schematic.has-active .sch-part:not(.is-on) {
+  opacity: 0.38;
+}
+
+.sch-part.is-on {
+  transform: translate(4px, -4px);
+  filter: drop-shadow(0 0 6px rgba(111, 211, 255, 0.45));
+}
+
+.sch-part.is-on .sch-face {
+  fill: rgba(111, 211, 255, 0.16);
+  stroke: var(--holo);
+}
+
+.sch-part.is-on .sch-top,
+.sch-part.is-on .sch-side {
+  fill: rgba(111, 211, 255, 0.24);
+}
+
+.sch-part.is-on .sch-label {
+  fill: #fff;
+}
+
+.sch-part.is-on .sch-gate,
+.sch-part.is-on .sch-stop {
+  fill: rgba(255, 91, 31, 0.5);
+}
+
+.sch-part.is-on .sch-note {
+  fill: var(--ice);
+}
+
+.sch-part.is-on .sch-note-hot {
+  fill: #ffb08f;
+}
+
+/* Every shape in a part is hoverable, even hollow ones; wires stay out of the way. */
+.sch-part :is(rect, circle, text, .sch-face, .sch-top, .sch-side, .sch-gate, .sch-stop) {
+  pointer-events: visible;
+}
+
+.sch-part .sch-wire {
+  pointer-events: stroke;
+}
+
+.sch-hit {
+  pointer-events: stroke;
+  stroke: transparent;
+  stroke-width: 14;
+  fill: none;
+}
+
+/* Data flows along the wires while the sheet is hovered. */
+.sheet:hover .sch-wire {
+  stroke-dasharray: 5 5;
+  animation: sch-flow 0.9s linear infinite;
+}
+
+@keyframes sch-flow {
+  to {
+    stroke-dashoffset: -20;
+  }
+}
+
+/* Footage frames and tokens light up in sequence when their part is pointed at. */
+.sch-part.is-on .sch-frame,
+.sch-part.is-on .sch-token {
+  animation: sch-scan 1.3s ease-in-out infinite;
+  animation-delay: calc(var(--i) * 0.08s);
+}
+
+@keyframes sch-scan {
+  0%,
+  100% {
+    fill: rgba(111, 211, 255, 0.06);
+  }
+  30% {
+    fill: rgba(111, 211, 255, 0.55);
+  }
+}
+
+.sch-caption {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 2.6em;
+  margin: 4px 6px 2px;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 1.35;
+  color: var(--muted);
+  transition: color 0.2s;
+}
+
+.sch-caption[data-on] {
+  color: var(--ice);
+}
+
+.sch-caption-mark {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  border: 1px solid var(--holo);
+  transition: background 0.2s, box-shadow 0.2s;
+}
+
+.sch-caption[data-on] .sch-caption-mark {
+  background: var(--holo);
+  box-shadow: 0 0 10px rgba(111, 211, 255, 0.8);
 }

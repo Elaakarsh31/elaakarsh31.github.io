@@ -37,6 +37,12 @@ const KEYS: [number, keyof typeof SHOTS][] = [
 ];
 
 const a = new Vector3();
+
+let snapNext = false;
+/** Puts the camera straight on its next shot, for a cut hidden behind a fade. */
+export function snapCamera() {
+  snapNext = true;
+}
 const b = new Vector3();
 
 /** Interpolated shot at timeline position p. */
@@ -73,7 +79,8 @@ export function CameraRig({ resolve, immediate }: { resolve: (out: ShotState) =>
 
   useFrame((_, dt) => {
     resolve(want);
-    const k = immediate ? 1 : 1 - Math.exp(-Math.min(dt, 0.05) * 7);
+    const k = immediate || snapNext ? 1 : 1 - Math.exp(-Math.min(dt, 0.05) * 7);
+    snapNext = false;
     if (!Number.isFinite(cur.pos.x) || cur.pos.lengthSq() === 0) {
       cur.pos.copy(want.pos);
       cur.target.copy(want.target);

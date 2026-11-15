@@ -220,7 +220,7 @@ async function mobile(browser) {
   const r = await page.evaluate(() => ({
     frames: document.querySelectorAll('.act .frame img').length,
     rail: getComputedStyle(document.querySelector('.rail')).display,
-    cursor: !!document.querySelector('.cursor-glow'),
+    cursor: !!document.querySelector('.cur-ring'),
     overflow: document.documentElement.scrollWidth > innerWidth + 1,
   }));
   if (r.frames !== 3) errors.push(`[mobile] ${r.frames} act frames shown, expected 3`);
@@ -391,7 +391,7 @@ async function reducedMotion(browser) {
     canvas: !!document.querySelector('.webgl canvas'),
     sticky: getComputedStyle(document.querySelector('.stage')).position,
     lenis: document.documentElement.classList.contains('lenis'),
-    cursor: !!document.querySelector('.cursor-glow'),
+    cursor: !!document.querySelector('.cur-ring'),
     frames: document.querySelectorAll('.frame img').length,
     callouts: document.querySelectorAll('.callout').length,
   }));

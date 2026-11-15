@@ -23,6 +23,8 @@ export type BotContext = {
   motion: boolean;
   /** Deterministic pose for still-frame captures: no blinking, sleeping or wobble. */
   capture: boolean;
+  /** The pointer is over the bot. */
+  hover?: boolean;
 };
 
 const SLEEP_AFTER = 20000;
@@ -53,6 +55,7 @@ export class BotBrain {
   private lastShake = 0;
   private asleep = false;
   private saluteStart = -10;
+  private happyUntil = -1;
   private tool: ToolName = 'welder';
   private swapStart = -10;
   private swapTo: ToolName = 'welder';
@@ -91,6 +94,11 @@ export class BotBrain {
 
   salute(t: number) {
     this.saluteStart = t;
+  }
+
+  /** A short happy reaction, for example when the machine is pinged. */
+  react(t: number) {
+    this.happyUntil = t + 1.4;
   }
 
   /** Spin angle for the click animation. */
@@ -179,6 +187,7 @@ export class BotBrain {
     if (working) eyes = 'focus';
     if (t < this.blinkUntil) eyes = 'blink';
     if (ctx.task.kind === 'thumbs' || ctx.task.kind === 'salute' || t - this.saluteStart < 1.6) eyes = 'happy';
+    if (!working && (ctx.hover || t < this.happyUntil)) eyes = 'happy';
     if (t < this.startleUntil) eyes = 'startle';
     if (dizzy) eyes = 'spiral';
     if (this.asleep) eyes = 'closed';
@@ -245,6 +254,12 @@ export class BotBrain {
         pose.right.thumb = 1;
         break;
       }
+    }
+    // Hovered: a friendly wave with the right gripper.
+    if (ctx.hover && !working && !this.asleep) {
+      pose.right.target.set(0.2, 0.12 + Math.sin(t * 11) * 0.035, 0.11);
+      pose.right.open = 0.55;
+      pose.right.roll = Math.sin(t * 11) * 0.4;
     }
     // Salute: right hand up to the top corner of the screen, hold, then snap out.
     const st = t - this.saluteStart;

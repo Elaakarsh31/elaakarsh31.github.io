@@ -297,30 +297,6 @@ strong {
 /* ---------------------------------------------------------------------------------------------
    Hover effects on text */
 
-/* Headings: the letter under the pointer lifts and heats to Molten; its neighbours warm. */
-.hword {
-  display: inline-block;
-  white-space: nowrap;
-}
-
-.hch {
-  display: inline-block;
-  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), color 0.3s, text-shadow 0.35s;
-}
-
-.hch:hover {
-  color: var(--molten);
-  transform: translateY(-0.07em) scale(1.06);
-  text-shadow: 0 0 0.35em rgba(255, 91, 31, 0.45);
-  transition-duration: 0.12s;
-}
-
-.hch:has(+ .hch:hover),
-.hch:hover + .hch {
-  color: #ffb594;
-  transform: translateY(-0.035em);
-}
-
 /* Links in the content: an underline that draws in from the left, and a nudge on the arrow. */
 main a:not(.btn, .rail-seg) {
   text-decoration: none;
@@ -376,8 +352,4 @@ a:hover .ext {
 
 .nav-mark:hover {
   color: var(--molten);
-}
-
-.htext-sr {
-  user-select: none;
 }

@@ -8,7 +8,6 @@ import { startStageSync } from '../lib/stageSync';
 import { createBuildTimeline } from '../lib/timeline';
 import { Callout } from './Callout';
 import { Frame } from './Frame';
-import { HoverText } from './HoverText';
 import { StageReadouts } from './StageReadouts';
 
 const stageLabel = (id: Act['id']) => STAGES.find((s) => s.id === id)!.label;
@@ -20,7 +19,7 @@ function Hero() {
     <section id="top" className="hero" aria-labelledby="hero-title">
       <div className="hero-copy">
         <h1 id="hero-title" className="hero-name" tabIndex={-1}>
-          <HoverText text={portfolio.site.name} />
+          {portfolio.site.name}
         </h1>
         <p className="hero-tagline">{h.tagline}</p>
         <p className="hero-intro">{h.intro}</p>
@@ -42,7 +41,7 @@ function ActSection({ act }: { act: Act }) {
           Act {act.index}, {stageLabel(act.id)}
         </p>
         <h2 id={`act-${act.id}-title`} className="act-title" tabIndex={-1}>
-          <HoverText text={act.title} />
+          {act.title}
         </h2>
         <p className="act-line">{act.line}</p>
         <a className="act-link" href={act.link.href}>
@@ -183,6 +182,12 @@ export function Build() {
           </g>
         ))}
       </svg>
+      {live && (
+        <div className="part-tag" data-hud-anchor="layer-1" aria-hidden="true">
+          <span className="part-name">Core layer</span>
+          <span className="part-hint">click to pulse</span>
+        </div>
+      )}
       <ul className="plate-tags" aria-label="Machine plates">
         {portfolio.plates.map((name, i) => (
           <li key={name} className="plate-tag" data-hud-anchor={`plate-${PLATE_SLUGS[i]}`} data-plate={name}>

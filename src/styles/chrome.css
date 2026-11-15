@@ -383,93 +383,88 @@ kbd {
   opacity: 1;
 }
 
-/* Cursor: a clean arrow in the site's colors, Molten over anything clickable, with a soft Holo
-   glow and a short comet trail following behind it (Cursor.tsx). Fine pointers only. */
+/* Cursor (Cursor.tsx): a small dot, a neon Holo ring gliding after it with a faint spotlight,
+   and a disc that swells over text and links and flips the colours under it. Fine pointers only. */
 html.has-cursor,
-html.has-cursor body {
-  cursor: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2226%22%20height%3D%2226%22%20viewBox%3D%220%200%2026%2026%22%3E%3Cpath%20d%3D%22M4.5%203.2%204.6%2019.4c0%20.7.8%201%201.3.6l3.7-3.3%202.6%206c.2.5.8.7%201.3.5l1.9-.8c.5-.2.7-.8.5-1.3l-2.6-5.9%204.9-.3c.7%200%201-.9.5-1.3L5.9%202.6c-.5-.4-1.4%200-1.4.6Z%22%20fill%3D%22%23EEF0F3%22%20stroke%3D%22%230F1013%22%20stroke-width%3D%221.5%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E") 5 3, auto;
+html.has-cursor * {
+  cursor: none !important;
 }
 
-html.has-cursor :is(a[href], button, summary, [role='option'], label, .callout-face) {
-  cursor: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2226%22%20height%3D%2226%22%20viewBox%3D%220%200%2026%2026%22%3E%3Cpath%20d%3D%22M4.5%203.2%204.6%2019.4c0%20.7.8%201%201.3.6l3.7-3.3%202.6%206c.2.5.8.7%201.3.5l1.9-.8c.5-.2.7-.8.5-1.3l-2.6-5.9%204.9-.3c.7%200%201-.9.5-1.3L5.9%202.6c-.5-.4-1.4%200-1.4.6Z%22%20fill%3D%22%23FF5B1F%22%20stroke%3D%22%230F1013%22%20stroke-width%3D%221.5%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E") 5 3, pointer;
+html.has-cursor :is(input, textarea),
+html.has-cursor dialog[open],
+html.has-cursor dialog[open] * {
+  cursor: auto !important;
 }
 
-html.has-cursor[data-bot-hover] body {
-  cursor: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2226%22%20height%3D%2226%22%20viewBox%3D%220%200%2026%2026%22%3E%3Cpath%20d%3D%22M4.5%203.2%204.6%2019.4c0%20.7.8%201%201.3.6l3.7-3.3%202.6%206c.2.5.8.7%201.3.5l1.9-.8c.5-.2.7-.8.5-1.3l-2.6-5.9%204.9-.3c.7%200%201-.9.5-1.3L5.9%202.6c-.5-.4-1.4%200-1.4.6Z%22%20fill%3D%22%23FF5B1F%22%20stroke%3D%22%230F1013%22%20stroke-width%3D%221.5%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E") 5 3, pointer;
+html.has-cursor dialog[open] :is([role='option'], button) {
+  cursor: pointer !important;
 }
 
-html.has-cursor :is(input, textarea) {
-  cursor: text;
-}
-
-html.has-cursor .stage-drag {
-  cursor: grab;
-}
-
-html.has-cursor .stage-drag[data-dragging],
-html[data-grabbing] {
-  cursor: grabbing !important;
-}
-
-html.has-cursor[data-grab] body {
-  cursor: grab;
-}
-
-.cursor-glow,
-.cursor-trail i {
+.cur {
   position: fixed;
   left: 0;
   top: 0;
   z-index: 999;
+  border-radius: 50%;
   pointer-events: none;
   opacity: 0;
+  transition: opacity 0.3s;
   will-change: transform;
 }
 
-html[data-cursor-on] .cursor-glow {
+html[data-cursor-on] .cur-dot,
+html[data-cursor-on] .cur-ring,
+html[data-cursor-on] .cur-spot {
   opacity: 1;
 }
 
-.cursor-glow {
-  width: 56px;
-  height: 56px;
-  margin: -28px 0 0 -28px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(111, 211, 255, 0.5) 0%, rgba(111, 211, 255, 0.2) 36%, rgba(111, 211, 255, 0) 70%);
-  filter: blur(3px);
-  mix-blend-mode: screen;
-  transition: opacity 0.25s, width 0.25s, height 0.25s, margin 0.25s, background 0.3s;
-}
-
-.cursor-glow[data-hot],
-html[data-bot-hover] .cursor-glow,
-html[data-grab] .cursor-glow {
-  width: 66px;
-  height: 66px;
-  margin: -33px 0 0 -33px;
-  /* A halo with a clear centre, so the text under the pointer stays readable. */
-  background: radial-gradient(circle, rgba(255, 91, 31, 0) 0 26%, rgba(255, 91, 31, 0.3) 42%, rgba(255, 91, 31, 0.1) 56%, rgba(255, 91, 31, 0) 70%);
-}
-
-.cursor-glow[data-press] {
-  width: 34px;
-  height: 34px;
-  margin: -17px 0 0 -17px;
-}
-
-.cursor-trail i {
+.cur-dot {
   width: 6px;
   height: 6px;
   margin: -3px 0 0 -3px;
-  border-radius: 50%;
-  background: rgba(111, 211, 255, 0.7);
-  box-shadow: 0 0 10px 2px rgba(111, 211, 255, 0.55);
-  scale: calc(1 - var(--i) * 0.13);
-  transition: opacity 0.12s linear;
+  background: #fff;
+  mix-blend-mode: difference;
 }
 
-html:not([data-cursor-on]) .cursor-trail i {
-  opacity: 0 !important;
+/* The disc that recolours what it covers: Holo over the dark page, deep ember inside white text. */
+.cur-fill {
+  width: 0;
+  height: 0;
+  background: #6fd3ff;
+  mix-blend-mode: difference;
+  transition: opacity 0.2s;
+}
+
+.cur-ring {
+  border: 1.5px solid rgba(207, 227, 242, 0.95);
+  background: radial-gradient(circle, rgba(111, 211, 255, 0.16) 0%, rgba(111, 211, 255, 0.04) 60%, rgba(111, 211, 255, 0) 72%);
+  box-shadow:
+    0 0 8px rgba(111, 211, 255, 0.95),
+    0 0 22px rgba(111, 211, 255, 0.5),
+    0 0 44px rgba(111, 211, 255, 0.22),
+    inset 0 0 10px rgba(111, 211, 255, 0.45);
+  mix-blend-mode: screen;
+  transition: opacity 0.3s, border-color 0.25s, box-shadow 0.25s;
+}
+
+.cur-ring[data-mode='link'],
+.cur-ring[data-mode='scene'],
+.cur-ring[data-mode='grab'],
+.cur-ring[data-mode='grabbing'] {
+  border-color: rgba(255, 196, 168, 0.95);
+  box-shadow:
+    0 0 8px rgba(255, 91, 31, 0.95),
+    0 0 22px rgba(255, 91, 31, 0.5),
+    0 0 44px rgba(255, 91, 31, 0.22),
+    inset 0 0 10px rgba(255, 91, 31, 0.45);
+}
+
+.cur-spot {
+  width: 440px;
+  height: 440px;
+  z-index: 998;
+  background: radial-gradient(circle, rgba(111, 211, 255, 0.075) 0%, rgba(111, 211, 255, 0.03) 32%, rgba(111, 211, 255, 0) 64%);
+  mix-blend-mode: screen;
 }
 
 .nav-k-keys {

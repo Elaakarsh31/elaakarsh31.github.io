@@ -60,6 +60,7 @@ import {
 import { edgesOf, latheWire } from './wire';
 
 const deg = Math.PI / 180;
+const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
 /** A part that exists first as a hologram and is then fabricated in metal. */
 type HoloPart = {
@@ -378,35 +379,91 @@ export function buildMachine() {
   });
 
   // Plate labels need a point that sits on the plate's face.
+  const baseAnchor = new Object3D();
+  baseAnchor.position.set(Math.sin(-30 * deg) * 0.9, 0.16, Math.cos(-30 * deg) * 0.9);
+  root.add(baseAnchor);
+
   const anchors: Record<string, Object3D> = {
     filaments: filamentAnchor,
     crown: crownAnchor,
+    base: baseAnchor,
   };
   layers.forEach((l, i) => (anchors[`layer-${i + 1}`] = l.anchor));
   plates.forEach((pl) => (anchors[`plate-${pl.spec.slug}`] = pl.anchor));
+
+  // --- Interaction: hover a part to outline it, click to send a pulse up the seams ------------
+  type Part = { kind: 'base' | 'layer' | 'crown' | 'plate'; index: number; anchor: string; label: string };
+  let hover: Part | null = null;
+  let pingAt = -10;
+  let lastP = 0;
+  let lastT = 0;
+
+  /** Which part of the machine a point on its proxy cylinder (machine-local) falls on. */
+  function pick(local: { x: number; y: number; z: number }): Part | null {
+    const a = Math.atan2(local.x, local.z) / deg;
+    const y = local.y;
+    for (const pl of plates) {
+      const st = plateState(pl.k, lastP);
+      if (st.fab < 0.999) continue;
+      const da = ((a - pl.spec.angle + 540) % 360) - 180;
+      if (Math.abs(da) <= pl.spec.span / 2 && y >= pl.spec.y0 && y <= pl.spec.y1) {
+        return { kind: 'plate', index: pl.k, anchor: `plate-${pl.spec.slug}`, label: pl.spec.name };
+      }
+    }
+    if (y < 0.27) return { kind: 'base', index: 0, anchor: 'base', label: 'Base' };
+    if (y >= crown.group.position.y - 0.01) return { kind: 'crown', index: 0, anchor: 'crown', label: 'Crown' };
+    for (let i = LAYERS - 1; i >= 0; i--) {
+      if (y >= layers[i].group.position.y - LAYER_GAP / 2) return { kind: 'layer', index: i, anchor: `layer-${i + 1}`, label: `Core layer ${i + 1} of ${LAYERS}` };
+    }
+    return null;
+  }
+
+  function setHover(part: Part | null) {
+    hover = part;
+  }
+
+  /** A pulse of light runs base → crown and the core gives one quick turn. */
+  function ping() {
+    pingAt = lastT;
+  }
 
   // --- Per-frame update ------------------------------------------------------------------------
   let pulseClock = 0;
   const HEIGHT = SPINE_TOP;
 
   function update(p: number, t: number, dt: number, motion: boolean, highlight: { chips: string[]; plates: string[] } | null) {
+    lastP = p;
+    lastT = t;
     const ex = explode(p);
     const bp = blueprint(p);
-    const spin = coreSpin(p);
+    // A click on the machine adds one smooth extra turn of the core.
+    const sinceP = t - pingAt;
+    const kick = sinceP >= 0 && sinceP < 1.2 ? easeInOutCubic(sinceP / 1.2) * Math.PI * 2 : 0;
+    const pingWave = sinceP >= 0 && sinceP < 1.5 ? sinceP / 1.3 : -1;
+    const pingGlow = sinceP >= 0 && sinceP < 0.9 ? 1 - sinceP / 0.9 : 0;
+    const spin = coreSpin(p) + kick;
     const isPowered = powered(p);
     pulseClock = isPowered && motion ? pulseClock + dt : 0;
     // Wave front from the base (0) to past the crown (1.15). Scroll-driven once, then on a timer.
     const wave = isPowered && motion ? ((pulseClock * 0.32) % 1.5) - 0.1 : power(p) * 1.15;
     const pulseAt = (y: number) => {
-      if (!(isPowered || power(p) > 0)) return 0;
-      const d = y / HEIGHT - wave;
-      return Math.exp(-(d * d) / 0.006);
+      let v = 0;
+      if (isPowered || power(p) > 0) {
+        const d = y / HEIGHT - wave;
+        v = Math.exp(-(d * d) / 0.006);
+      }
+      if (pingWave >= 0) {
+        const d = y / HEIGHT - pingWave * 1.15;
+        v = Math.max(v, Math.exp(-(d * d) / 0.004) * 1.2);
+      }
+      return v;
     };
+    const hoverHolo = (m: MeshBasicMaterial) => m.color.copy(C.holo).multiplyScalar(1.15);
     const hlModel = highlight?.chips.includes('model') ?? false;
     const hlSystem = highlight?.chips.includes('system') ?? false;
 
     const hlData = highlight?.chips.includes('data') ?? false;
-    if (hlData) baseSeamMat.color.copy(C.holo).multiplyScalar(1.1);
+    if (hlData || hover?.kind === 'base') hoverHolo(baseSeamMat);
     else seamColor(baseSeamMat, 0, pulseAt(0.1));
 
     layers.forEach((L, i) => {
@@ -420,17 +477,19 @@ export function buildMachine() {
       gm.uniforms.uFab.value = fab;
       gm.uniforms.uTime.value = t;
       gm.uniforms.uMotion.value = motion ? 1 : 0;
-      gm.uniforms.uOpacity.value = fab >= 0.999 ? (hlModel ? 0.5 : 0) : bp;
+      const hovered = hover?.kind === 'layer' && hover.index === i;
+      gm.uniforms.uOpacity.value = (fab >= 0.999 ? (hlModel ? 0.5 : hovered ? 0.35 : 0) : bp) + pingGlow * 0.5;
       L.ghost.visible = gm.uniforms.uOpacity.value > 0.001;
-      L.wire.material.opacity = fab >= 0.999 ? (hlModel ? 0.35 : 0) : 0.5 * bp;
+      L.wire.material.opacity = fab >= 0.999 ? (hlModel ? 0.35 : hovered ? 0.6 : 0) : 0.5 * bp + (hovered ? 0.35 : 0);
       L.wire.visible = L.wire.material.opacity > 0.001;
       const heat = Math.max(seamHeat(i, p), 0);
-      seamColor(L.seamM, heat, pulseAt(layerY(i) + LAYER_H));
+      if (hovered && heat < 0.05) hoverHolo(L.seamM);
+      else seamColor(L.seamM, heat, pulseAt(layerY(i) + LAYER_H));
       L.seam.visible = fab > 0.98 || heat > 0;
     });
 
     filamentLines.rotation.y = spin;
-    filamentMat.uniforms.uOn.value = motion ? filaments(p) : filaments(p) * 0.6;
+    filamentMat.uniforms.uOn.value = Math.max(motion ? filaments(p) : filaments(p) * 0.6, pingGlow * 0.8);
     filamentMat.uniforms.uTime.value = motion ? t : 0;
     filamentLines.visible = filamentMat.uniforms.uOn.value > 0.001;
 
@@ -443,10 +502,12 @@ export function buildMachine() {
     crown.ghost.material.uniforms.uFab.value = cf;
     crown.ghost.material.uniforms.uTime.value = t;
     crown.ghost.material.uniforms.uMotion.value = motion ? 1 : 0;
-    crown.ghost.material.uniforms.uOpacity.value = cf >= 0.999 ? 0 : bp;
-    crown.ghost.visible = cf < 0.999;
-    crown.wire.material.opacity = cf >= 0.999 ? 0 : 0.5 * bp;
-    seamColor(crownSeamM, 0, pulseAt(CROWN_Y + 0.13));
+    const crownHover = hover?.kind === 'crown';
+    crown.ghost.material.uniforms.uOpacity.value = (cf >= 0.999 ? (crownHover ? 0.35 : 0) : bp) + pingGlow * 0.5;
+    crown.ghost.visible = crown.ghost.material.uniforms.uOpacity.value > 0.001;
+    crown.wire.material.opacity = cf >= 0.999 ? (crownHover ? 0.6 : 0) : 0.5 * bp + (crownHover ? 0.35 : 0);
+    if (crownHover) hoverHolo(crownSeamM);
+    else seamColor(crownSeamM, 0, pulseAt(CROWN_Y + 0.13));
     const pw = power(p);
     lamps.forEach((l, i) => {
       const chase = isPowered && motion ? 0.55 + 0.45 * Math.max(0, Math.sin(t * 3 - i * 0.7)) : 1;
@@ -478,8 +539,9 @@ export function buildMachine() {
       pl.metal.visible = st.fab > 0.001;
       // The lock click, and the power-on pulse running along the plate's seams.
       const pulse = st.locked ? pulseAt((pl.spec.y0 + pl.spec.y1) / 2) * 0.7 : 0;
-      (pl.flash.material as ShaderMaterial).uniforms.uFlash.value = Math.max(st.flash, pulse);
-      pl.flash.visible = st.flash > 0.001 || pulse > 0.01;
+      const plateHover = hover?.kind === 'plate' && hover.index === pl.k ? 0.55 : 0;
+      (pl.flash.material as ShaderMaterial).uniforms.uFlash.value = Math.max(st.flash, pulse, plateHover);
+      pl.flash.visible = st.flash > 0.001 || pulse > 0.01 || plateHover > 0;
     });
   }
 
@@ -517,6 +579,9 @@ export function buildMachine() {
     root,
     anchors,
     update,
+    pick,
+    setHover,
+    ping,
     heroWeldPoint,
     seamPoint,
     plateBoltPoint,

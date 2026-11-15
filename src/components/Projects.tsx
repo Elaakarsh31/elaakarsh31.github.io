@@ -3,7 +3,6 @@ import { findPublication, yearOf } from '../content/resume';
 import { projectImageUrl } from '../lib/assets';
 import { stage } from '../lib/stage';
 import { ExtLink } from './ExtLink';
-import { HoverText } from './HoverText';
 import { LinkRow } from './LinkRow';
 import { Schematic } from './Schematic';
 
@@ -107,7 +106,7 @@ export function Projects() {
   return (
     <section id="projects" className="section projects" aria-labelledby="projects-title">
       <h2 id="projects-title" className="section-title" tabIndex={-1}>
-        <HoverText text="Projects" />
+        Projects
       </h2>
       <ul className="sheets">
         {portfolio.projects.map((p) => (

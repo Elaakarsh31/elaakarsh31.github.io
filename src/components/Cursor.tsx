@@ -1,92 +1,116 @@
 import { useEffect, useRef } from 'react';
 
-/** Interactive things the glow warms up over. */
-const HOT = 'a[href], button, summary, [role="option"], .sheet, .callout';
-const TRAIL = 6;
+// What the follower does over different things. Order matters: the first match wins.
+const LINKS = 'a[href], button, summary, [role="option"], .callout-face';
+const BIG_TEXT = 'h1, h2, .contact-email, .resume-band-line';
+const TEXT = 'h3, .sheet-title, .paper-title, .hero-tagline, .act-line, .log-title';
+
+type Mode = 'rest' | 'link' | 'text' | 'big' | 'scene' | 'grab' | 'grabbing';
+
+// [ring size, fill size, spot opacity] per mode, in px.
+const SIZES: Record<Mode, [number, number]> = {
+  rest: [34, 0],
+  link: [58, 58],
+  text: [92, 92],
+  big: [132, 132],
+  scene: [52, 0],
+  grab: [48, 0],
+  grabbing: [28, 0],
+};
 
 /**
- * A clean arrow cursor (drawn in CSS, see chrome.css) with a soft Holo glow that follows a beat
- * behind it, plus a short comet trail while it moves. Over links and controls the glow warms to
- * Molten and swells; it pulses on press. Fine pointers only, never with reduced motion.
+ * A minimal cursor: a small precise dot, a neon Holo ring that glides after it with a soft
+ * spotlight around it, and a disc that swells over text and links and flips the colours under it
+ * (mix-blend difference), so the heading or link you point at changes colour inside the circle.
+ * Fine pointers only, never with reduced motion.
  */
 export function Cursor() {
-  const glow = useRef<HTMLDivElement>(null);
-  const trail = useRef<HTMLDivElement>(null);
+  const spot = useRef<HTMLDivElement>(null);
+  const fill = useRef<HTMLDivElement>(null);
+  const ring = useRef<HTMLDivElement>(null);
+  const dot = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const html = document.documentElement;
     html.classList.add('has-cursor');
-    const g = glow.current!;
-    const dots = [...trail.current!.children] as HTMLElement[];
-    // Offset from the arrow's tip to its visual centre, so the glow sits behind the arrow.
-    const OX = 7;
-    const OY = 9;
-    let x = -200;
-    let y = -200;
-    let gx = x;
-    let gy = y;
-    const pts = dots.map(() => ({ x, y }));
+    let x = -300;
+    let y = -300;
+    let fx = x;
+    let fy = y;
+    let sx = x;
+    let sy = y;
+    let ringSize = SIZES.rest[0];
+    let fillSize = 0;
+    let mode: Mode = 'rest';
+    let target: Element | null = null;
+    let pressed = false;
     let visible = false;
-    let hot = false;
     let raf = 0;
 
-    const setState = (key: string, on: boolean) => {
-      if (on) g.dataset[key] = '1';
-      else delete g.dataset[key];
+    const modeFor = (el: Element | null): Mode => {
+      if (html.dataset.grabbing) return 'grabbing';
+      if (html.dataset.grab) return 'grab';
+      if (html.dataset.botHover || html.dataset.machineHover) return 'scene';
+      if (!el) return 'rest';
+      if (el.closest('dialog')) return 'rest';
+      if (el.closest(LINKS)) return 'link';
+      if (el.closest(BIG_TEXT)) return 'big';
+      if (el.closest(TEXT)) return 'text';
+      return 'rest';
     };
 
     const onMove = (e: PointerEvent) => {
       if (e.pointerType !== 'mouse') return;
       x = e.clientX;
       y = e.clientY;
+      target = e.target instanceof Element ? e.target : null;
       if (!visible) {
         visible = true;
-        gx = x;
-        gy = y;
-        pts.forEach((p) => {
-          p.x = x;
-          p.y = y;
-        });
+        fx = sx = x;
+        fy = sy = y;
         html.dataset.cursorOn = '1';
-      }
-      const el = e.target instanceof Element ? e.target.closest(HOT) : null;
-      if (!!el !== hot) {
-        hot = !!el;
-        setState('hot', hot);
       }
     };
     const onLeave = () => {
       visible = false;
       delete html.dataset.cursorOn;
     };
-    const onDown = () => setState('press', true);
-    const onUp = () => setState('press', false);
+    const onDown = () => (pressed = true);
+    const onUp = () => (pressed = false);
+
+    const r = ring.current!;
+    const f = fill.current!;
+    const s = spot.current!;
+    const d = dot.current!;
 
     const frame = () => {
       raf = requestAnimationFrame(frame);
-      // The glow lags behind, then settles onto the arrow.
-      const px = gx;
-      const py = gy;
-      gx += (x + OX - gx) * 0.16;
-      gy += (y + OY - gy) * 0.16;
-      const vx = gx - px;
-      const vy = gy - py;
-      const speed = Math.min(1, Math.hypot(vx, vy) / 24);
+      const next = modeFor(target);
+      if (next !== mode) {
+        mode = next;
+        r.dataset.mode = mode;
+      }
+      const [rs, fs] = SIZES[mode];
+      const press = pressed ? 0.82 : 1;
+      ringSize += (rs * press - ringSize) * 0.2;
+      fillSize += (fs * press - fillSize) * 0.2;
+      const px = fx;
+      const py = fy;
+      fx += (x - fx) * 0.2;
+      fy += (y - fy) * 0.2;
+      sx += (x - sx) * 0.07;
+      sy += (y - sy) * 0.07;
+      const vx = fx - px;
+      const vy = fy - py;
+      const stretch = Math.min(0.28, Math.hypot(vx, vy) / 70);
       const angle = Math.atan2(vy, vx);
-      g.style.transform = `translate3d(${gx}px, ${gy}px, 0) rotate(${angle}rad) scale(${1 + speed * 0.45}, ${1 - speed * 0.25})`;
-      // Comet trail: each dot chases the one before it, fading out when still.
-      let lx = x + OX * 0.4;
-      let ly = y + OY * 0.4;
-      pts.forEach((p, i) => {
-        p.x += (lx - p.x) * 0.42;
-        p.y += (ly - p.y) * 0.42;
-        const d = dots[i];
-        const gap = Math.hypot(lx - p.x, ly - p.y);
-        d.style.transform = `translate3d(${p.x}px, ${p.y}px, 0)`;
-        d.style.opacity = String(Math.min(1, gap / 6) * (1 - i / TRAIL) * 0.9);
-        lx = p.x;
-        ly = p.y;
-      });
+      d.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+      r.style.width = r.style.height = `${ringSize}px`;
+      r.style.transform = `translate3d(${fx}px, ${fy}px, 0) translate(-50%, -50%) rotate(${angle}rad) scale(${1 + stretch}, ${1 - stretch * 0.6})`;
+      f.style.width = f.style.height = `${fillSize}px`;
+      f.style.transform = `translate3d(${fx}px, ${fy}px, 0) translate(-50%, -50%)`;
+      f.style.opacity = fillSize > 1 ? '1' : '0';
+      s.style.transform = `translate3d(${sx}px, ${sy}px, 0) translate(-50%, -50%)`;
     };
 
     window.addEventListener('pointermove', onMove, { passive: true });
@@ -109,12 +133,10 @@ export function Cursor() {
 
   return (
     <>
-      <div ref={trail} className="cursor-trail" aria-hidden="true">
-        {Array.from({ length: TRAIL }, (_, i) => (
-          <i key={i} style={{ ['--i' as string]: i }} />
-        ))}
-      </div>
-      <div ref={glow} className="cursor-glow" aria-hidden="true" />
+      <div ref={spot} className="cur cur-spot" aria-hidden="true" />
+      <div ref={fill} className="cur cur-fill" aria-hidden="true" />
+      <div ref={ring} className="cur cur-ring" data-mode="rest" aria-hidden="true" />
+      <div ref={dot} className="cur cur-dot" aria-hidden="true" />
     </>
   );
 }
