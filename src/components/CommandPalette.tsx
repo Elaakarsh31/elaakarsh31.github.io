@@ -151,6 +151,8 @@ export function CommandPalette() {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      // Not while the power-on gate is up.
+      if (document.documentElement.dataset.gate) return;
       const k = e.key.toLowerCase();
       if ((e.metaKey || e.ctrlKey) && !e.altKey && !e.shiftKey && k === 'k') {
         e.preventDefault();

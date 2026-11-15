@@ -18,6 +18,8 @@ export function startSmoothScroll() {
   if (lenis) return stopSmoothScroll;
   lenis = new Lenis({ autoRaf: false, lerp: 0.11, wheelMultiplier: 1, anchors: false });
   lenis.on('scroll', ScrollTrigger.update);
+  // The power-on gate holds the page still until the visitor powers on.
+  if (document.documentElement.dataset.gate) lenis.stop();
   gsap.ticker.add(raf);
   gsap.ticker.lagSmoothing(0);
   ScrollTrigger.refresh();

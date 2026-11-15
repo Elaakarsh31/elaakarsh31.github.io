@@ -119,6 +119,14 @@ export class BotBrain {
     this.saluteStart = t;
   }
 
+  /** Power on: a startled hop, then a moment of happy eyes. */
+  wake(t: number) {
+    this.asleep = false;
+    input.lastInput = performance.now();
+    this.startleUntil = t + 0.45;
+    this.happyUntil = t + 1.6;
+  }
+
   /** Shows a pixel icon (or 'happy' / 'heart') on the face, with a blink and a nod as it changes. */
   setGlyph(glyph: string | null, t: number) {
     if (glyph === this.glyph) return;

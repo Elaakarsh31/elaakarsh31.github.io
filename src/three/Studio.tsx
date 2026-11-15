@@ -1,7 +1,7 @@
 import { Environment, Lightformer, MeshReflectorMaterial } from '@react-three/drei';
-import { useFrame } from '@react-three/fiber';
+import { useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useMemo, useRef } from 'react';
-import { AdditiveBlending, CylinderGeometry, DoubleSide, Object3D, ShaderMaterial, type SpotLight } from 'three';
+import { AdditiveBlending, CylinderGeometry, DoubleSide, Object3D, ShaderMaterial, type DirectionalLight, type HemisphereLight, type SpotLight } from 'three';
 import { stage } from '../lib/stage';
 import { blueprint } from './choreo';
 import { C } from './palette';
@@ -101,7 +101,7 @@ function Projector() {
   useFrame(({ clock }) => {
     mat.uniforms.uTime.value = clock.elapsedTime;
     const lit = stage.highlight?.chips.includes('data') ? 0.7 : 0;
-    mat.uniforms.uOn.value = Math.min(1.4, 0.45 + 0.55 * blueprint(stage.p) + lit);
+    mat.uniforms.uOn.value = Math.min(1.4, 0.45 + 0.55 * blueprint(stage.p) + lit) * stage.power;
   });
   return (
     <mesh rotation-x={-Math.PI / 2} position-y={0.004} material={mat} renderOrder={1}>
@@ -110,8 +110,25 @@ function Projector() {
   );
 }
 
+/** Lights at full power; behind the power-on gate they sit at a dim fraction of this. */
+const LIGHTS = { spot: 150, hemi: 0.22, key: 0.9, fill: 0.18 };
+const DIM = 0.12;
+
 export function Studio({ reflect, shadows }: { reflect: boolean; shadows: boolean }) {
   const spot = useRef<SpotLight>(null);
+  const hemi = useRef<HemisphereLight>(null);
+  const key = useRef<DirectionalLight>(null);
+  const fill = useRef<DirectionalLight>(null);
+  const scene = useThree((s) => s.scene);
+  // The power-on gate brings the lights up (stage.power 0 → 1, with a flicker).
+  useFrame(() => {
+    const k = DIM + (1 - DIM) * stage.power;
+    if (spot.current) spot.current.intensity = LIGHTS.spot * k;
+    if (hemi.current) hemi.current.intensity = LIGHTS.hemi * k;
+    if (key.current) key.current.intensity = LIGHTS.key * k;
+    if (fill.current) fill.current.intensity = LIGHTS.fill * k;
+    scene.environmentIntensity = k;
+  });
   const target = useMemo(() => {
     const o = new Object3D();
     o.position.set(0, 0.9, 0);
@@ -127,14 +144,14 @@ export function Studio({ reflect, shadows }: { reflect: boolean; shadows: boolea
         <Lightformer form="rect" intensity={0.7} color="#ffe0cf" position={[5, 1.4, -0.5]} rotation-y={-Math.PI / 2} scale={[2.4, 5, 1]} />
         <Lightformer form="rect" intensity={0.5} position={[0, 1.5, 7]} scale={[6, 1.2, 1]} />
       </Environment>
-      <hemisphereLight args={['#cfe3f2', '#0f1013', 0.22]} />
+      <hemisphereLight ref={hemi} args={['#cfe3f2', '#0f1013', LIGHTS.hemi]} />
       <primitive object={target} />
       <spotLight
         ref={spot}
         position={[0.5, 6.6, 1.6]}
         angle={0.42}
         penumbra={0.9}
-        intensity={150}
+        intensity={LIGHTS.spot}
         decay={2}
         color="#f4f6fa"
         target={target}
@@ -143,8 +160,8 @@ export function Studio({ reflect, shadows }: { reflect: boolean; shadows: boolea
         shadow-bias={-0.0003}
         shadow-normalBias={0.02}
       />
-      <directionalLight position={[-3.5, 3, -4]} intensity={0.9} color="#9cc8ff" />
-      <directionalLight position={[3.5, 1.2, 3]} intensity={0.18} color="#ffc2a6" />
+      <directionalLight ref={key} position={[-3.5, 3, -4]} intensity={LIGHTS.key} color="#9cc8ff" />
+      <directionalLight ref={fill} position={[3.5, 1.2, 3]} intensity={LIGHTS.fill} color="#ffc2a6" />
       <LightCone />
       <Projector />
       <mesh rotation-x={-Math.PI / 2} receiveShadow>

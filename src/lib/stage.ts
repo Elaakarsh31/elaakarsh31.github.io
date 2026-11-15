@@ -12,6 +12,8 @@ export const stage = {
   project: null as string | null,
   /** Drag-to-orbit offset in radians, eased back to zero on release. */
   orbit: { yaw: 0, pitch: 0 },
+  /** Studio lights, 0..1: dim behind the power-on gate, up when the visitor powers on. */
+  power: 0,
 };
 
 /**

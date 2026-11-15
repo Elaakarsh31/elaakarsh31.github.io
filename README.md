@@ -2,6 +2,8 @@
 
 A static portfolio that tells one story: **data → model → system**. In a dark engineering workshop, a small robot builds one machine in three acts as you scroll. Raw data fragments are refined into clean blocks. The blocks are fabricated into a model core. Housing plates lock on until the machine powers on. Holographic callouts pin real facts from the resume to the parts they describe.
 
+The page opens on a **power-on gate**: a systems check that shows the scene loading for real, then one Power on button. Browsers only play sound after a click, tap or key press (scrolling doesn't count), so this one click is what lets every visitor hear the workshop. It is skipped with reduced motion or without WebGL, where there is no sound.
+
 Vite + React + TypeScript, with Three.js through React Three Fiber, GSAP ScrollTrigger and Lenis. Rapier runs the toolbench physics. There is no backend and there are no API keys. Nothing is requested from another origin at runtime: fonts are self-hosted with `@fontsource`, and Rapier's WASM is inlined.
 
 ## Commands
@@ -22,6 +24,7 @@ npm run resume    # only regenerate src/content/resume.generated.json
 ```
 
 `npm run shots` serves `dist/` and checks the following. It fails on any console error, page error or request to another origin.
+- The power-on gate holds the page, fills, focuses Power on, lifts on Enter or a tap, and starts audio.
 - Screenshots at 1440×900 and 390×844: the hero; the start, middle and end of each act; projects; career; the toolbench before and after sorting; contact.
 - No HUD panel overlaps the act copy.
 - Readouts show live values.
@@ -99,7 +102,7 @@ scripts/frames.mjs                      still frames and OG image from the real 
 scripts/check-links.mjs                 link checker
 src/content/                            portfolio.ts (copy), resume.ts (typed resume data)
 src/components/                         sections, HUD, palette, rail, dock, cursor
-src/lib/                                modes, scroll, timeline, stage state, spy, sound
+src/lib/                                modes, scroll, timeline, stage state, spy, sound, boot
 src/three/                              canvas, studio, machine, bot, data, toolbench, HUD sync
 public/frames/                          still frames (generated), og.png (generated), resume.pdf
 ```

@@ -1,8 +1,8 @@
 // Sound, synthesized with Web Audio: a scan chirp as each data fragment passes the refinery ring
 // and a soft knock as its block lands, a click when a plate locks, a faint crackle while the bot
 // welds. On by default (the toggle turns it off, and the choice is remembered per browser).
-// Browsers only allow audio after a click, tap or key press, so the audio engine starts on the
-// first one; scrolling alone does not count.
+// Browsers only allow audio after a click, tap or key press, so the power-on gate asks for one
+// (powerOn), and any other first gesture unlocks it too; scrolling alone does not count.
 const KEY = 'workshop-sound';
 
 let enabled = true;
@@ -80,6 +80,69 @@ export function setSoundOn(on: boolean) {
     if (c && c.state !== 'running') void c.resume();
   } else void ctx?.suspend();
   listeners.forEach((l) => l(on));
+}
+
+/**
+ * The Power on button: start audio inside the click, turn sound on, and play the power-up: a
+ * relay clunk, then a mains hum that swells as the lights come up and settles away.
+ */
+export async function powerOn() {
+  const c = ensure();
+  if (!c) return;
+  setSoundOn(true);
+  try {
+    await c.resume();
+  } catch {
+    return;
+  }
+  if (!master || !noise) return;
+  const t = c.currentTime + 0.02;
+  // Relay clunk: a low thump with a short burst of filtered noise on top.
+  const thump = c.createOscillator();
+  const tg = c.createGain();
+  thump.type = 'sine';
+  thump.frequency.setValueAtTime(150, t);
+  thump.frequency.exponentialRampToValueAtTime(48, t + 0.12);
+  tg.gain.setValueAtTime(0.0001, t);
+  tg.gain.exponentialRampToValueAtTime(0.5, t + 0.006);
+  tg.gain.exponentialRampToValueAtTime(0.0001, t + 0.2);
+  thump.connect(tg).connect(master);
+  thump.start(t);
+  thump.stop(t + 0.22);
+  const burst = c.createBufferSource();
+  burst.buffer = noise;
+  const lp = c.createBiquadFilter();
+  lp.type = 'lowpass';
+  lp.frequency.value = 1800;
+  const bg = c.createGain();
+  bg.gain.setValueAtTime(0.0001, t);
+  bg.gain.exponentialRampToValueAtTime(0.22, t + 0.004);
+  bg.gain.exponentialRampToValueAtTime(0.0001, t + 0.06);
+  burst.connect(lp).connect(bg).connect(master);
+  burst.start(t);
+  burst.stop(t + 0.08);
+  // Mains hum: two detuned saws through a low-pass that opens as the lights come up.
+  const h0 = t + 0.08;
+  const hf = c.createBiquadFilter();
+  hf.type = 'lowpass';
+  hf.Q.value = 3;
+  hf.frequency.setValueAtTime(180, h0);
+  hf.frequency.exponentialRampToValueAtTime(900, h0 + 0.45);
+  hf.frequency.exponentialRampToValueAtTime(260, h0 + 1.1);
+  const hg = c.createGain();
+  hg.gain.setValueAtTime(0.0001, h0);
+  hg.gain.exponentialRampToValueAtTime(0.16, h0 + 0.3);
+  hg.gain.setValueAtTime(0.16, h0 + 0.5);
+  hg.gain.exponentialRampToValueAtTime(0.0001, h0 + 1.25);
+  hf.connect(hg).connect(master);
+  for (const f of [55, 55.7, 110.4]) {
+    const o = c.createOscillator();
+    o.type = 'sawtooth';
+    o.frequency.value = f;
+    o.connect(hf);
+    o.start(h0);
+    o.stop(h0 + 1.3);
+  }
 }
 
 /** A soft mechanical click with a short ping, for a plate locking. */

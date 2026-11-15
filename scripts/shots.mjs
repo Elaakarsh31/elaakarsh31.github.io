@@ -70,7 +70,17 @@ function watch(page, label) {
   });
 }
 
-async function newPage(browser, label, { viewport = DESKTOP, reducedMotion = 'no-preference', mobile = false, permissions = [] } = {}) {
+/** Presses Power on (or Enter) once the gate is ready, and waits for it to lift. */
+async function passGate(page, { key = false } = {}) {
+  if (!(await page.$('.gate'))) return false;
+  await page.waitForSelector('.gate-power:not([disabled])', { timeout: 12000 });
+  if (key) await page.keyboard.press('Enter');
+  else await page.click('.gate-power');
+  await page.waitForSelector('.gate', { state: 'detached', timeout: 5000 });
+  return true;
+}
+
+async function newPage(browser, label, { viewport = DESKTOP, reducedMotion = 'no-preference', mobile = false, permissions = [], gate = true } = {}) {
   const context = await browser.newContext({ viewport, deviceScaleFactor: 1, reducedMotion, hasTouch: mobile, isMobile: mobile, permissions });
   // Popups from the palette (GitHub, LinkedIn…) must not load other origins during the test;
   // the URLs they tried to open are recorded instead.
@@ -85,9 +95,22 @@ async function newPage(browser, label, { viewport = DESKTOP, reducedMotion = 'no
   });
   context.blocked = blocked;
   const page = await context.newPage();
+  // Keep a handle on audio contexts, so the gate check can see that sound started.
+  await page.addInitScript(() => {
+    const AC = window.AudioContext;
+    if (!AC) return;
+    window.__audio = [];
+    window.AudioContext = class extends AC {
+      constructor(...a) {
+        super(...a);
+        window.__audio.push(this);
+      }
+    };
+  });
   watch(page, label);
   await page.goto(URL, { waitUntil: 'networkidle' });
   await page.evaluate(() => document.fonts.ready);
+  if (gate) await passGate(page);
   await page.waitForTimeout(1500);
   return page;
 }
@@ -384,6 +407,52 @@ async function content(browser) {
   await page.context().close();
 }
 
+/** The power-on gate: holds the page, fills, focuses Power on, lifts on Enter and starts sound. */
+async function gateCheck(browser) {
+  if (!want('gate')) return;
+  for (const [label, opts] of [
+    ['gate', {}],
+    ['gate-mobile', { viewport: MOBILE, mobile: true }],
+  ]) {
+    const page = await newPage(browser, label, { ...opts, gate: false });
+    const before = await page.evaluate(() => ({
+      gate: !!document.querySelector('.gate'),
+      flag: document.documentElement.dataset.gate === '1',
+      bar: !!document.querySelector('.gate [role="progressbar"]'),
+      inert: document.querySelector('main')?.hasAttribute('inert'),
+    }));
+    if (!before.gate || !before.flag || !before.bar || !before.inert) errors.push(`[${label}] gate not up: ${JSON.stringify(before)}`);
+    await page.waitForSelector('.gate-power:not([disabled])', { timeout: 12000 });
+    const focused = await page.evaluate(() => document.activeElement?.classList.contains('gate-power'));
+    if (!focused) errors.push(`[${label}] Power on is not focused when ready`);
+    if (!opts.mobile) {
+      await page.mouse.move(700, 500);
+      await page.mouse.wheel(0, 900);
+      await page.waitForTimeout(400);
+      if ((await page.evaluate(() => scrollY)) > 0) errors.push(`[${label}] the page scrolls behind the gate`);
+    }
+    await shot(page, label);
+    if (opts.mobile) await page.tap('.gate-power');
+    else await page.keyboard.press('Enter');
+    await page.waitForSelector('.gate', { state: 'detached', timeout: 5000 });
+    await page.waitForTimeout(300);
+    const after = await page.evaluate(() => ({
+      flag: !!document.documentElement.dataset.gate,
+      inert: !!document.querySelector('[inert]'),
+      audio: (window.__audio ?? []).map((c) => c.state),
+    }));
+    if (after.flag || after.inert) errors.push(`[${label}] page still locked after Power on: ${JSON.stringify(after)}`);
+    if (!after.audio.includes('running')) errors.push(`[${label}] audio not running after Power on: ${after.audio.join(',') || 'no context'}`);
+    if (!opts.mobile) {
+      await page.mouse.wheel(0, 900);
+      await page.waitForTimeout(600);
+      if ((await page.evaluate(() => scrollY)) < 100) errors.push(`[${label}] the page does not scroll after Power on`);
+    }
+    notes.push(`${label}: up, filled, focused, lifted, audio ${after.audio.join(',')}`);
+    await page.context().close();
+  }
+}
+
 async function reducedMotion(browser) {
   if (!want('reduced')) return;
   const page = await newPage(browser, 'reduced-motion', { reducedMotion: 'reduce' });
@@ -396,6 +465,7 @@ async function reducedMotion(browser) {
     sticky: getComputedStyle(document.querySelector('.stage')).position,
     lenis: document.documentElement.classList.contains('lenis'),
     cursor: !!document.querySelector('.cur-ring'),
+    gate: !!document.querySelector('.gate'),
     frames: document.querySelectorAll('.frame img').length,
     callouts: document.querySelectorAll('.callout').length,
   }));
@@ -404,6 +474,7 @@ async function reducedMotion(browser) {
   if (r.sticky === 'sticky') errors.push('[reduced-motion] stage is pinned');
   if (r.lenis) errors.push('[reduced-motion] smooth scrolling is on');
   if (r.cursor) errors.push('[reduced-motion] custom cursor is mounted');
+  if (r.gate) errors.push('[reduced-motion] the power-on gate is shown');
   if (r.frames !== 4) errors.push(`[reduced-motion] ${r.frames} still frames, expected 4`);
   notes.push(`reduced motion: ${JSON.stringify(r)}`);
   await page.context().close();
@@ -431,6 +502,7 @@ const server = await startPreview();
 let browser;
 try {
   browser = await chromium.launch({ args: LAUNCH });
+  await gateCheck(browser);
   await desktop(browser);
   await mobile(browser);
   await palette(browser);

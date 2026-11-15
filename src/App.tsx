@@ -7,6 +7,7 @@ import { Cursor } from './components/Cursor';
 import { Log } from './components/Log';
 import { Nav } from './components/Nav';
 import { PipelineRail } from './components/PipelineRail';
+import { PowerGate } from './components/PowerGate';
 import { Projects } from './components/Projects';
 import { ResumeBand } from './components/ResumeBand';
 import { ResumeButton } from './components/ResumeButton';
@@ -18,6 +19,7 @@ import { captureFrame, isCapture } from './three/capture';
 import { hasFinePointer, useMode } from './lib/env';
 import { interceptHashLinks, scrollToTarget, startSmoothScroll } from './lib/scroll';
 import { startSpy } from './lib/spy';
+import { bootStep } from './lib/boot';
 
 const WorkshopCanvas = lazy(() => import('./three/WorkshopCanvas'));
 
@@ -59,6 +61,7 @@ function Site() {
   }, [mode]);
 
   useEffect(() => {
+    void document.fonts.ready.then(() => bootStep('fonts'));
     const stopLinks = interceptHashLinks();
     const stopSpy = startSpy();
     // Land on a deep link once fonts and layout have settled.
@@ -102,6 +105,7 @@ function Site() {
       {mode !== 'static' && <BotSpeech />}
       <div className="veil" aria-hidden="true" />
       {finePointer && document.documentElement.dataset.motion !== 'reduce' && <Cursor />}
+      {mode !== 'static' && <PowerGate />}
     </>
   );
 }

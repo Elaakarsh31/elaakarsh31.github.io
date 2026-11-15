@@ -2,6 +2,7 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Bloom, EffectComposer, ToneMapping } from '@react-three/postprocessing';
 import { ToneMappingMode } from 'postprocessing';
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import { bootStep, setPowered } from '../lib/boot';
 import { markContextLost, type Mode } from '../lib/env';
 import { currentSection } from '../lib/spy';
 import { BUILD_LENGTH, stage } from '../lib/stage';
@@ -36,6 +37,17 @@ function BenchLoader() {
       <Bench active={active} />
     </Suspense>
   );
+}
+
+/** Reports the first frames to the power-on gate: shaders compiled, then the bot running. */
+function BootProbe() {
+  const frames = useRef(0);
+  useFrame(() => {
+    frames.current++;
+    if (frames.current === 3) bootStep('materials');
+    if (frames.current === 10) bootStep('bot');
+  });
+  return null;
 }
 
 /** Signals that a still-frame capture has rendered long enough for shadows and sparks to settle. */
@@ -96,6 +108,11 @@ export default function WorkshopCanvas({ mode }: { mode: Mode }) {
   useEffect(() => {
     startInput();
     if (fixedP !== null) stage.p = fixedP;
+    // Still frames have no gate: the workshop is powered from the start.
+    if (isCapture) {
+      stage.power = 1;
+      setPowered();
+    }
   }, []);
 
   const resolve = useMemo(() => {
@@ -164,9 +181,11 @@ export default function WorkshopCanvas({ mode }: { mode: Mode }) {
         eventPrefix="client"
         onCreated={(state) => {
           if (import.meta.env.DEV) (window as unknown as { __r3f: unknown }).__r3f = state;
+          bootStep('scene');
         }}
       >
         {isCapture ? <CaptureReady /> : <Lifecycle phone={phone} />}
+        <BootProbe />
         <Studio reflect={!phone} shadows={!phone} />
         <Workshop motion={motion} sparks={motion || isCapture} capture={isCapture} />
         {!phone && !isCapture && <BenchLoader />}

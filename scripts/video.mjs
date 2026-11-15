@@ -53,6 +53,10 @@ try {
   page.on('pageerror', (e) => errors.push(e.message));
   page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
   await page.goto(URL, { waitUntil: 'networkidle' });
+  // Power on, as a visitor would.
+  await page.waitForSelector('.gate-power:not([disabled])', { timeout: 12000 });
+  await page.click('.gate-power');
+  await page.waitForSelector('.gate', { state: 'detached', timeout: 5000 });
   await page.waitForTimeout(2500);
   await page.mouse.move(SIZE.width * 0.55, SIZE.height * 0.5);
   // Scroll the whole page with the wheel, so Lenis and the scrubbed timeline behave as for a visitor.

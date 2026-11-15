@@ -14,6 +14,7 @@ import { currentSection } from '../lib/spy';
 import { BUILD_LENGTH } from '../lib/stage';
 import { createSparks } from './sparks';
 import { setCrackle } from '../lib/sound';
+import { isPowered } from '../lib/boot';
 import { input } from './input';
 
 const v = new Vector3();
@@ -139,6 +140,13 @@ export function Workshop({ motion, sparks: sparksOn, capture }: { motion: boolea
     return () => window.removeEventListener('section', on);
   }, [brain, clock]);
 
+  // Power on (the gate's button): the bot startles awake and the welding starts.
+  useEffect(() => {
+    const onPower = () => brain.wake(clock.elapsedTime);
+    window.addEventListener('workshop:power', onPower);
+    return () => window.removeEventListener('workshop:power', onPower);
+  }, [brain, clock]);
+
   useEffect(() => {
     const onPoke = () => brain.poke(clock.elapsedTime);
     window.addEventListener('bot:poke', onPoke);
@@ -214,10 +222,12 @@ export function Workshop({ motion, sparks: sparksOn, capture }: { motion: boolea
     bot.root.updateMatrixWorld(true);
     bot.setPose(brain.pose);
 
-    if (sparksOn && brain.pose.weld > 0.05) sparks.emit(bot.weldTip(), 260 * brain.pose.weld, dt);
+    // Before Power on the welder stays cold: no sparks, no crackle.
+    const live = isPowered();
+    if (sparksOn && live && brain.pose.weld > 0.05) sparks.emit(bot.weldTip(), 260 * brain.pose.weld, dt);
     if (sparksOn) sparks.update(Math.min(dt, 0.05));
     else sparks.clear();
-    setCrackle(motion ? brain.pose.weld : 0);
+    setCrackle(motion && live ? brain.pose.weld : 0);
   }, -1);
 
   const onClick = (e: ThreeEvent<MouseEvent>) => {
