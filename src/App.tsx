@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
+import { BotSpeech } from './components/BotSpeech';
 import { Build } from './components/Build';
 import { CommandPalette } from './components/CommandPalette';
 import { Contact } from './components/Contact';
@@ -15,6 +16,8 @@ import { portfolio } from './content/portfolio';
 import { hasFinePointer, useMode } from './lib/env';
 import { interceptHashLinks, scrollToTarget, startSmoothScroll } from './lib/scroll';
 import { startSpy } from './lib/spy';
+
+const WorkshopCanvas = lazy(() => import('./three/WorkshopCanvas'));
 
 export function App() {
   const mode = useMode();
@@ -41,6 +44,11 @@ export function App() {
 
   return (
     <>
+      {mode !== 'static' && (
+        <Suspense fallback={null}>
+          <WorkshopCanvas mode={mode} />
+        </Suspense>
+      )}
       <a className="skip" href="#projects">
         Skip to projects
       </a>
@@ -63,6 +71,7 @@ export function App() {
       <SocialDock />
       <ResumeButton />
       <CommandPalette />
+      {mode !== 'static' && <BotSpeech />}
       <div className="veil" aria-hidden="true" />
       {finePointer && document.documentElement.dataset.motion !== 'reduce' && <Cursor />}
     </>

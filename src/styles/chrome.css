@@ -481,3 +481,99 @@ kbd {
     display: none;
   }
 }
+
+/* WebGL canvas: fixed behind the page */
+.webgl {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.webgl canvas {
+  display: block;
+}
+
+main,
+.footer {
+  position: relative;
+  z-index: 1;
+}
+
+html[data-bot-hover] .cursor-ring {
+  border-color: var(--molten);
+  transform-origin: center;
+}
+
+/* Bot speech tag: pinned above the bot by the HUD sync */
+.bot-speech-anchor {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 20;
+  pointer-events: none;
+  transform: translate3d(var(--hx, -999px), var(--hy, -999px), 0);
+}
+
+.bot-speech-anchor:not([data-hud-visible='1']) {
+  visibility: hidden;
+}
+
+.bot-speech {
+  position: absolute;
+  left: 0;
+  bottom: 64px;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 260px;
+  padding: 8px 12px;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: var(--ice);
+  animation: holo-in 0.32s steps(1, end) both, holo-rise 0.28s ease-out both;
+}
+
+.bot-speech::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  width: 1px;
+  height: 22px;
+  background: linear-gradient(var(--holo-line), transparent);
+}
+
+.bot-speech-name {
+  display: block;
+  color: var(--holo);
+  font-size: 11px;
+}
+
+@keyframes holo-in {
+  0% {
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.8;
+  }
+  35% {
+    opacity: 0.2;
+  }
+  55% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 0.6;
+  }
+  85%,
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes holo-rise {
+  from {
+    translate: 0 6px;
+  }
+}

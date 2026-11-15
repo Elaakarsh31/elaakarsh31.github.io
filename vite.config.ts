@@ -21,6 +21,20 @@ export default defineConfig({
       transformIndexHtml: (html) => html.replaceAll('__SITE_URL__', siteUrl),
     },
   ],
+  // Pre-bundle the lazily imported 3D stack so the dev server never re-optimizes mid-session
+  // (which would load a second copy of React).
+  optimizeDeps: {
+    include: [
+      'three',
+      '@react-three/fiber',
+      '@react-three/drei',
+      '@react-three/postprocessing',
+      'postprocessing',
+      'gsap',
+      'gsap/ScrollTrigger',
+      'lenis',
+    ],
+  },
   define: {
     // Optional schematic previews for the project spec sheets: public/projects/<project id>.<ext>
     __PROJECT_IMAGES__: JSON.stringify(listImages('public/projects')),
