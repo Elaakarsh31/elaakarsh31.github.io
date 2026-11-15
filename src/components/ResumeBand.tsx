@@ -1,6 +1,7 @@
 import { portfolio } from '../content/portfolio';
 import { resumeUrl } from '../lib/assets';
 import { DocIcon } from './Icons';
+import { Roll } from './Roll';
 
 export function ResumeBand() {
   return (
@@ -8,9 +9,9 @@ export function ResumeBand() {
       <h2 id="resume-title" className="resume-band-line" tabIndex={-1}>
         {portfolio.resumeBand.line}
       </h2>
-      <a className="btn btn-hot" href={resumeUrl} download="Aakarsh_Arora_Resume.pdf">
+      <a className="band-download roll-host" href={resumeUrl} download="Aakarsh_Arora_Resume.pdf">
         <DocIcon />
-        {portfolio.resumeBand.button}
+        <Roll>{portfolio.resumeBand.button}</Roll>
       </a>
     </section>
   );

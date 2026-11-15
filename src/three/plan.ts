@@ -152,6 +152,7 @@ export function planBot(p: number, m: MachineHandles, d: DataHandles, out: BotPl
 
 export const BOT_CONTACT = new Vector3(-2.0, 1.42, 3.35);
 export const BOT_BENCH = new Vector3(31.55, 0.62, 0.95);
+export const BOT_CAREER = new Vector3(-2.0, 1.42, 3.35);
 
 const SW_CENTER = new Vector3(0, 1.32, 0);
 
@@ -201,6 +202,12 @@ export function planProject(project: string | null, t: number, m: MachineHandles
 export function planAfterBuild(section: string, out: BotPlan): BotPlan | null {
   if (section === 'toolbench') {
     out.target.copy(BOT_BENCH);
+    out.task = { kind: 'idle' };
+    out.tool = 'gripper';
+    return out;
+  }
+  if (section === 'career' || section === 'resume') {
+    out.target.copy(BOT_CAREER);
     out.task = { kind: 'idle' };
     out.tool = 'gripper';
     return out;

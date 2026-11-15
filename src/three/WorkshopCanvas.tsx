@@ -8,7 +8,7 @@ import { currentSection } from '../lib/spy';
 import { BUILD_LENGTH, stage } from '../lib/stage';
 
 /** Sections after the build that frame the scene with their own camera shot. */
-const SECTION_SHOTS = new Set(['toolbench', 'contact']);
+const SECTION_SHOTS = new Set(['career', 'resume', 'toolbench', 'contact']);
 import { CameraRig, SHOTS, newShot, shotAt, snapCamera, type ShotState } from './CameraRig';
 import { easeInOut } from './timing';
 import { captureFrame, debugCam, fixedP, isCapture, noPost } from './capture';
@@ -53,7 +53,7 @@ function CaptureReady() {
 }
 
 /** Sections where the scene is faded out, so rendering pauses. */
-const NO_SCENE = new Set(['career', 'resume']);
+const NO_SCENE = new Set<string>();
 
 /**
  * Pauses rendering when the tab is hidden or the current section shows no scene, and falls back
@@ -151,6 +151,7 @@ export default function WorkshopCanvas({ mode }: { mode: Mode }) {
       return out;
     };
     return (out: ShotState) => {
+      out.rate = 7;
       if (debugCam) {
         out.pos.set(debugCam[0], debugCam[1], debugCam[2]);
         out.target.set(debugCam[3], debugCam[4], debugCam[5]);
@@ -186,7 +187,9 @@ export default function WorkshopCanvas({ mode }: { mode: Mode }) {
         return regionCut(out);
       }
       if (done) {
-        const s = SHOTS[section];
+        // Section shots glide in more slowly than the scroll-driven build framing.
+        const s = SHOTS[section === 'resume' ? 'career' : section];
+        out.rate = 2.6;
         out.pos.fromArray(s.pos);
         out.target.fromArray(s.target);
         out.shift = s.shift;

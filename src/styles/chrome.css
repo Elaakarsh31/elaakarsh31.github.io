@@ -122,50 +122,87 @@ kbd {
   }
 }
 
-/* Social dock */
+/* Social dock: bare icons; a Molten pill slides behind the one you point at. */
 .dock {
   position: fixed;
   left: 14px;
   bottom: 14px;
   z-index: 35;
-  padding: 5px;
-  border-radius: 12px;
-  background: linear-gradient(180deg, #23262c, var(--gunmetal));
-  border: 1px solid rgba(185, 190, 199, 0.16);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) inset, 0 10px 30px rgba(0, 0, 0, 0.4);
 }
 
 .dock ul {
+  position: relative;
   display: flex;
-  gap: 2px;
+  gap: 4px;
+}
+
+.dock-pill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 100%;
+  border-radius: 999px;
+  background: var(--molten);
+  box-shadow: 0 0 18px rgba(255, 91, 31, 0.55), 0 0 42px rgba(255, 91, 31, 0.22);
+  opacity: 0;
+  scale: 0.5;
+  pointer-events: none;
+  transition:
+    left 0.34s cubic-bezier(0.3, 1.25, 0.45, 1),
+    right 0.34s cubic-bezier(0.3, 1.25, 0.45, 1),
+    opacity 0.2s ease,
+    scale 0.28s cubic-bezier(0.3, 1.4, 0.45, 1);
+}
+
+/* Moving right, the right edge leads and the left edge follows: the pill stretches, then settles. */
+.dock-pill[data-dir='right'] {
+  transition:
+    right 0.18s cubic-bezier(0.2, 0.9, 0.3, 1),
+    left 0.42s cubic-bezier(0.3, 1.2, 0.45, 1),
+    opacity 0.2s ease,
+    scale 0.28s cubic-bezier(0.3, 1.4, 0.45, 1);
+}
+
+.dock-pill[data-dir='left'] {
+  transition:
+    left 0.18s cubic-bezier(0.2, 0.9, 0.3, 1),
+    right 0.42s cubic-bezier(0.3, 1.2, 0.45, 1),
+    opacity 0.2s ease,
+    scale 0.28s cubic-bezier(0.3, 1.4, 0.45, 1);
+}
+
+.dock-pill[data-on] {
+  opacity: 1;
+  scale: 1;
 }
 
 .dock-link {
   position: relative;
+  z-index: 1;
   display: grid;
   place-items: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 9px;
+  width: 42px;
+  height: 42px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
   color: var(--titanium);
-  transition: color 0.18s, transform 0.18s, background 0.18s, box-shadow 0.18s;
-}
-
-.dock-link:hover,
-.dock-link:focus-visible {
-  color: var(--molten);
-  transform: translateY(-2px);
-  background: radial-gradient(circle at 50% 60%, rgba(255, 91, 31, 0.22), transparent 70%);
-  box-shadow: 0 0 18px rgba(255, 91, 31, 0.28);
+  transition: color 0.2s ease;
 }
 
 .dock-link svg {
-  transition: filter 0.18s;
+  filter: drop-shadow(0 1px 6px rgba(0, 0, 0, 0.85));
+  transition: filter 0.2s, transform 0.25s cubic-bezier(0.3, 1.4, 0.45, 1);
 }
 
-.dock-link:hover svg,
-.dock-link:focus-visible svg {
-  filter: drop-shadow(0 0 6px rgba(255, 91, 31, 0.7));
+.dock-link[data-active] {
+  color: var(--graphite);
+}
+
+.dock-link[data-active] svg {
+  filter: none;
+  transform: scale(1.06);
 }
 
 .dock-tip {
@@ -186,38 +223,75 @@ kbd {
   transition: opacity 0.15s, transform 0.15s;
 }
 
-.dock-link:hover .dock-tip,
-.dock-link:focus-visible .dock-tip {
+.dock-link[data-active] .dock-tip {
   opacity: 1;
   transform: translate(-50%, 0);
 }
 
-/* Resume button */
+/* Rolling text: the label slides up, a coloured copy slides in from below. */
+.roll {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  height: 1.25em;
+  line-height: 1.25em;
+  vertical-align: middle;
+}
+
+.roll-a,
+.roll-b {
+  display: block;
+  transition: transform 0.42s cubic-bezier(0.7, 0, 0.2, 1);
+}
+
+.roll-b {
+  position: absolute;
+  left: 0;
+  top: 100%;
+}
+
+.roll-host:hover .roll-a,
+.roll-host:hover .roll-b,
+.roll-host:focus-visible .roll-a,
+.roll-host:focus-visible .roll-b {
+  transform: translateY(-100%);
+}
+
+/* Resume button: no card, just the word and an icon; it rolls up into Holo. */
 .resume-fab {
   position: fixed;
-  right: 14px;
-  bottom: 14px;
+  right: 22px;
+  bottom: 22px;
   z-index: 35;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  min-height: 44px;
-  padding: 0 16px 0 14px;
-  border-radius: 12px;
-  background: linear-gradient(180deg, #23262c, var(--gunmetal));
-  border: 1px solid rgba(185, 190, 199, 0.16);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) inset, 0 10px 30px rgba(0, 0, 0, 0.4);
-  font-weight: 600;
-  font-size: 15px;
+  gap: 9px;
+  min-height: 40px;
+  padding: 0 4px;
+  font-family: var(--font-display);
+  font-weight: 650;
+  font-stretch: 112%;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
   text-decoration: none;
-  color: var(--text);
-  transition: color 0.18s, border-color 0.18s, transform 0.18s;
+  color: var(--muted);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.8);
+  transition: color 0.3s;
 }
 
-.resume-fab:hover,
-.resume-fab:focus-visible {
-  color: var(--molten);
-  border-color: rgba(255, 91, 31, 0.5);
+.resume-fab .roll-b {
+  color: var(--holo);
+  text-shadow: 0 0 14px rgba(111, 211, 255, 0.45);
+}
+
+.resume-fab svg {
+  transition: color 0.3s, transform 0.42s cubic-bezier(0.7, 0, 0.2, 1);
+}
+
+.resume-fab:hover svg,
+.resume-fab:focus-visible svg {
+  color: var(--holo);
   transform: translateY(-2px);
 }
 

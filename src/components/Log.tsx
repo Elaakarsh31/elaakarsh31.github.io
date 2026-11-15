@@ -1,4 +1,5 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useMode } from '../lib/env';
 import { portfolio, type LogEntry } from '../content/portfolio';
 import { findEducation, findExperience } from '../content/resume';
 
@@ -84,7 +85,7 @@ function Graph({ lane, branch, first, last, kind }: { lane: 0 | 1 | 'merge'; bra
 }
 
 /** Heats up the entry nearest the middle of the viewport. */
-function useCurrentEntry(list: React.RefObject<HTMLOListElement | null>) {
+function useCurrentEntry(list: React.RefObject<HTMLOListElement | null>, onChange: (id: string) => void) {
   useEffect(() => {
     const ol = list.current;
     if (!ol) return;
@@ -100,6 +101,11 @@ function useCurrentEntry(list: React.RefObject<HTMLOListElement | null>) {
         // The last one in document order wins, so the graph heats up as you read down.
         const current = entries.filter((e) => seen.has(e)).pop();
         if (!current) return;
+        if (!current.dataset.current) {
+          onChange(current.id);
+          // The 3D bot changes its face for the entry in view.
+          window.dispatchEvent(new CustomEvent('career:entry', { detail: current.id }));
+        }
         for (const e of entries) {
           if (e === current) e.dataset.current = '1';
           else delete e.dataset.current;
@@ -111,13 +117,35 @@ function useCurrentEntry(list: React.RefObject<HTMLOListElement | null>) {
     );
     entries.forEach((e) => io.observe(e));
     return () => io.disconnect();
-  }, [list]);
+  }, [list, onChange]);
+}
+
+type EntryRow = Extract<Row, { type: 'entry' }>;
+
+/** The bot projects a small hologram of the entry in view, beside the timeline (live mode). */
+function CareerHolo({ row }: { row: EntryRow | null }) {
+  if (!row) return null;
+  return (
+    <div className="career-holo-anchor" data-hud-anchor="bot" aria-hidden="true">
+      <div key={row.e.id} className="career-holo">
+        <p className="career-holo-head">
+          <span>{row.e.version}</span>
+          <span>{row.dates}</span>
+        </p>
+        <p className="career-holo-role">{row.role}</p>
+        <p className="career-holo-org">{row.e.org}</p>
+      </div>
+    </div>
+  );
 }
 
 export function Log() {
   const rows = buildRows();
   const list = useRef<HTMLOListElement>(null);
-  useCurrentEntry(list);
+  const live = useMode() === 'live';
+  const [currentId, setCurrentId] = useState<string | null>(null);
+  useCurrentEntry(list, setCurrentId);
+  const current = (rows.find((r) => r.type === 'entry' && r.e.id === currentId) as EntryRow | undefined) ?? null;
   return (
     <section id="career" className="section log" aria-labelledby="career-title">
       <h2 id="career-title" className="section-title" tabIndex={-1}>
@@ -134,6 +162,7 @@ export function Log() {
           ),
         )}
       </p>
+      {live && <CareerHolo row={current} />}
       <ol className="log-list" ref={list}>
         {rows.map((r, k) => {
           if (r.type === 'merge') {

@@ -298,7 +298,7 @@ strong {
    Hover effects on text */
 
 /* Links in the content: an underline that draws in from the left, and a nudge on the arrow. */
-main a:not(.btn, .rail-seg) {
+main a:not(.btn, .rail-seg, .roll-host) {
   text-decoration: none;
   background-image: linear-gradient(var(--holo), var(--holo)), linear-gradient(rgba(238, 240, 243, 0.28), rgba(238, 240, 243, 0.28));
   background-size: 0% 1px, 100% 1px;
@@ -308,8 +308,8 @@ main a:not(.btn, .rail-seg) {
   transition: background-size 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), color 0.2s;
 }
 
-main a:not(.btn, .rail-seg):hover,
-main a:not(.btn, .rail-seg):focus-visible {
+main a:not(.btn, .rail-seg, .roll-host):hover,
+main a:not(.btn, .rail-seg, .roll-host):focus-visible {
   background-size: 100% 1px, 100% 1px;
   color: var(--holo);
 }

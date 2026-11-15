@@ -24,7 +24,7 @@ const local = new Vector3();
 function sceneHidden() {
   const s = currentSection();
   const html = document.documentElement;
-  return s === 'career' || s === 'resume' || (html.dataset.mode === 'phone' && s !== 'top') || !!document.querySelector('.webgl[data-cut]');
+  return (html.dataset.mode === 'phone' && s !== 'top') || !!document.querySelector('.webgl[data-cut]');
 }
 
 /** Shows the hovered machine part's name in the HUD and lights its plate label. */
@@ -100,6 +100,35 @@ export function Workshop({ motion, sparks: sparksOn, capture }: { motion: boolea
       sparks.dispose();
     };
   }, [machine, bot, sparks, data, proxy]);
+
+  // In Career, the bot's face shows an icon for the timeline entry in view.
+  useEffect(() => {
+    const ICON: Record<string, string> = {
+      'career-v0-1': 'cap',
+      'career-v0-2': 'lens',
+      'career-v0-3': 'db',
+      'career-v0-4': 'spark',
+      'career-v0-5': 'cap',
+      'career-v0-6': 'chart',
+      'career-v0-9': 'happy',
+      'career-v1-0': 'heart',
+    };
+    let entry: string | null = null;
+    const apply = () => {
+      const s = currentSection();
+      brain.setGlyph(s === 'career' && entry ? ICON[entry] ?? null : null, clock.elapsedTime);
+    };
+    const onEntry = (e: Event) => {
+      entry = (e as CustomEvent<string>).detail;
+      apply();
+    };
+    window.addEventListener('career:entry', onEntry);
+    window.addEventListener('section', apply);
+    return () => {
+      window.removeEventListener('career:entry', onEntry);
+      window.removeEventListener('section', apply);
+    };
+  }, [brain, clock]);
 
   // At Contact the bot comes to centre stage and salutes, once each time the section is entered.
   useEffect(() => {

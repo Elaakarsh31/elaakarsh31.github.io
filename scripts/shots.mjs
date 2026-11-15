@@ -188,22 +188,26 @@ async function desktop(browser) {
   await scrollToP(page, 0);
   await shot(page, 'desktop-reverse-hero');
 
-  // Lifecycle: paused over Career, running in the build, paused in a hidden tab.
+  // Lifecycle: rendering in Career (the bot is on screen there), paused in a hidden tab, and
+  // running again when the tab comes back.
   const running = () => page.evaluate(() => document.querySelector('.webgl canvas')?.dataset.running);
   await scrollToId(page, 'career-v0-2', 300);
   await page.waitForTimeout(900);
-  const offstage = await running();
-  if (offstage !== '0') errors.push(`[lifecycle] still rendering over Career (${offstage})`);
-  await scrollToP(page, 100);
-  const back = await running();
-  if (back !== '1') errors.push(`[lifecycle] did not resume in the build (${back})`);
+  const career = await running();
+  if (career !== '1') errors.push(`[lifecycle] not rendering in Career, where the bot is on screen (${career})`);
   await page.evaluate(() => {
     Object.defineProperty(document, 'hidden', { configurable: true, get: () => true });
     document.dispatchEvent(new Event('visibilitychange'));
   });
   const hidden = await running();
   if (hidden !== '0') errors.push(`[lifecycle] still rendering in a hidden tab (${hidden})`);
-  notes.push(`lifecycle: offstage ${offstage}, build ${back}, hidden tab ${hidden}`);
+  await page.evaluate(() => {
+    Object.defineProperty(document, 'hidden', { configurable: true, get: () => false });
+    document.dispatchEvent(new Event('visibilitychange'));
+  });
+  const back = await running();
+  if (back !== '1') errors.push(`[lifecycle] did not resume when the tab came back (${back})`);
+  notes.push(`lifecycle: career ${career}, hidden tab ${hidden}, back ${back}`);
   await page.context().close();
 }
 
@@ -227,6 +231,8 @@ async function mobile(browser) {
   if (r.rail !== 'none') errors.push('[mobile] pipeline rail is visible');
   if (r.cursor) errors.push('[mobile] custom cursor is mounted');
   if (r.overflow) errors.push('[mobile] page scrolls horizontally');
+  const phoneRunning = await page.evaluate(() => document.querySelector('.webgl canvas')?.dataset.running);
+  if (phoneRunning !== '0') errors.push(`[mobile] still rendering below the hero (${phoneRunning})`);
   await page.context().close();
 }
 

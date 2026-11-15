@@ -1,11 +1,13 @@
 import { useEffect, useRef } from 'react';
 
 // What the follower does over different things. Order matters: the first match wins.
+/** Controls with their own hover effect (dock pill, rolling text): the ring only, no recolour. */
+const OWN = '.dock, .resume-fab, .band-download';
 const LINKS = 'a[href], button, summary, [role="option"], .callout-face';
 const BIG_TEXT = 'h1, h2, .contact-email, .resume-band-line';
 const TEXT = 'h3, .sheet-title, .paper-title, .hero-tagline, .act-line, .log-title';
 
-type Mode = 'rest' | 'link' | 'text' | 'big' | 'scene' | 'grab' | 'grabbing';
+type Mode = 'rest' | 'link' | 'text' | 'big' | 'scene' | 'grab' | 'grabbing' | 'own';
 
 // [ring size, fill size] per mode, in px: it grows a little, never a lot.
 const SIZES: Record<Mode, [number, number]> = {
@@ -16,6 +18,7 @@ const SIZES: Record<Mode, [number, number]> = {
   scene: [40, 0],
   grab: [38, 0],
   grabbing: [26, 0],
+  own: [34, 0],
 };
 
 /**
@@ -55,6 +58,7 @@ export function Cursor() {
       if (html.dataset.botHover || html.dataset.machineHover) return 'scene';
       if (!el) return 'rest';
       if (el.closest('dialog')) return 'rest';
+      if (el.closest(OWN)) return 'own';
       if (el.closest(LINKS)) return 'link';
       if (el.closest(BIG_TEXT)) return 'big';
       if (el.closest(TEXT)) return 'text';
@@ -95,7 +99,7 @@ export function Cursor() {
       const press = pressed ? 0.82 : 1;
       ringSize += (rs * press - ringSize) * 0.2;
       fillSize += (fs * press - fillSize) * 0.2;
-      const atRest = mode === 'rest' || mode === 'scene' || mode === 'grab' || mode === 'grabbing';
+      const atRest = mode !== 'link' && mode !== 'text' && mode !== 'big';
       ox += ((atRest ? 7 : 0) - ox) * 0.2;
       oy += ((atRest ? 8 : 0) - oy) * 0.2;
       const px = fx;

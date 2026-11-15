@@ -9,12 +9,6 @@ export function Contact() {
       <h2 id="contact-title" className="contact-title" tabIndex={-1}>
         {portfolio.contactSection.title}
       </h2>
-      <div className="availability-card">
-        <p className="availability-main">
-          <span className="status-dot" aria-hidden="true" />
-          {portfolio.availability}
-        </p>
-      </div>
       <p className="contact-email">
         <a href={`mailto:${c.email}`}>{c.email}</a>
       </p>

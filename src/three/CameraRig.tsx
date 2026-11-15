@@ -13,6 +13,8 @@ export const SHOTS: Record<string, Shot> = {
   model: { pos: [0.95, 1.9, 6.7], target: [0.12, 1.1, 0], shift: 0.15 },
   system: { pos: [0.75, 1.75, 7.4], target: [0.1, 1.06, 0], shift: 0.15 },
   projects: { pos: [0.1, 1.7, 9.6], target: [0.08, 1.08, 0], shift: 0.31 },
+  // Career: the bot on its own, close and large on the right, beside the timeline.
+  career: { pos: [-1.95, 1.52, 5.5], target: [-2.0, 1.42, 3.35], shift: 0.27 },
   toolbench: { pos: [30, 3.15, 3.55], target: [30, 0, 0.12], shift: 0.06, lift: 0.07 },
   contact: { pos: [-2.0, 1.62, 6.3], target: [-2.0, 1.4, 3.35], shift: 0, lift: -0.35 },
   // Still frames: centred, for the phone, reduced-motion and no-WebGL layouts.
@@ -63,7 +65,7 @@ export function shotAt(p: number, out: { pos: Vector3; target: Vector3; shift: n
 }
 
 export type ShotState = ReturnType<typeof newShot>;
-export const newShot = () => ({ pos: new Vector3(), target: new Vector3(), shift: 0, lift: 0, fov: 30 });
+export const newShot = () => ({ pos: new Vector3(), target: new Vector3(), shift: 0, lift: 0, fov: 30, rate: 7 });
 
 /**
  * Places the camera. `resolve` returns the shot for this frame (the build timeline, or a section
@@ -79,7 +81,7 @@ export function CameraRig({ resolve, immediate }: { resolve: (out: ShotState) =>
 
   useFrame((_, dt) => {
     resolve(want);
-    const k = immediate || snapNext ? 1 : 1 - Math.exp(-Math.min(dt, 0.05) * 7);
+    const k = immediate || snapNext ? 1 : 1 - Math.exp(-Math.min(dt, 0.05) * want.rate);
     snapNext = false;
     if (!Number.isFinite(cur.pos.x) || cur.pos.lengthSq() === 0) {
       cur.pos.copy(want.pos);

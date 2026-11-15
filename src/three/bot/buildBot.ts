@@ -101,6 +101,8 @@ export type ArmPose = {
 
 export type BotPose = {
   eyes: EyeState;
+  /** Pixel icon shown when eyes === 'icon'. */
+  icon: string;
   dx: number;
   dy: number;
   frame: number;
@@ -354,7 +356,7 @@ export function buildBot() {
   };
 
   function setPose(pose: BotPose) {
-    face.draw(pose.eyes, pose.dx, pose.dy, pose.frame);
+    face.draw(pose.eyes, pose.dx, pose.dy, pose.frame, pose.icon);
     ledMat.color.copy(ledColors[pose.led]);
     nozzleMat.color.copy(C.molten).multiplyScalar(0.3 + pose.thruster * 3);
     glowMat.opacity = Math.min(1, pose.thruster * 0.6);

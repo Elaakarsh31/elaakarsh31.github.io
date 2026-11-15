@@ -64,6 +64,9 @@ export class BotBrain {
   private tilt = 0;
   private tuckL = new Vector3();
   private tuckR = new Vector3();
+  /** Face override from the page (Career): a pixel icon, 'happy' or 'heart'. */
+  private glyph: string | null = null;
+  private glyphAt = -10;
   private tool: ToolName = 'welder';
   private swapStart = -10;
   private swapTo: ToolName = 'welder';
@@ -83,6 +86,7 @@ export class BotBrain {
     });
     this.pose = {
       eyes: 'open',
+      icon: '',
       dx: 0,
       dy: 0,
       frame: 0,
@@ -102,6 +106,17 @@ export class BotBrain {
 
   salute(t: number) {
     this.saluteStart = t;
+  }
+
+  /** Shows a pixel icon (or 'happy' / 'heart') on the face, with a blink and a nod as it changes. */
+  setGlyph(glyph: string | null, t: number) {
+    if (glyph === this.glyph) return;
+    this.glyph = glyph;
+    this.glyphAt = t;
+    if (glyph) {
+      this.blinkUntil = t + 0.14;
+      this.nodStart = t;
+    }
   }
 
   /** A short happy reaction, for example when the machine is pinged. */
@@ -208,11 +223,22 @@ export class BotBrain {
     if (working) eyes = 'focus';
     if (t < this.blinkUntil) eyes = 'blink';
     if (ctx.task.kind === 'thumbs' || ctx.task.kind === 'salute' || t - this.saluteStart < 1.6) eyes = 'happy';
-    if (!working && (ctx.hover || t < this.happyUntil)) eyes = 'happy';
+    if (!working && t < this.happyUntil) eyes = 'happy';
+    let icon = '';
+    if (this.glyph && t - this.glyphAt > 0.14) {
+      if (this.glyph === 'happy' || this.glyph === 'heart') eyes = this.glyph;
+      else {
+        eyes = 'icon';
+        icon = this.glyph;
+      }
+    }
+    // Hovered: pixel hearts, whatever the bot was doing.
+    if (ctx.hover) eyes = 'heart';
     if (t < this.startleUntil) eyes = 'startle';
     if (dizzy) eyes = 'spiral';
     if (this.asleep) eyes = 'closed';
     pose.eyes = eyes;
+    pose.icon = icon;
     pose.dx = eyes === 'open' || eyes === 'focus' ? dx : 0;
     pose.dy = eyes === 'open' || eyes === 'focus' ? dy : 0;
     pose.frame = Math.floor(t * 10);

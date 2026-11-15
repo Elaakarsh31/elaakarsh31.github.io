@@ -5,7 +5,68 @@ const COLS = 16;
 const ROWS = 8;
 const CELL = 4; // px per LED (3px lamp + 1px gap)
 
-export type EyeState = 'open' | 'blink' | 'closed' | 'happy' | 'spiral' | 'startle' | 'focus';
+export type EyeState = 'open' | 'blink' | 'closed' | 'happy' | 'spiral' | 'startle' | 'focus' | 'heart' | 'icon';
+
+/** Full-screen pixel icons (16×8) the bot shows while it walks through the Career timeline. */
+const ICONS: Record<string, string[]> = {
+  cap: [
+    '................',
+    '.......XX.......',
+    '....XXXXXXXX....',
+    '.XXXXXXXXXXXXXX.',
+    '....XXXXXXXX..X.',
+    '.....XXXXXX...X.',
+    '.....XXXXXX..XXX',
+    '................',
+  ],
+  lens: [
+    '.....XXXX.......',
+    '....X....X......',
+    '...X......X.....',
+    '...X......X.....',
+    '....X....X......',
+    '.....XXXXXX.....',
+    '..........XX....',
+    '...........XX...',
+  ],
+  db: [
+    '....XXXXXXXX....',
+    '...X........X...',
+    '...XXXXXXXXXX...',
+    '...X........X...',
+    '...XXXXXXXXXX...',
+    '...X........X...',
+    '....XXXXXXXX....',
+    '................',
+  ],
+  spark: [
+    '.......XX.......',
+    '.......XX.......',
+    '...X..XXXX..X...',
+    '....XXXXXXXX....',
+    '..XXXXXXXXXXXX..',
+    '....XXXXXXXX....',
+    '...X..XXXX..X...',
+    '.......XX.......',
+  ],
+  chart: [
+    '...........XX...',
+    '.......XX..XX...',
+    '.......XX..XX...',
+    '...XX..XX..XX...',
+    '...XX..XX..XX...',
+    '...XX..XX..XX...',
+    '..XXXXXXXXXXXX..',
+    '................',
+  ],
+};
+
+const HEART: Cells = [
+  [-1, -1], [1, -1],
+  [-2, 0], [-1, 0], [0, 0], [1, 0], [2, 0],
+  [-1, 1], [0, 1], [1, 1],
+  [0, 2],
+];
 
 type Cells = [number, number][];
 
@@ -46,6 +107,11 @@ function eyeCells(state: EyeState, cx: number, dx: number, dy: number, frame: nu
       return [
         [-2, 5], [-1, 4], [0, 4], [1, 5],
       ].map(([x, y]) => [Math.round(cx) + x, y - 1] as [number, number]);
+    case 'heart':
+      // A little beat: the hearts sit one row lower on alternate frames.
+      return HEART.map(([x, y]) => [Math.round(cx) + x, 3 + y] as [number, number]);
+    case 'icon':
+      return [];
     case 'spiral': {
       // Rotate the spiral in quarter turns.
       const r = frame % 4;
@@ -70,8 +136,8 @@ export function createFace() {
   texture.colorSpace = SRGBColorSpace;
 
   let key = '';
-  function draw(state: EyeState, dx = 0, dy = 0, frame = 0) {
-    const k = `${state}|${dx}|${dy}|${state === 'spiral' ? frame : 0}`;
+  function draw(state: EyeState, dx = 0, dy = 0, frame = 0, icon = '') {
+    const k = `${state}|${dx}|${dy}|${state === 'spiral' ? frame : 0}|${state === 'icon' ? icon : ''}`;
     if (k === key) return;
     key = k;
     g.fillStyle = '#000';
@@ -80,6 +146,11 @@ export function createFace() {
     g.fillStyle = '#0c151b';
     for (let x = 0; x < COLS; x++) for (let y = 0; y < ROWS; y++) g.fillRect(x * CELL, y * CELL, CELL - 1, CELL - 1);
     g.fillStyle = '#ffffff';
+    if (state === 'icon' && ICONS[icon]) {
+      ICONS[icon].forEach((row, y) => [...row].forEach((c, x) => c === 'X' && g.fillRect(x * CELL, y * CELL, CELL - 1, CELL - 1)));
+      texture.needsUpdate = true;
+      return;
+    }
     for (const cx of EYE_X) {
       for (const [x, y] of eyeCells(state, cx, dx, dy, frame)) {
         if (x < 0 || y < 0 || x >= COLS || y >= ROWS) continue;
