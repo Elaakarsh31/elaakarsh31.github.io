@@ -1,5 +1,6 @@
-// Sound, synthesized with Web Audio: a soft click when a plate locks, a faint crackle while the
-// bot welds. On by default (the toggle turns it off, and the choice is remembered per browser).
+// Sound, synthesized with Web Audio: a scan chirp as each data fragment passes the refinery ring
+// and a soft knock as its block lands, a click when a plate locks, a faint crackle while the bot
+// welds. On by default (the toggle turns it off, and the choice is remembered per browser).
 // Browsers only allow audio after a click, tap or key press, so the audio engine starts on the
 // first one; scrolling alone does not count.
 const KEY = 'workshop-sound';
@@ -8,6 +9,7 @@ let enabled = true;
 let ctx: AudioContext | null = null;
 let master: GainNode | null = null;
 let crackleGain: GainNode | null = null;
+let noise: AudioBuffer | null = null;
 const listeners = new Set<(on: boolean) => void>();
 
 try {
@@ -59,6 +61,10 @@ function ensure() {
   crackleGain.gain.value = 0;
   src.connect(band).connect(crackleGain).connect(master);
   src.start();
+  // A short white-noise buffer for the refinery scan.
+  noise = ctx.createBuffer(1, Math.floor(ctx.sampleRate * 0.3), ctx.sampleRate);
+  const nd = noise.getChannelData(0);
+  for (let i = 0; i < nd.length; i++) nd[i] = Math.random() * 2 - 1;
   return ctx;
 }
 
@@ -91,6 +97,73 @@ export function playClick() {
   osc.connect(g).connect(master);
   osc.start(t);
   osc.stop(t + 0.1);
+}
+
+const ready = () => enabled && !!ctx && ctx.state === 'running' && !!master;
+
+/**
+ * A fragment passing through the refinery ring: a rising band of noise (the scan) under a short
+ * two-note chirp. `k` (0..1, the fragment's place in the queue) nudges the pitch so twelve in a
+ * row do not sound identical.
+ */
+export function playScan(k = 0) {
+  if (!ready() || !noise) return;
+  const c = ctx!;
+  const t = c.currentTime;
+  const src = c.createBufferSource();
+  src.buffer = noise;
+  const band = c.createBiquadFilter();
+  band.type = 'bandpass';
+  band.Q.value = 6;
+  band.frequency.setValueAtTime(700, t);
+  band.frequency.exponentialRampToValueAtTime(4200, t + 0.16);
+  const ng = c.createGain();
+  ng.gain.setValueAtTime(0.0001, t);
+  ng.gain.exponentialRampToValueAtTime(0.16, t + 0.03);
+  ng.gain.exponentialRampToValueAtTime(0.0001, t + 0.2);
+  src.connect(band).connect(ng).connect(master!);
+  src.start(t);
+  src.stop(t + 0.22);
+  const base = 980 * Math.pow(2, (k * 5) / 12);
+  const osc = c.createOscillator();
+  const og = c.createGain();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(base, t + 0.05);
+  osc.frequency.setValueAtTime(base * 1.5, t + 0.1);
+  og.gain.setValueAtTime(0.0001, t + 0.05);
+  og.gain.exponentialRampToValueAtTime(0.07, t + 0.06);
+  og.gain.exponentialRampToValueAtTime(0.0001, t + 0.22);
+  osc.connect(og).connect(master!);
+  osc.start(t + 0.05);
+  osc.stop(t + 0.24);
+}
+
+/** A clean block setting down in its row: a soft low knock with a faint tick on top. */
+export function playLand() {
+  if (!ready()) return;
+  const c = ctx!;
+  const t = c.currentTime;
+  const osc = c.createOscillator();
+  const g = c.createGain();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(240, t);
+  osc.frequency.exponentialRampToValueAtTime(95, t + 0.09);
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(0.22, t + 0.005);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + 0.14);
+  osc.connect(g).connect(master!);
+  osc.start(t);
+  osc.stop(t + 0.15);
+  const tick = c.createOscillator();
+  const tg = c.createGain();
+  tick.type = 'triangle';
+  tick.frequency.value = 2400;
+  tg.gain.setValueAtTime(0.0001, t);
+  tg.gain.exponentialRampToValueAtTime(0.05, t + 0.002);
+  tg.gain.exponentialRampToValueAtTime(0.0001, t + 0.025);
+  tick.connect(tg).connect(master!);
+  tick.start(t);
+  tick.stop(t + 0.03);
 }
 
 /** Crackle level while welding, 0..1. Called every frame by the scene. */

@@ -61,7 +61,18 @@ export default function Bench({ active }: { active: boolean }) {
       rough,
       tag: new MeshPhysicalMaterial({ color: '#c3c8d0', metalness: 1, roughness: 0.5, roughnessMap: rough }),
       tray: new MeshPhysicalMaterial({ color: '#3a3e45', metalness: 1, roughness: 0.6, roughnessMap: rough }),
-      bench: new MeshPhysicalMaterial({ map: benchTexture(), color: '#6b7078', metalness: 0.15, roughness: 0.92, envMapIntensity: 0.25 }),
+      // The bench top sits exactly on the floor: a depth offset keeps it in front, so the two
+      // surfaces don't flicker against each other as the camera moves.
+      bench: new MeshPhysicalMaterial({
+        map: benchTexture(),
+        color: '#6b7078',
+        metalness: 0.15,
+        roughness: 0.92,
+        envMapIntensity: 0.25,
+        polygonOffset: true,
+        polygonOffsetFactor: -2,
+        polygonOffsetUnits: -4,
+      }),
     };
   }, []);
 

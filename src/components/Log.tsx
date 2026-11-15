@@ -16,7 +16,10 @@ type Row =
   | { type: 'entry'; e: LogEntry; dates: string; role: string; lane: 0 | 1; start: number; branch?: Branch }
   | { type: 'merge'; branch: string; when: string; state?: Branch };
 
-/** Entries in date order, with a merge row where each degree branch rejoins main. */
+/**
+ * Entries newest first, like `git log`: a merge row where a degree branch rejoined main (only once
+ * that has happened; a degree still in progress keeps its lane open to the top).
+ */
 function buildRows(): Row[] {
   const now = new Date();
   const nowIdx = now.getFullYear() * 12 + now.getMonth();
@@ -35,29 +38,33 @@ function buildRows(): Row[] {
     ...r,
     start: r.e.kind === 'now' ? nowIdx : r.e.kind === 'next' ? monthIndex('Jan 2027') : monthIndex(r.dates.split('–')[0]),
   }));
-  const rows: Row[] = [];
-  const merges = withStart
+  withStart.sort((a, b) => b.start - a.start);
+  const degrees = withStart
     .filter((r) => r.e.kind === 'degree')
     .map((r) => {
       const end = r.dates.split('–')[1]?.trim() ?? '';
-      return { branch: r.e.branch ?? '', when: end, at: monthIndex(end) };
+      return { branch: r.e.branch ?? '', when: end, at: monthIndex(end), placed: false };
     });
-  withStart.forEach((r, k) => {
-    rows.push(r);
-    const next = withStart[k + 1];
-    for (const m of merges) {
-      if (r.start < m.at && (!next || next.start >= m.at)) rows.push({ type: 'merge', branch: m.branch, when: m.when });
+  const rows: Row[] = [];
+  for (const r of withStart) {
+    for (const m of degrees) {
+      if (!m.placed && m.at <= nowIdx && r.start < m.at) {
+        rows.push({ type: 'merge', branch: m.branch, when: m.when });
+        m.placed = true;
+      }
     }
-  });
-  // Branch lane state per row, for drawing the graph.
-  let open = false;
+    rows.push(r);
+  }
+  // Branch lane state per row, top to bottom: a merge row opens the lane below it, a degree row
+  // closes it where the branch forked off main.
+  let open = degrees.some((m) => m.at > nowIdx);
   for (const r of rows) {
     if (r.type === 'merge') {
       r.state = 'merge';
-      open = false;
+      open = true;
     } else if (r.lane === 1) {
       r.branch = 'fork';
-      open = true;
+      open = false;
     } else r.branch = open ? 'through' : 'none';
   }
   return rows;
@@ -70,13 +77,13 @@ function Graph({ lane, branch, first, last, kind }: { lane: 0 | 1 | 'merge'; bra
       <span className="lane lane-main" />
       {branch !== 'none' && <span className="lane lane-branch" />}
       {branch === 'fork' && (
-        <svg className="curve curve-fork" viewBox="0 0 64 28" width="64" height="28">
-          <path d="M20,0 C20,16 44,10 44,26" />
+        <svg className="curve curve-fork" viewBox="0 0 64 44" width="64" height="44">
+          <path d="M44,15 C44,31 20,25 20,41" />
         </svg>
       )}
       {branch === 'merge' && (
-        <svg className="curve curve-merge" viewBox="0 0 64 28" width="64" height="28">
-          <path d="M44,0 C44,16 20,10 20,26" />
+        <svg className="curve curve-merge" viewBox="0 0 64 54" width="64" height="54">
+          <path d="M20,25 C20,41 44,35 44,51" />
         </svg>
       )}
       <span className="node" data-kind={kind} />

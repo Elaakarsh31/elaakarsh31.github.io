@@ -309,7 +309,7 @@ html[data-mode='live'] .projects > .papers {
   width: min(880px, 62vw);
 }
 
-/* Toolbench: the bench stays in view while you scroll far enough to sort it. */
+/* Toolbench: the header stays pinned while the camera arrives and you scroll far enough to sort. */
 html[data-mode='live'] .toolbench {
   max-width: none;
   margin: 0;
@@ -317,7 +317,7 @@ html[data-mode='live'] .toolbench {
 }
 
 html[data-mode='live'] .bench-wrap {
-  height: 125vh;
+  height: 150vh;
 }
 
 html[data-mode='live'] .bench-stage {
@@ -396,12 +396,6 @@ html[data-mode='live'] .tray-title span {
   border: 1px solid rgba(111, 211, 255, 0.45);
   background: rgba(10, 16, 22, 0.75);
   white-space: nowrap;
-}
-
-html[data-mode='live'] .all-skills {
-  margin: 0 auto;
-  max-width: var(--maxw);
-  padding: 0 var(--gutter);
 }
 
 /* Contact: the bot salutes from centre stage, above the copy. */

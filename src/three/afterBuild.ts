@@ -4,8 +4,9 @@
 import type { Vector3 } from 'three';
 import { easeInOut } from './timing';
 
-export type Spot = 'exit' | 'projects' | 'career' | 'toolbench' | 'contact';
-type Stop = { y: number; spot: Spot };
+export type Spot = 'exit' | 'projects' | 'career' | 'careerUp' | 'toolbench' | 'contact';
+/** `linear`: the move into this stop keeps pace with the page instead of easing. */
+type Stop = { y: number; spot: Spot; linear?: boolean };
 
 let stops: Stop[] = [];
 let frame = 0;
@@ -20,6 +21,8 @@ function measure() {
   const build = document.getElementById('build');
   const end = build ? build.offsetTop + build.offsetHeight - vh : 0;
   const career = docTop('career');
+  const careerEl = document.getElementById('career');
+  const careerEnd = careerEl ? careerEl.getBoundingClientRect().bottom + window.scrollY : career;
   const bench = docTop('toolbench');
   const contact = docTop('contact');
   const raw: Stop[] = [
@@ -27,8 +30,11 @@ function measure() {
     { y: end + 0.95 * vh, spot: 'projects' },
     { y: career - 1.0 * vh, spot: 'projects' },
     { y: career - 0.12 * vh, spot: 'career' },
-    { y: bench - 0.9 * vh, spot: 'career' },
-    { y: bench + 0.04 * vh, spot: 'toolbench' },
+    // The bot rides up and out with the end of the timeline, at the page's pace…
+    { y: careerEnd - 0.9 * vh, spot: 'career' },
+    { y: careerEnd - 0.2 * vh, spot: 'careerUp', linear: true },
+    // …then the camera glides over to the bench while its header is pinned.
+    { y: bench + 0.2 * vh, spot: 'toolbench' },
     { y: contact - 0.95 * vh, spot: 'toolbench' },
     { y: contact - 0.12 * vh, spot: 'contact' },
   ];
@@ -44,7 +50,10 @@ export function blendAt(y: number): { a: Spot; b: Spot; k: number } {
   for (let i = 0; i < stops.length - 1; i++) {
     const s0 = stops[i];
     const s1 = stops[i + 1];
-    if (y < s1.y) return { a: s0.spot, b: s1.spot, k: s0.spot === s1.spot ? 0 : easeInOut((y - s0.y) / (s1.y - s0.y)) };
+    if (y < s1.y) {
+      const u = (y - s0.y) / (s1.y - s0.y);
+      return { a: s0.spot, b: s1.spot, k: s0.spot === s1.spot ? 0 : s1.linear ? u : easeInOut(u) };
+    }
   }
   const last = stops[stops.length - 1].spot;
   return { a: last, b: last, k: 0 };

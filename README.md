@@ -30,7 +30,7 @@ npm run resume    # only regenerate src/content/resume.generated.json
   - opens with ⌘K, Ctrl K and "/"
   - every action works from the keyboard alone: jumps land with focus, the email is in the clipboard, links open in new tabs, and the bot replies
 - Content:
-  - the skill count matches the `.tex`, and every toolbench tag is a `.tex` skill
+  - every toolbench tag is a `.tex` skill
   - no phone number appears on the page
   - every new-tab link has `rel="noopener noreferrer"`
 - Tab reaches every link, button and disclosure with a visible focus ring.
@@ -42,7 +42,7 @@ On macOS the scripts render with the GPU (ANGLE Metal). Pass `-- --sw` to use Sw
 
 | What | Where |
 | --- | --- |
-| Dates, bullets, publications, every skill | `content/Aakarsh_Arora_Full_Resume.tex` (source of truth) |
+| Dates, bullets, publications, skills | `content/Aakarsh_Arora_Full_Resume.tex` (source of truth) |
 | Hero copy, act titles and lines, callouts, spec sheets, publications, career notes, toolbench tags, contact | `src/content/portfolio.ts` |
 | The bot's lines | `portfolio.bot.lines` in `src/content/portfolio.ts` |
 | The bot's name | `portfolio.bot.name` in the same file. It is empty by default, and with no name the bot shows none anywhere. |

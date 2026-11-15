@@ -334,7 +334,6 @@ async function content(browser) {
   const page = await newPage(browser, 'content');
   const skillSet = new Set(resumeData.skills.flatMap((s) => s.items));
   const r = await page.evaluate(() => ({
-    skills: document.querySelectorAll('[data-skill]').length,
     tags: [...document.querySelectorAll('.tag[data-tag]')].map((e) => e.dataset.tag),
     sheets: document.querySelectorAll('.sheet').length,
     papers: document.querySelectorAll('.paper').length,
@@ -343,13 +342,12 @@ async function content(browser) {
     phone: /857\D?351/.test(document.body.innerText),
     title: document.title,
   }));
-  if (r.skills !== resumeData.counts.skills) errors.push(`[content] ${r.skills} skills on the page, ${resumeData.counts.skills} in the .tex`);
   const notSkills = r.tags.filter((t) => !skillSet.has(t));
   if (r.tags.length !== 18) errors.push(`[content] ${r.tags.length} toolbench tags, expected 18`);
   if (notSkills.length) errors.push(`[content] tags not in the .tex: ${notSkills.join(', ')}`);
   if (r.sheets !== 4) errors.push(`[content] ${r.sheets} spec sheets, expected 4`);
   if (r.papers !== 3) errors.push(`[content] ${r.papers} publications, expected 3`);
-  if (r.log !== 8) errors.push(`[content] ${r.log} career entries, expected 8`);
+  if (r.log !== 6) errors.push(`[content] ${r.log} career entries, expected 6`);
   if (r.blank) errors.push(`[content] ${r.blank} new-tab links without rel="noopener noreferrer"`);
   if (r.phone) errors.push('[content] phone number visible on the page');
   if (r.title !== 'Aakarsh Arora | Data Scientist, ML Researcher, AI Engineer') errors.push(`[content] title is "${r.title}"`);
@@ -382,7 +380,7 @@ async function content(browser) {
   }
   if (seen.size < total) errors.push(`[content] Tab reached ${seen.size} of ${total} links, buttons and disclosures`);
   if (noRing) errors.push(`[content] ${noRing} focused elements without a visible outline`);
-  notes.push(`content: ${r.skills} skills, ${r.tags.length} tags, ${r.sheets} sheets, ${r.papers} publications, ${r.log} career entries, Tab ${seen.size}/${total}`);
+  notes.push(`content: ${r.tags.length} tags, ${r.sheets} sheets, ${r.papers} publications, ${r.log} career entries, Tab ${seen.size}/${total}`);
   await page.context().close();
 }
 

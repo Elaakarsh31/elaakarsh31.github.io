@@ -3,8 +3,8 @@
 // Thresholds are symmetric, so scrolling back hides things in reverse order.
 import { gsap } from 'gsap';
 import { portfolio } from '../content/portfolio';
-import { plateLockAt } from '../three/timing';
-import { playClick } from './sound';
+import { FRAGMENTS, fragWindow, plateLockAt } from '../three/timing';
+import { playClick, playLand, playScan } from './sound';
 import { BUILD_LENGTH, stage } from './stage';
 
 function setFlag(el: Element & { dataset: DOMStringMap }, key: string, on: boolean) {
@@ -30,6 +30,21 @@ export function startStageSync(root: HTMLElement) {
     for (let k = 0; k < plateTags.length; k++) {
       const at = plateLockAt(k);
       if (last < at && p >= at && p - last < 20) playClick();
+    }
+    // Act 1, either way: a scan as a fragment passes the ring, a knock as its block lands.
+    // At most one of each per frame, so a fast scroll does not pile them up.
+    if (Math.abs(p - last) < 20) {
+      const lo = Math.min(last, p);
+      const hi = Math.max(last, p);
+      let scan = -1;
+      let land = false;
+      for (let j = 0; j < FRAGMENTS; j++) {
+        const [t0, t1] = fragWindow(j);
+        if (lo < t0 + 6.2 && hi >= t0 + 6.2) scan = j;
+        if (lo < t1 && hi >= t1) land = true;
+      }
+      if (scan >= 0) playScan(scan / (FRAGMENTS - 1));
+      if (land) playLand();
     }
     last = p;
     for (const c of callouts) {

@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { portfolio, STAGES } from '../content/portfolio';
-import { resume } from '../content/resume';
 import { setBenchSorted } from '../lib/bench';
 import { useMode } from '../lib/env';
 import { DragIcon, Hint } from './Hint';
@@ -63,25 +62,6 @@ export function Toolbench() {
           </div>
         </div>
       </div>
-      <details className="details all-skills">
-        <summary>
-          <span className="details-label">{t.all}</span>
-        </summary>
-        <div className="skill-groups">
-          {resume.skills.map((s) => (
-            <div key={s.category} className="skill-group">
-              <h3 className="skill-cat">{s.category}</h3>
-              <ul className="skill-list">
-                {s.items.map((item, k) => (
-                  <li key={k} data-skill>
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-      </details>
     </section>
   );
 }

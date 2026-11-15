@@ -498,25 +498,12 @@ export const portfolio = {
           text: 'Low-confidence fields to human review, using an LLM-as-judge that returns a verdict, confidence and reason per field.',
         },
       ],
-      showDetails: false,
-    },
-    {
-      version: 'v0.9',
-      id: 'career-v0-9',
-      kind: 'now',
-      dates: 'Now',
-      role: 'Building agent systems',
-      org: 'The SOP-guided claims agent and StoryWeaver',
-      notes: [],
-    },
-    {
-      version: 'v1.0',
-      id: 'career-v1-0',
-      kind: 'next',
-      dates: 'From January 2027',
-      role: '“Ships with your team.”',
-      org: 'Open to full-time roles.',
-      notes: [],
+      showDetails: true,
+      more: [
+        'Ingestion for ~1,300 documents across 1,000+ workitems, with batched Textract jobs.',
+        'Evaluation scaled from a 113-document pilot to 850 documents: 98.7% loan-balance accuracy.',
+        'Judge calls per 850-document pass cut from 850 to 595 by skipping unflagged agreements.',
+      ],
     },
   ] satisfies LogEntry[] as LogEntry[],
 
@@ -527,7 +514,6 @@ export const portfolio = {
     line: 'The tools I reach for, sorted by the same pipeline.',
     sort: 'Sort the bench',
     scatter: 'Scatter',
-    all: 'See every skill',
     // Every name must match a skill in the .tex exactly.
     tags: [
       { name: 'SQL', tray: 'data' },

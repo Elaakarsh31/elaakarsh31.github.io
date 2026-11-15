@@ -7,7 +7,6 @@ import { easeInOut, fragWindow, heroWeld, plateStart, seg, weldWindow } from './
 import type { DataHandles } from './data/buildData';
 import type { MachineHandles } from './machine/buildMachine';
 import { PLATES } from './machine/parts';
-import { BENCH } from './toolbench/layout';
 import { contactBotPoint, type Spot } from './afterBuild';
 
 export type BotPlan = { target: Vector3; task: BotTask; tool: ToolName };
@@ -152,9 +151,11 @@ export function planBot(p: number, m: MachineHandles, d: DataHandles, out: BotPl
   return out;
 }
 
-// Over the System tray, watching the tags.
-export const BOT_BENCH = new Vector3(BENCH.x + 1.05, 0.5, BENCH.z - 0.05);
 export const BOT_CAREER = new Vector3(-2.0, 1.42, 3.35);
+/** Leaving Career: risen out of the top of the frame, as if scrolled away with the timeline. */
+export const BOT_CAREER_UP = BOT_CAREER.clone().add(new Vector3(0, 1.05, 0));
+/** Out of sight above the Contact framing while the toolbench is on screen; it drops in from here. */
+export const BOT_WINGS = new Vector3(4.6, 3.6, 3.2);
 
 const SW_CENTER = new Vector3(0, 1.32, 0);
 
@@ -212,8 +213,13 @@ export function planSpot(spot: Spot, project: string | null, t: number, m: Machi
       out.task = { kind: 'idle' };
       out.tool = 'gripper';
       return out;
+    case 'careerUp':
+      out.target.copy(BOT_CAREER_UP);
+      out.task = { kind: 'idle' };
+      out.tool = 'gripper';
+      return out;
     case 'toolbench':
-      out.target.copy(BOT_BENCH);
+      out.target.copy(BOT_WINGS);
       out.task = { kind: 'idle' };
       out.tool = 'gripper';
       return out;

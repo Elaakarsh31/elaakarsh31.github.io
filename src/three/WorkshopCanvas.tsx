@@ -103,7 +103,7 @@ export default function WorkshopCanvas({ mode }: { mode: Mode }) {
     const tmpB = newShot();
     const fill = (spot: Spot, o: ShotState) => {
       if (spot === 'exit') return shotAt(BUILD_LENGTH, o);
-      const s = SHOTS[spot];
+      const s = SHOTS[spot === 'careerUp' ? 'career' : spot];
       o.pos.fromArray(s.pos);
       o.target.fromArray(s.target);
       o.shift = s.shift;

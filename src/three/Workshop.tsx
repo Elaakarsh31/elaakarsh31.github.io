@@ -109,8 +109,6 @@ export function Workshop({ motion, sparks: sparksOn, capture }: { motion: boolea
       'career-v0-4': 'spark',
       'career-v0-5': 'cap',
       'career-v0-6': 'chart',
-      'career-v0-9': 'happy',
-      'career-v1-0': 'heart',
     };
     let entry: string | null = null;
     const apply = () => {
