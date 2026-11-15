@@ -171,8 +171,8 @@ async function desktop(browser) {
 
   await scrollToId(page, 'projects', 60);
   await shot(page, 'desktop-projects');
-  await scrollToId(page, 'log-v0-3', 380);
-  await shot(page, 'desktop-log');
+  await scrollToId(page, 'career-v0-3', 380);
+  await shot(page, 'desktop-career');
   await scrollToId(page, 'toolbench', 0);
   await page.waitForTimeout(3000);
   await shot(page, 'desktop-toolbench-before');
@@ -188,12 +188,12 @@ async function desktop(browser) {
   await scrollToP(page, 0);
   await shot(page, 'desktop-reverse-hero');
 
-  // Lifecycle: paused over the Log, running in the build, paused in a hidden tab.
+  // Lifecycle: paused over Career, running in the build, paused in a hidden tab.
   const running = () => page.evaluate(() => document.querySelector('.webgl canvas')?.dataset.running);
-  await scrollToId(page, 'log-v0-2', 300);
+  await scrollToId(page, 'career-v0-2', 300);
   await page.waitForTimeout(900);
   const offstage = await running();
-  if (offstage !== '0') errors.push(`[lifecycle] still rendering over the Log (${offstage})`);
+  if (offstage !== '0') errors.push(`[lifecycle] still rendering over Career (${offstage})`);
   await scrollToP(page, 100);
   const back = await running();
   if (back !== '1') errors.push(`[lifecycle] did not resume in the build (${back})`);
@@ -213,14 +213,14 @@ async function mobile(browser) {
   const mode = await page.evaluate(() => document.documentElement.dataset.mode);
   if (mode !== 'phone') errors.push(`[mobile] expected phone mode, got ${mode}`);
   await shot(page, 'mobile-hero');
-  for (const id of ['data', 'model', 'system', 'projects', 'log', 'toolbench', 'contact']) {
+  for (const id of ['data', 'model', 'system', 'projects', 'career', 'toolbench', 'contact']) {
     await scrollToId(page, id, 60);
     await shot(page, `mobile-${id}`);
   }
   const r = await page.evaluate(() => ({
     frames: document.querySelectorAll('.act .frame img').length,
     rail: getComputedStyle(document.querySelector('.rail')).display,
-    cursor: !!document.querySelector('.cursor-ring'),
+    cursor: !!document.querySelector('.cursor-glow'),
     overflow: document.documentElement.scrollWidth > innerWidth + 1,
   }));
   if (r.frames !== 3) errors.push(`[mobile] ${r.frames} act frames shown, expected 3`);
@@ -251,8 +251,8 @@ async function palette(browser) {
   // Every "Go to" action, keyboard only.
   for (const [query, id, focusId] of [
     ['projects', 'projects', 'projects-title'],
-    ['papers', 'papers', 'papers'],
-    ['log', 'log', 'log-title'],
+    ['publications', 'publications', 'publications'],
+    ['career', 'career', 'career-title'],
     ['toolbench', 'toolbench', 'toolbench-title'],
     ['contact', 'contact', 'contact-title'],
     ['data', 'data', 'act-data-title'],
@@ -342,8 +342,8 @@ async function content(browser) {
   if (r.tags.length !== 18) errors.push(`[content] ${r.tags.length} toolbench tags, expected 18`);
   if (notSkills.length) errors.push(`[content] tags not in the .tex: ${notSkills.join(', ')}`);
   if (r.sheets !== 4) errors.push(`[content] ${r.sheets} spec sheets, expected 4`);
-  if (r.papers !== 3) errors.push(`[content] ${r.papers} papers, expected 3`);
-  if (r.log !== 8) errors.push(`[content] ${r.log} log entries, expected 8`);
+  if (r.papers !== 3) errors.push(`[content] ${r.papers} publications, expected 3`);
+  if (r.log !== 8) errors.push(`[content] ${r.log} career entries, expected 8`);
   if (r.blank) errors.push(`[content] ${r.blank} new-tab links without rel="noopener noreferrer"`);
   if (r.phone) errors.push('[content] phone number visible on the page');
   if (r.title !== 'Aakarsh Arora | Data Scientist, ML Researcher, AI Engineer') errors.push(`[content] title is "${r.title}"`);
@@ -376,7 +376,7 @@ async function content(browser) {
   }
   if (seen.size < total) errors.push(`[content] Tab reached ${seen.size} of ${total} links, buttons and disclosures`);
   if (noRing) errors.push(`[content] ${noRing} focused elements without a visible outline`);
-  notes.push(`content: ${r.skills} skills, ${r.tags.length} tags, ${r.sheets} sheets, ${r.papers} papers, ${r.log} log entries, Tab ${seen.size}/${total}`);
+  notes.push(`content: ${r.skills} skills, ${r.tags.length} tags, ${r.sheets} sheets, ${r.papers} publications, ${r.log} career entries, Tab ${seen.size}/${total}`);
   await page.context().close();
 }
 
@@ -391,7 +391,7 @@ async function reducedMotion(browser) {
     canvas: !!document.querySelector('.webgl canvas'),
     sticky: getComputedStyle(document.querySelector('.stage')).position,
     lenis: document.documentElement.classList.contains('lenis'),
-    cursor: !!document.querySelector('.cursor-ring'),
+    cursor: !!document.querySelector('.cursor-glow'),
     frames: document.querySelectorAll('.frame img').length,
     callouts: document.querySelectorAll('.callout').length,
   }));

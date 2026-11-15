@@ -39,8 +39,8 @@ function buildItems(): Item[] {
     go('model', 'Model', 'act 2 train'),
     go('system', 'System', 'act 3 build agent'),
     go('projects', 'Projects', 'work spec sheets'),
-    go('papers', 'Papers', 'publications research'),
-    go('log', 'Log', 'experience career release notes'),
+    go('publications', 'Publications', 'papers research'),
+    go('career', 'Career', 'log experience work history release notes'),
     go('toolbench', 'Toolbench', 'skills tools stack'),
     go('contact', 'Contact', 'email hire'),
     {

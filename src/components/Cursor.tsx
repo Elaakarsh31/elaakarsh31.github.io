@@ -1,30 +1,39 @@
 import { useEffect, useRef } from 'react';
 
-const WRAP = 'a[href], button, summary, input, .sheet, .callout, [data-cursor="wrap"]';
-const PAD = 6;
+/** Interactive things the glow warms up over. */
+const HOT = 'a[href], button, summary, [role="option"], .sheet, .callout';
+const TRAIL = 6;
 
 /**
- * Precision ring with four tick marks, for fine pointers only. Over a link or card it wraps the
- * element's bounds as a thin outline, then snaps back. Mounted only when motion is allowed.
+ * A clean arrow cursor (drawn in CSS, see chrome.css) with a soft Holo glow that follows a beat
+ * behind it, plus a short comet trail while it moves. Over links and controls the glow warms to
+ * Molten and swells; it pulses on press. Fine pointers only, never with reduced motion.
  */
 export function Cursor() {
-  const ring = useRef<HTMLDivElement>(null);
-  const dot = useRef<HTMLDivElement>(null);
+  const glow = useRef<HTMLDivElement>(null);
+  const trail = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const html = document.documentElement;
     html.classList.add('has-cursor');
-    const r = ring.current!;
-    const d = dot.current!;
-    let x = -100;
-    let y = -100;
-    let rx = x;
-    let ry = y;
-    let w = 30;
-    let h = 30;
-    let target: Element | null = null;
+    const g = glow.current!;
+    const dots = [...trail.current!.children] as HTMLElement[];
+    // Offset from the arrow's tip to its visual centre, so the glow sits behind the arrow.
+    const OX = 7;
+    const OY = 9;
+    let x = -200;
+    let y = -200;
+    let gx = x;
+    let gy = y;
+    const pts = dots.map(() => ({ x, y }));
     let visible = false;
+    let hot = false;
     let raf = 0;
+
+    const setState = (key: string, on: boolean) => {
+      if (on) g.dataset[key] = '1';
+      else delete g.dataset[key];
+    };
 
     const onMove = (e: PointerEvent) => {
       if (e.pointerType !== 'mouse') return;
@@ -32,49 +41,52 @@ export function Cursor() {
       y = e.clientY;
       if (!visible) {
         visible = true;
-        rx = x;
-        ry = y;
-        r.dataset.on = d.dataset.on = '1';
+        gx = x;
+        gy = y;
+        pts.forEach((p) => {
+          p.x = x;
+          p.y = y;
+        });
+        html.dataset.cursorOn = '1';
       }
-      const el = (e.target as Element | null)?.closest?.(WRAP) ?? null;
-      // Large elements (whole sheets) wrap only when the pointer is not on a smaller control.
-      if (el !== target) {
-        target = el;
-        r.dataset.wrap = el ? '1' : '';
+      const el = e.target instanceof Element ? e.target.closest(HOT) : null;
+      if (!!el !== hot) {
+        hot = !!el;
+        setState('hot', hot);
       }
     };
     const onLeave = () => {
       visible = false;
-      r.dataset.on = d.dataset.on = '';
+      delete html.dataset.cursorOn;
     };
-    const onDown = () => (r.dataset.press = '1');
-    const onUp = () => (r.dataset.press = '');
+    const onDown = () => setState('press', true);
+    const onUp = () => setState('press', false);
 
     const frame = () => {
       raf = requestAnimationFrame(frame);
-      d.style.transform = `translate3d(${x}px, ${y}px, 0)`;
-      let tx = x;
-      let ty = y;
-      let tw = 30;
-      let th = 30;
-      let radius = 999;
-      if (target && target.isConnected) {
-        const b = target.getBoundingClientRect();
-        tx = b.left + b.width / 2;
-        ty = b.top + b.height / 2;
-        tw = b.width + PAD * 2;
-        th = b.height + PAD * 2;
-        radius = Math.min(parseFloat(getComputedStyle(target).borderTopLeftRadius) + PAD || PAD, 18);
-      }
-      const k = target ? 0.32 : 0.45;
-      rx += (tx - rx) * k;
-      ry += (ty - ry) * k;
-      w += (tw - w) * 0.3;
-      h += (th - h) * 0.3;
-      r.style.transform = `translate3d(${rx - w / 2}px, ${ry - h / 2}px, 0)`;
-      r.style.width = `${w}px`;
-      r.style.height = `${h}px`;
-      r.style.borderRadius = `${target ? radius : 999}px`;
+      // The glow lags behind, then settles onto the arrow.
+      const px = gx;
+      const py = gy;
+      gx += (x + OX - gx) * 0.16;
+      gy += (y + OY - gy) * 0.16;
+      const vx = gx - px;
+      const vy = gy - py;
+      const speed = Math.min(1, Math.hypot(vx, vy) / 24);
+      const angle = Math.atan2(vy, vx);
+      g.style.transform = `translate3d(${gx}px, ${gy}px, 0) rotate(${angle}rad) scale(${1 + speed * 0.45}, ${1 - speed * 0.25})`;
+      // Comet trail: each dot chases the one before it, fading out when still.
+      let lx = x + OX * 0.4;
+      let ly = y + OY * 0.4;
+      pts.forEach((p, i) => {
+        p.x += (lx - p.x) * 0.42;
+        p.y += (ly - p.y) * 0.42;
+        const d = dots[i];
+        const gap = Math.hypot(lx - p.x, ly - p.y);
+        d.style.transform = `translate3d(${p.x}px, ${p.y}px, 0)`;
+        d.style.opacity = String(Math.min(1, gap / 6) * (1 - i / TRAIL) * 0.9);
+        lx = p.x;
+        ly = p.y;
+      });
     };
 
     window.addEventListener('pointermove', onMove, { passive: true });
@@ -86,6 +98,7 @@ export function Cursor() {
     return () => {
       cancelAnimationFrame(raf);
       html.classList.remove('has-cursor');
+      delete html.dataset.cursorOn;
       window.removeEventListener('pointermove', onMove);
       window.removeEventListener('pointerdown', onDown);
       window.removeEventListener('pointerup', onUp);
@@ -96,13 +109,12 @@ export function Cursor() {
 
   return (
     <>
-      <div ref={ring} className="cursor-ring" aria-hidden="true">
-        <i />
-        <i />
-        <i />
-        <i />
+      <div ref={trail} className="cursor-trail" aria-hidden="true">
+        {Array.from({ length: TRAIL }, (_, i) => (
+          <i key={i} style={{ ['--i' as string]: i }} />
+        ))}
       </div>
-      <div ref={dot} className="cursor-dot" aria-hidden="true" />
+      <div ref={glow} className="cursor-glow" aria-hidden="true" />
     </>
   );
 }

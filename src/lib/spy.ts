@@ -3,7 +3,7 @@
 import { gsap } from 'gsap';
 import { clamp01, elementRange, getSection } from './stage';
 
-const ORDER = ['top', 'data', 'model', 'system', 'projects', 'log', 'resume', 'toolbench', 'contact'];
+const ORDER = ['top', 'data', 'model', 'system', 'projects', 'career', 'resume', 'toolbench', 'contact'];
 const ACTS = ['data', 'model', 'system'];
 
 export function startSpy() {

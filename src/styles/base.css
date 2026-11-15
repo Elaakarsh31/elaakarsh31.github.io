@@ -293,3 +293,91 @@ strong {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ---------------------------------------------------------------------------------------------
+   Hover effects on text */
+
+/* Headings: the letter under the pointer lifts and heats to Molten; its neighbours warm. */
+.hword {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.hch {
+  display: inline-block;
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), color 0.3s, text-shadow 0.35s;
+}
+
+.hch:hover {
+  color: var(--molten);
+  transform: translateY(-0.07em) scale(1.06);
+  text-shadow: 0 0 0.35em rgba(255, 91, 31, 0.45);
+  transition-duration: 0.12s;
+}
+
+.hch:has(+ .hch:hover),
+.hch:hover + .hch {
+  color: #ffb594;
+  transform: translateY(-0.035em);
+}
+
+/* Links in the content: an underline that draws in from the left, and a nudge on the arrow. */
+main a:not(.btn, .rail-seg) {
+  text-decoration: none;
+  background-image: linear-gradient(var(--holo), var(--holo)), linear-gradient(rgba(238, 240, 243, 0.28), rgba(238, 240, 243, 0.28));
+  background-size: 0% 1px, 100% 1px;
+  background-position: 0 100%, 0 100%;
+  background-repeat: no-repeat;
+  padding-bottom: 1px;
+  transition: background-size 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), color 0.2s;
+}
+
+main a:not(.btn, .rail-seg):hover,
+main a:not(.btn, .rail-seg):focus-visible {
+  background-size: 100% 1px, 100% 1px;
+  color: var(--holo);
+}
+
+.ext {
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+a:hover .ext {
+  transform: translate(2px, -2px);
+}
+
+/* Nav: a short Molten bar slides in under the hovered or current item. */
+.nav-list a {
+  position: relative;
+  padding: 4px 0;
+}
+
+.nav-list a::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  right: 50%;
+  bottom: -2px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--molten);
+  transition: left 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), right 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.nav-list a:hover::after,
+.nav-list a[aria-current='true']::after {
+  left: 0;
+  right: 0;
+}
+
+.nav-mark {
+  transition: color 0.2s, letter-spacing 0.3s;
+}
+
+.nav-mark:hover {
+  color: var(--molten);
+}
+
+.htext-sr {
+  user-select: none;
+}

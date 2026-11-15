@@ -709,3 +709,90 @@
   place-items: center;
   padding: 10px;
 }
+
+/* Text hover details */
+.sheet-title {
+  transition: color 0.25s;
+}
+
+.sheet:hover .sheet-title {
+  color: #fff;
+}
+
+.sheet-title::after {
+  content: '';
+  display: block;
+  width: 0;
+  height: 2px;
+  margin-top: 8px;
+  border-radius: 2px;
+  background: var(--molten);
+  transition: width 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.sheet:hover .sheet-title::after,
+.sheet:focus-within .sheet-title::after {
+  width: 56px;
+}
+
+.sheet-summary,
+.log-notes,
+.paper-title,
+.skill-list li,
+.stack li,
+.tag,
+.chip {
+  transition: color 0.2s, border-color 0.2s, transform 0.2s;
+}
+
+.sheet:hover .sheet-summary {
+  color: #b9bec7;
+}
+
+.stack li:hover {
+  color: var(--ice);
+}
+
+.paper:hover .paper-title {
+  color: var(--holo);
+}
+
+.log-entry:hover .log-notes {
+  color: var(--text);
+}
+
+.log-entry:hover .node {
+  border-color: var(--holo);
+  box-shadow: 0 0 0 4px rgba(111, 211, 255, 0.12);
+}
+
+.log-entry:hover .log-version {
+  color: var(--holo);
+}
+
+.skill-list li:hover {
+  color: var(--text);
+}
+
+.tag:hover {
+  color: var(--text);
+  border-color: rgba(111, 211, 255, 0.5);
+  transform: translateY(-1px);
+}
+
+.chip:not([data-on]):hover {
+  color: var(--ice);
+  border-color: rgba(111, 211, 255, 0.4);
+}
+
+.callout-face:hover .callout-text {
+  color: #fff;
+}
+
+.contact-email a {
+  transition: color 0.2s, text-shadow 0.3s, background-size 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.contact-email a:hover {
+  text-shadow: 0 0 24px rgba(111, 211, 255, 0.35);
+}

@@ -287,12 +287,12 @@ html[data-mode='live'] .hero-cue {
   bottom: 30px;
 }
 
-/* The scene fades out over the Log and the resume band, where rendering pauses. */
+/* The scene fades out over Career and the resume band, where rendering pauses. */
 .webgl {
   transition: opacity 0.6s ease;
 }
 
-html[data-section='log'] .webgl,
+html[data-section='career'] .webgl,
 html[data-section='resume'] .webgl {
   opacity: 0;
 }
@@ -406,17 +406,6 @@ html[data-mode='live'] .all-skills {
   margin: 0 auto;
   max-width: var(--maxw);
   padding: 0 var(--gutter);
-}
-
-html[data-grab] .cursor-ring,
-html[data-grabbing] .cursor-ring {
-  border-color: var(--holo);
-  scale: 1.35;
-}
-
-html[data-grabbing] .cursor-ring {
-  border-color: var(--molten);
-  scale: 0.8;
 }
 
 /* Contact: the bot salutes from centre stage, above the copy. */

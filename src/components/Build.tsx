@@ -8,6 +8,7 @@ import { startStageSync } from '../lib/stageSync';
 import { createBuildTimeline } from '../lib/timeline';
 import { Callout } from './Callout';
 import { Frame } from './Frame';
+import { HoverText } from './HoverText';
 import { StageReadouts } from './StageReadouts';
 
 const stageLabel = (id: Act['id']) => STAGES.find((s) => s.id === id)!.label;
@@ -19,7 +20,7 @@ function Hero() {
     <section id="top" className="hero" aria-labelledby="hero-title">
       <div className="hero-copy">
         <h1 id="hero-title" className="hero-name" tabIndex={-1}>
-          {portfolio.site.name}
+          <HoverText text={portfolio.site.name} />
         </h1>
         <p className="hero-tagline">{h.tagline}</p>
         <p className="hero-intro">{h.intro}</p>
@@ -41,7 +42,7 @@ function ActSection({ act }: { act: Act }) {
           Act {act.index}, {stageLabel(act.id)}
         </p>
         <h2 id={`act-${act.id}-title`} className="act-title" tabIndex={-1}>
-          {act.title}
+          <HoverText text={act.title} />
         </h2>
         <p className="act-line">{act.line}</p>
         <a className="act-link" href={act.link.href}>

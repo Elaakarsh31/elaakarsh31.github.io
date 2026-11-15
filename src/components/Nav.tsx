@@ -7,7 +7,7 @@ export const NAV_ITEMS = [
   { id: 'model', label: 'Model' },
   { id: 'system', label: 'System' },
   { id: 'projects', label: 'Projects' },
-  { id: 'log', label: 'Log' },
+  { id: 'career', label: 'Career' },
   { id: 'contact', label: 'Contact' },
 ];
 

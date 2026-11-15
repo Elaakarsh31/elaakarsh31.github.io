@@ -7,7 +7,7 @@ import { currentSection } from '../lib/spy';
 import { BUILD_LENGTH, stage } from '../lib/stage';
 
 /** Sections after the build that frame the scene with their own camera shot. */
-const AFTER_BUILD = new Set(['projects', 'papers', 'log', 'resume', 'toolbench', 'contact']);
+const AFTER_BUILD = new Set(['projects', 'publications', 'career', 'resume', 'toolbench', 'contact']);
 import { CameraRig, SHOTS, newShot, shotAt, type ShotState } from './CameraRig';
 import { captureFrame, debugCam, fixedP, isCapture, noPost } from './capture';
 import { HudSync } from './HudSync';
@@ -22,7 +22,7 @@ function BenchLoader() {
   const [mounted, setMounted] = useState(false);
   const [active, setActive] = useState(false);
   useEffect(() => {
-    const near = new Set(['log', 'resume', 'toolbench', 'contact']);
+    const near = new Set(['career', 'resume', 'toolbench', 'contact']);
     const on = () => {
       const s = currentSection();
       if (near.has(s)) setMounted(true);
@@ -51,7 +51,7 @@ function CaptureReady() {
 }
 
 /** Sections where the scene is faded out, so rendering pauses. */
-const NO_SCENE = new Set(['log', 'resume']);
+const NO_SCENE = new Set(['career', 'resume']);
 
 /**
  * Pauses rendering when the tab is hidden or the current section shows no scene, and falls back
@@ -126,7 +126,7 @@ export default function WorkshopCanvas({ mode }: { mode: Mode }) {
       const section = currentSection();
       const after = stage.p >= BUILD_LENGTH - 0.5 && AFTER_BUILD.has(section);
       if (after) {
-        const s = SHOTS[section === 'papers' ? 'projects' : section] ?? SHOTS.projects;
+        const s = SHOTS[section === 'publications' ? 'projects' : section] ?? SHOTS.projects;
         out.pos.fromArray(s.pos);
         out.target.fromArray(s.target);
         out.shift = s.shift;

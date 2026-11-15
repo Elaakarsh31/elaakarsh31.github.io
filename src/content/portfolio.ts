@@ -165,7 +165,7 @@ export const portfolio = {
       line: 'I collect messy, unstructured data and refine it.',
       from: 40,
       to: 160,
-      link: { href: '#log', label: 'Read the log' },
+      link: { href: '#career', label: 'See my career' },
       frameAlt:
         'Scattered data fragments (a social post, a scanned form, a video frame, a product row) pass through a glowing refinery ring and come out as identical clean blocks in rows.',
       callouts: [
@@ -178,7 +178,7 @@ export const portfolio = {
           detail:
             'Pipelines over seller catalog and listing-update data raised the share of records published by the scheduled cutoff from 75% to 90%.',
           bullet: { source: 'experience', company: 'Hexbit', index: 0 },
-          links: [{ href: '#log-v0-3', label: 'Log v0.3, Hexbit' }],
+          links: [{ href: '#career-v0-3', label: 'Career v0.3, Hexbit' }],
         },
         {
           id: 'zingroll',
@@ -189,7 +189,7 @@ export const portfolio = {
           detail:
             'Collected unstructured social media data, tweets and posts, and fine-tuned Hugging Face models to generate dark-humor memes.',
           bullet: { source: 'experience', company: 'Zingroll', index: 0 },
-          links: [{ href: '#log-v0-4', label: 'Log v0.4, Zingroll' }],
+          links: [{ href: '#career-v0-4', label: 'Career v0.4, Zingroll' }],
         },
         {
           id: 'fidelity-textract',
@@ -199,7 +199,7 @@ export const portfolio = {
           slot: 3,
           detail:
             'An LLM document-validation pipeline on AWS (S3, Textract, Claude) for student-debt workitems.',
-          links: [{ href: '#log-v0-6', label: 'Log v0.6, Fidelity' }],
+          links: [{ href: '#career-v0-6', label: 'Career v0.6, Fidelity' }],
         },
       ],
     },
@@ -246,14 +246,14 @@ export const portfolio = {
           links: [{ href: links.numericCode, label: 'Code', external: true }],
         },
         {
-          id: 'papers',
-          text: 'Six papers, first author on each',
+          id: 'publications',
+          text: 'Six publications, first author on each',
           anchor: 'crown',
           at: 245,
           slot: 1,
-          detail: 'Three of them are listed under Projects, with venue, year and links.',
+          detail: 'Three of them are listed under Publications, with venue, year and links.',
           links: [
-            { href: '#papers', label: 'Papers' },
+            { href: '#publications', label: 'Publications' },
             { href: contact.scholar, label: 'Google Scholar', external: true },
           ],
         },
@@ -298,7 +298,7 @@ export const portfolio = {
           slot: 2,
           detail:
             'An LLM-as-judge returns a verdict, confidence and reason per field, and low-confidence fields go to human review.',
-          links: [{ href: '#log-v0-6', label: 'Log v0.6, Fidelity' }],
+          links: [{ href: '#career-v0-6', label: 'Career v0.6, Fidelity' }],
         },
       ],
     },
@@ -399,7 +399,7 @@ export const portfolio = {
   log: [
     {
       version: 'v0.1',
-      id: 'log-v0-1',
+      id: 'career-v0-1',
       kind: 'degree',
       resumeInstitution: 'Kalinga Institute of Industrial Technology',
       branch: 'B.Tech',
@@ -409,19 +409,19 @@ export const portfolio = {
     },
     {
       version: 'v0.2',
-      id: 'log-v0-2',
+      id: 'career-v0-2',
       kind: 'work',
       resumeCompany: 'KIIT University',
       org: 'KIIT University, Bhubaneswar',
       notes: [
         { tag: 'Added', text: 'Medical image segmentation research with Attention U-Net and GAN-based augmentation.' },
-        { tag: 'Added', text: 'Papers in IEEE OITS and Springer ICITA, 2023.' },
+        { tag: 'Added', text: 'Publications in IEEE OITS and Springer ICITA, 2023.' },
       ],
       showDetails: true,
     },
     {
       version: 'v0.3',
-      id: 'log-v0-3',
+      id: 'career-v0-3',
       kind: 'work',
       // Role title comes from the .tex ("Software Engineer").
       resumeCompany: 'Hexbit',
@@ -434,7 +434,7 @@ export const portfolio = {
     },
     {
       version: 'v0.4',
-      id: 'log-v0-4',
+      id: 'career-v0-4',
       kind: 'work',
       resumeCompany: 'Zingroll',
       org: 'Zingroll, New Delhi',
@@ -446,7 +446,7 @@ export const portfolio = {
     },
     {
       version: 'v0.5',
-      id: 'log-v0-5',
+      id: 'career-v0-5',
       kind: 'degree',
       resumeInstitution: 'Northeastern University',
       branch: 'MS',
@@ -456,7 +456,7 @@ export const portfolio = {
     },
     {
       version: 'v0.6',
-      id: 'log-v0-6',
+      id: 'career-v0-6',
       kind: 'work',
       resumeCompany: 'Fidelity Investments',
       org: 'Fidelity Investments, Boston',
@@ -474,7 +474,7 @@ export const portfolio = {
     },
     {
       version: 'v0.9',
-      id: 'log-v0-9',
+      id: 'career-v0-9',
       kind: 'now',
       dates: 'Now',
       role: 'Building agent systems',
@@ -483,7 +483,7 @@ export const portfolio = {
     },
     {
       version: 'v1.0',
-      id: 'log-v1-0',
+      id: 'career-v1-0',
       kind: 'next',
       dates: 'From January 2027',
       role: '“Ships with your team.”',

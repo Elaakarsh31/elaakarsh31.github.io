@@ -22,7 +22,7 @@ npm run resume    # only regenerate src/content/resume.generated.json
 ```
 
 `npm run shots` serves `dist/` and checks the following. It fails on any console error, page error or request to another origin.
-- Screenshots at 1440×900 and 390×844: the hero; the start, middle and end of each act; projects; the log; the toolbench before and after sorting; contact.
+- Screenshots at 1440×900 and 390×844: the hero; the start, middle and end of each act; projects; career; the toolbench before and after sorting; contact.
 - No HUD panel overlaps the act copy.
 - Readouts show live values.
 - Rendering pauses offscreen and in a hidden tab.
@@ -43,7 +43,7 @@ On macOS the scripts render with the GPU (ANGLE Metal). Pass `-- --sw` to use Sw
 | What | Where |
 | --- | --- |
 | Dates, bullets, publications, every skill | `content/Aakarsh_Arora_Full_Resume.tex` (source of truth) |
-| Hero copy, act titles and lines, callouts, spec sheets, papers, log notes, toolbench tags, contact | `src/content/portfolio.ts` |
+| Hero copy, act titles and lines, callouts, spec sheets, publications, career notes, toolbench tags, contact | `src/content/portfolio.ts` |
 | The bot's lines | `portfolio.bot.lines` in `src/content/portfolio.ts` |
 | The bot's name | `portfolio.bot.name` in the same file. It is empty by default, and with no name the bot shows none anywhere. |
 | The one-page resume | `public/resume.pdf` |
@@ -53,7 +53,7 @@ On macOS the scripts render with the GPU (ANGLE Metal). Pass `-- --sw` to use Sw
 - It reads nothing above `\section{Experience}`, so the header and its phone number never reach the page.
 - It fails with a clear message if any LaTeX would leak through.
 
-Entries in `portfolio.ts` match the resume by title or company, ignoring case and punctuation. Fidelity has `showDetails: false`, so its log entry has no "More" disclosure.
+Entries in `portfolio.ts` match the resume by title or company, ignoring case and punctuation. Fidelity has `showDetails: false`, so its Career entry has no "More" disclosure.
 
 Callouts carry:
 - `at`: when the callout appears on the timeline

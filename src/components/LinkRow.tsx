@@ -6,7 +6,7 @@ export function LinkRow({ links }: { links: Links }) {
   const items: { label: string; href: string; note?: string }[] = [];
   if (links.code) items.push({ label: 'Code', href: links.code });
   if (links.demo) items.push({ label: 'Live demo', href: links.demo, note: links.demoNote });
-  if (links.paper) items.push({ label: 'Paper', href: links.paper });
+  if (links.paper) items.push({ label: 'Publication', href: links.paper });
   if (links.notebook) items.push({ label: 'Notebook', href: links.notebook });
   if (!items.length) return null;
   return (

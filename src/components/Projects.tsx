@@ -3,6 +3,7 @@ import { findPublication, yearOf } from '../content/resume';
 import { projectImageUrl } from '../lib/assets';
 import { stage } from '../lib/stage';
 import { ExtLink } from './ExtLink';
+import { HoverText } from './HoverText';
 import { LinkRow } from './LinkRow';
 import { Schematic } from './Schematic';
 
@@ -75,9 +76,9 @@ function SpecSheet({ p }: { p: Project }) {
 
 function Papers() {
   return (
-    <section id="papers" className="papers" aria-labelledby="papers-title">
-      <h3 id="papers-title" className="papers-title">
-        Papers
+    <section id="publications" className="papers" aria-labelledby="publications-title">
+      <h3 id="publications-title" className="papers-title">
+        Publications
       </h3>
       <ul className="papers-list">
         {portfolio.papers.map((paper) => {
@@ -106,7 +107,7 @@ export function Projects() {
   return (
     <section id="projects" className="section projects" aria-labelledby="projects-title">
       <h2 id="projects-title" className="section-title" tabIndex={-1}>
-        Projects
+        <HoverText text="Projects" />
       </h2>
       <ul className="sheets">
         {portfolio.projects.map((p) => (

@@ -1,13 +1,14 @@
 import { portfolio } from '../content/portfolio';
 import { CopyEmail } from './CopyEmail';
 import { ExtLink } from './ExtLink';
+import { HoverText } from './HoverText';
 
 export function Contact() {
   const c = portfolio.contact;
   return (
     <section id="contact" className="section contact" aria-labelledby="contact-title">
       <h2 id="contact-title" className="contact-title" tabIndex={-1}>
-        {portfolio.contactSection.title}
+        <HoverText text={portfolio.contactSection.title} />
       </h2>
       <p className="contact-email">
         <a href={`mailto:${c.email}`}>{c.email}</a>
