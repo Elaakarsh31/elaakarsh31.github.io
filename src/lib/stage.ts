@@ -8,28 +8,29 @@ export const stage = {
   p: 0,
   /** Which project sheet is hovered, for lighting the machine. */
   highlight: null as null | { chips: string[]; plates: string[] },
+  /** Drag-to-orbit offset in radians, eased back to zero on release. */
+  orbit: { yaw: 0, pitch: 0 },
 };
 
-type Range = () => [number, number];
-const ranges = new Map<string, Range>();
-
 /**
- * Overrides where a section starts and ends in page scroll pixels. The live stage registers
- * its acts here, because they sit inside one pinned element.
+ * A section that lives inside the pinned stage. Both values are window.scrollY positions:
+ * `range` is when the section is current, `landing` is where links to it should scroll.
  */
-export function registerRange(id: string, range: Range) {
-  ranges.set(id, range);
+export type SectionReg = { range: () => [number, number]; landing: () => number };
+
+const sections = new Map<string, SectionReg>();
+
+export function registerSection(id: string, reg: SectionReg) {
+  sections.set(id, reg);
   return () => {
-    if (ranges.get(id) === range) ranges.delete(id);
+    if (sections.get(id) === reg) sections.delete(id);
   };
 }
 
-export const hasRegisteredRange = (id: string) => ranges.has(id);
+export const getSection = (id: string) => sections.get(id);
 
-/** Section range in document pixels: a registered override or the element's own box. */
-export function rangeOf(id: string): [number, number] | null {
-  const r = ranges.get(id);
-  if (r) return r();
+/** Range of a normal section in document pixels. */
+export function elementRange(id: string): [number, number] | null {
   const el = document.getElementById(id);
   if (!el) return null;
   const rect = el.getBoundingClientRect();

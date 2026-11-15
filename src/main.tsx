@@ -8,6 +8,7 @@ import './styles/tokens.css';
 import './styles/base.css';
 import './styles/chrome.css';
 import './styles/build.css';
+import './styles/stage.css';
 import './styles/sections.css';
 import { App } from './App';
 

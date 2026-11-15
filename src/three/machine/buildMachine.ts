@@ -412,7 +412,7 @@ export function buildMachine() {
       L.group.rotation.y = spin + ex * (i % 2 ? 0.24 : -0.18);
       const fab = layerFab(i, p);
       L.fab.uFab.value = fab;
-      L.fab.uPulse.value = pulseAt(layerY(i) + LAYER_H / 2) * 0.5;
+      L.fab.uPulse.value = 0;
       L.metal.visible = fab > 0.001;
       const gm = L.ghost.material;
       gm.uniforms.uFab.value = fab;
@@ -436,7 +436,7 @@ export function buildMachine() {
     crown.group.rotation.y = spin + ex * 0.3;
     const cf = crownFab(p);
     crown.fab.uFab.value = cf;
-    crown.fab.uPulse.value = pulseAt(CROWN_Y + 0.1) * 0.5;
+    crown.fab.uPulse.value = 0;
     crown.metal.visible = cf > 0.001;
     crown.ghost.material.uniforms.uFab.value = cf;
     crown.ghost.material.uniforms.uTime.value = t;
@@ -472,15 +472,17 @@ export function buildMachine() {
       const pull = open * 0.35;
       pl.pivotOuter.position.set(Math.sin(pl.theta) * pull, pl.spec.y0 + open * 0.08, Math.cos(pl.theta) * pull);
       pl.fab.uFab.value = st.fab;
-      pl.fab.uPulse.value = pulseAt(pl.spec.y0 + 0.2);
+      pl.fab.uPulse.value = 0;
       pl.metal.visible = st.fab > 0.001;
-      (pl.flash.material as ShaderMaterial).uniforms.uFlash.value = st.flash;
-      pl.flash.visible = st.flash > 0.001;
+      // The lock click, and the power-on pulse running along the plate's seams.
+      const pulse = st.locked ? pulseAt((pl.spec.y0 + pl.spec.y1) / 2) * 0.7 : 0;
+      (pl.flash.material as ShaderMaterial).uniforms.uFlash.value = Math.max(st.flash, pulse);
+      pl.flash.visible = st.flash > 0.001 || pulse > 0.01;
     });
   }
 
   /** Where the hero weld happens: on layer 0's fabrication line, front right. */
-  function heroWeldPoint(p: number, out: { x: number; y: number; z: number }) {
+  function heroWeldPoint<T extends { x: number; y: number; z: number }>(p: number, out: T): T {
     const fab = layerFab(0, p);
     const a = 34 * deg + coreSpin(p) - 0.18 * explode(p);
     out.x = Math.sin(a) * (CORE_R + 0.01);
@@ -490,7 +492,7 @@ export function buildMachine() {
   }
 
   /** Front point of the seam on top of layer k, for welding. */
-  function seamPoint(k: number, p: number, out: { x: number; y: number; z: number }) {
+  function seamPoint<T extends { x: number; y: number; z: number }>(k: number, p: number, out: T): T {
     const a = 30 * deg;
     out.x = Math.sin(a) * (CORE_R + 0.01);
     out.y = layerY(k) + explode(p) * layerLift(k) + LAYER_H + LAYER_GAP / 2;
@@ -499,7 +501,7 @@ export function buildMachine() {
   }
 
   /** Lock point on plate k's outer face. */
-  function plateBoltPoint(k: number, out: { x: number; y: number; z: number }) {
+  function plateBoltPoint<T extends { x: number; y: number; z: number }>(k: number, out: T): T {
     const spec = PLATES[k];
     const a = (spec.angle + (spec.angle >= 0 ? -spec.span * 0.32 : spec.span * 0.32)) * deg;
     out.x = Math.sin(a) * (PLATE_R1 + 0.01);

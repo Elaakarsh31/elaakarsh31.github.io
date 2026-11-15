@@ -9,9 +9,9 @@ type Shot = { pos: [number, number, number]; target: [number, number, number]; s
 // the left never sits over the machine; `lift` moves it down (phones).
 export const SHOTS: Record<string, Shot> = {
   hero: { pos: [0.55, 1.8, 8.0], target: [0.12, 1.06, 0], shift: 0.19 },
-  data: { pos: [-1.5, 1.55, 5.7], target: [-1.95, 0.62, 0.2], shift: 0.2 },
-  model: { pos: [0.95, 1.85, 6.2], target: [0.12, 1.08, 0], shift: 0.2 },
-  system: { pos: [0.75, 1.75, 7.4], target: [0.1, 1.06, 0], shift: 0.2 },
+  data: { pos: [-1.5, 1.55, 5.7], target: [-1.95, 0.62, 0.2], shift: 0.15 },
+  model: { pos: [0.95, 1.9, 6.7], target: [0.12, 1.1, 0], shift: 0.15 },
+  system: { pos: [0.75, 1.75, 7.4], target: [0.1, 1.06, 0], shift: 0.15 },
   projects: { pos: [-0.2, 1.55, 6.9], target: [0.1, 1.05, 0], shift: 0.26 },
   heroPhone: { pos: [0.2, 1.55, 7.4], target: [0.15, 0.95, 0], shift: 0, lift: 0.17, fov: 34 },
 };

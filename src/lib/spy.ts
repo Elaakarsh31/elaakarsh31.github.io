@@ -1,7 +1,7 @@
 // Keeps the nav's current item and the pipeline rail's fills in sync with the scroll position.
 // Writes straight to the DOM once per frame, and only when the scroll position or size changed.
 import { gsap } from 'gsap';
-import { clamp01, rangeOf } from './stage';
+import { clamp01, elementRange, getSection } from './stage';
 
 const ORDER = ['top', 'data', 'model', 'system', 'projects', 'log', 'resume', 'toolbench', 'contact'];
 const ACTS = ['data', 'model', 'system'];
@@ -23,7 +23,12 @@ export function startSpy() {
     const probe = y + h * 0.4;
     let now = 'top';
     for (const id of ORDER) {
-      const r = rangeOf(id);
+      const reg = getSection(id);
+      if (reg) {
+        if (reg.range()[0] <= y) now = id;
+        continue;
+      }
+      const r = elementRange(id);
       if (r && r[0] <= probe) now = id;
     }
     if (now !== current) {
@@ -36,10 +41,18 @@ export function startSpy() {
     }
 
     for (const id of ACTS) {
-      const r = rangeOf(id);
       const seg = document.querySelector<HTMLElement>(`.rail-seg[data-seg="${id}"]`);
-      if (!r || !seg) continue;
-      const fill = clamp01((y + h * 0.5 - r[0]) / Math.max(1, r[1] - r[0]));
+      if (!seg) continue;
+      const reg = getSection(id);
+      let fill = 0;
+      if (reg) {
+        const [a, b] = reg.range();
+        fill = clamp01((y - a) / Math.max(1, b - a));
+      } else {
+        const r = elementRange(id);
+        if (!r) continue;
+        fill = clamp01((y + h * 0.5 - r[0]) / Math.max(1, r[1] - r[0]));
+      }
       seg.style.setProperty('--fill', fill.toFixed(3));
     }
   };

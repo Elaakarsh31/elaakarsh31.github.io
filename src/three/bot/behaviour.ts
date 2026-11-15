@@ -226,12 +226,17 @@ export class BotBrain {
         break;
       }
       case 'bolt': {
-        reachFor(toLocal(ctx.task.point, this.local), this.shoulderL, 0.035);
-        pose.left.target.copy(this.local);
-        pose.left.open = 0.05;
-        pose.left.roll = ctx.task.twist * Math.PI * 2;
-        pose.right.target.set(0.17, -0.02, 0.15);
-        pose.right.open = 0.6;
+        // Use whichever gripper is on the side of the bolt.
+        toLocal(ctx.task.point, this.local);
+        const useRight = this.local.x >= 0;
+        const arm = useRight ? pose.right : pose.left;
+        const other = useRight ? pose.left : pose.right;
+        reachFor(this.local, useRight ? this.shoulderR : this.shoulderL, 0.035);
+        arm.target.copy(this.local);
+        arm.open = 0.05;
+        arm.roll = ctx.task.twist * Math.PI * 2;
+        other.target.set(useRight ? -0.17 : 0.17, -0.02, 0.15);
+        other.open = 0.6;
         break;
       }
       case 'thumbs': {

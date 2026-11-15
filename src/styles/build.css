@@ -164,6 +164,10 @@
   color: var(--holo);
 }
 
+.callout-detail[hidden] {
+  display: none;
+}
+
 .callout-detail {
   padding: 0 14px 14px;
   font-size: 15px;

@@ -3,7 +3,7 @@
 import Lenis from 'lenis';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { hasRegisteredRange, rangeOf } from './stage';
+import { elementRange, getSection } from './stage';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -39,10 +39,11 @@ const navH = () => parseFloat(getComputedStyle(document.documentElement).getProp
 /** Where a target lands: registered act positions, the top, or the element under the nav. */
 export function targetY(id: string): number | null {
   if (id === 'top' || id === '') return 0;
-  const r = rangeOf(id);
-  if (!r) return null;
   // Pinned acts register their own landing point; sections land just under the nav.
-  if (hasRegisteredRange(id)) return Math.max(0, r[0]);
+  const reg = getSection(id);
+  if (reg) return Math.max(0, reg.landing());
+  const r = elementRange(id);
+  if (!r) return null;
   const el = document.getElementById(id);
   const offset = navH() + (el?.classList.contains('log-entry') ? 24 : 0);
   return Math.max(0, r[0] - offset);

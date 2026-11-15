@@ -6,6 +6,7 @@ import { stage } from '../lib/stage';
 import { registerAnchor } from './anchors';
 import { BotBrain } from './bot/behaviour';
 import { buildBot } from './bot/buildBot';
+import { buildData } from './data/buildData';
 import { buildMachine } from './machine/buildMachine';
 import { newPlan, planBot } from './plan';
 import { createSparks } from './sparks';
@@ -24,6 +25,7 @@ export function Workshop({ motion, capture }: { motion: boolean; capture: boolea
   }, []);
   const brain = useMemo(() => new BotBrain(), []);
   const sparks = useMemo(createSparks, []);
+  const data = useMemo(buildData, []);
   const plan = useMemo(newPlan, []);
   const turntable = useRef<Group>(null);
   const camera = useThree((s) => s.camera);
@@ -32,19 +34,21 @@ export function Workshop({ motion, capture }: { motion: boolean; capture: boolea
   const clock = useThree((s) => s.clock);
 
   useEffect(() => {
-    for (const [name, obj] of Object.entries(machine.anchors)) registerAnchor(name, obj);
+    const all = { ...machine.anchors, ...data.anchors };
+    for (const [name, obj] of Object.entries(all)) registerAnchor(name, obj);
     const head = bot.body.children[0];
     registerAnchor('bot', head);
     setBotPresent(true);
     return () => {
-      for (const name of Object.keys(machine.anchors)) registerAnchor(name, null);
+      for (const name of Object.keys(all)) registerAnchor(name, null);
       registerAnchor('bot', null);
       setBotPresent(false);
       machine.dispose();
+      data.dispose();
       bot.dispose();
       sparks.dispose();
     };
-  }, [machine, bot, sparks]);
+  }, [machine, bot, sparks, data]);
 
   useEffect(() => {
     const onPoke = () => brain.poke(clock.elapsedTime);
@@ -60,8 +64,17 @@ export function Workshop({ motion, capture }: { motion: boolean; capture: boolea
     const p = stage.p;
     const t = state.clock.elapsedTime;
     machine.update(p, t, dt, motion, stage.highlight);
+    data.update(p, t, motion, stage.highlight?.chips.includes('data') ?? false);
 
-    planBot(p, machine, plan);
+    // Drag-to-orbit: the turntable follows the drag and eases back on release.
+    const tt = turntable.current;
+    if (tt) {
+      const k = 1 - Math.exp(-Math.min(dt, 0.05) * 6);
+      tt.rotation.y += (stage.orbit.yaw - tt.rotation.y) * k;
+      tt.rotation.x += (stage.orbit.pitch - tt.rotation.x) * k;
+    }
+
+    planBot(p, machine, data, plan);
     v.copy(bot.root.position).project(camera);
     const screenX = (v.x * 0.5 + 0.5) * size.width;
     const screenY = (-v.y * 0.5 + 0.5) * size.height;
@@ -86,6 +99,7 @@ export function Workshop({ motion, capture }: { motion: boolean; capture: boolea
   return (
     <group ref={turntable}>
       <primitive object={machine.root} />
+      <primitive object={data.root} />
       <primitive
         object={bot.root}
         onClick={onClick}
