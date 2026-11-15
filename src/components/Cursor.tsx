@@ -1,8 +1,8 @@
 import { useEffect, useRef } from 'react';
 
 // What the follower does over different things. Order matters: the first match wins.
-/** Controls with their own hover effect (dock pill, rolling text): the ring only, no recolour. */
-const OWN = '.dock, .resume-fab, .band-download';
+/** Controls with their own hover effect (dock pill, rolling text, neon buttons): the ring only, no recolour. */
+const OWN = '.dock, .resume-fab, .band-download, .btn';
 const LINKS = 'a[href], button, summary, [role="option"], .callout-face';
 const BIG_TEXT = 'h1, h2, .contact-email, .resume-band-line';
 const TEXT = 'h3, .sheet-title, .paper-title, .hero-tagline, .act-line, .log-title';
