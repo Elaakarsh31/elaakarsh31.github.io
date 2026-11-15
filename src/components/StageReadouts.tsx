@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { portfolio } from '../content/portfolio';
 import { BUILD_LENGTH, stage } from '../lib/stage';
-import { fragWindow, loss, platesLocked } from '../three/choreo';
+import { fragWindow, loss, platesLocked } from '../three/timing';
 
 const R = 15;
 const CIRC = 2 * Math.PI * R;

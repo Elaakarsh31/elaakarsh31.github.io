@@ -10,16 +10,9 @@ import {
   mergeVertices,
 } from './geom';
 
-// Layout of the machine, in scene units. The machine stands on the bench at the origin.
-export const CORE_R = 0.56;
-export const HOLE_R = 0.13;
-export const LAYER_H = 0.32;
-export const LAYER_GAP = 0.04;
-export const LAYER_Y0 = 0.3;
-export const LAYERS = 4;
-export const layerY = (i: number) => LAYER_Y0 + i * (LAYER_H + LAYER_GAP);
-export const CROWN_Y = layerY(LAYERS);
-export const SPINE_TOP = CROWN_Y + 0.42;
+import { CORE_R, HOLE_R, LAYER_H, PLATE_R0, PLATE_R1, SPINE_TOP, type PlateSpec } from './layout';
+
+export * from './layout';
 
 /** A closed lathe profile: (radius, height) pairs, revolved around Y. */
 function lathe(points: [number, number][], segments = 72) {
@@ -96,27 +89,6 @@ export const crownGeometry = () => lathe(CROWN_PROFILE);
 export function spineGeometry() {
   return new CylinderGeometry(0.11, 0.11, SPINE_TOP - 0.22, 48, 1).translate(0, (SPINE_TOP + 0.22) / 2, 0);
 }
-
-export type PlateSpec = {
-  name: string;
-  slug: string;
-  /** Angle around the machine, from +Z (facing the camera), positive toward +X. Degrees. */
-  angle: number;
-  span: number;
-  y0: number;
-  y1: number;
-};
-
-export const PLATES: PlateSpec[] = [
-  { name: 'Gates', slug: 'gates', angle: -48, span: 62, y0: 0.34, y1: 0.84 },
-  { name: 'Retrieval', slug: 'retrieval', angle: 50, span: 60, y0: 0.4, y1: 0.9 },
-  { name: 'Human review', slug: 'human-review', angle: 0, span: 56, y0: 0.94, y1: 1.42 },
-  { name: 'API', slug: 'api', angle: -58, span: 58, y0: 1.06, y1: 1.52 },
-  { name: 'Interface', slug: 'interface', angle: 58, span: 58, y0: 1.12, y1: 1.62 },
-];
-
-export const PLATE_R0 = 0.615;
-export const PLATE_R1 = 0.655;
 
 /**
  * A curved housing plate: an annular sector extruded upward with a small bevel. Built centered on

@@ -3,7 +3,7 @@
 // Thresholds are symmetric, so scrolling back hides things in reverse order.
 import { gsap } from 'gsap';
 import { portfolio } from '../content/portfolio';
-import { plateLockAt } from '../three/choreo';
+import { plateLockAt } from '../three/timing';
 import { BUILD_LENGTH, stage } from './stage';
 
 function setFlag(el: Element & { dataset: DOMStringMap }, key: string, on: boolean) {
