@@ -12,6 +12,7 @@ import { newPlan, planAfterBuild, planBot } from './plan';
 import { currentSection } from '../lib/spy';
 import { BUILD_LENGTH } from '../lib/stage';
 import { createSparks } from './sparks';
+import { setCrackle } from '../lib/sound';
 
 const v = new Vector3();
 /** The bot's size relative to the machine: palm-sized, big enough to read its face. */
@@ -104,6 +105,7 @@ export function Workshop({ motion, sparks: sparksOn, capture }: { motion: boolea
     if (sparksOn && brain.pose.weld > 0.05) sparks.emit(bot.weldTip(), 260 * brain.pose.weld, dt);
     if (sparksOn) sparks.update(Math.min(dt, 0.05));
     else sparks.clear();
+    setCrackle(motion ? brain.pose.weld : 0);
   }, -1);
 
   const onClick = (e: ThreeEvent<MouseEvent>) => {

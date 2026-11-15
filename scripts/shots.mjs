@@ -1,13 +1,13 @@
 #!/usr/bin/env node
-// Serves the production build with `vite preview` and captures screenshots with Playwright.
-// Any console error or page error fails the run.
+// Verifies the production build with Playwright and captures screenshots into screenshots/.
+// Any console error, page error, failed request or request to another origin fails the run.
 //
-//   npm run build && npm run shots          # all captures into screenshots/
-//   npm run shots -- --og                   # also write public/og.png (1200x630 hero)
-//   npm run shots -- --only=desktop-p0      # just captures whose name contains this
+//   npm run build && npm run shots              # everything
+//   npm run shots -- --only=desktop             # captures and checks whose name contains this
+//   npm run shots -- --sw                       # force SwiftShader (default on non-macOS)
 
 import { spawn } from 'node:child_process';
-import { mkdirSync, readFileSync, existsSync } from 'node:fs';
+import { mkdirSync, readFileSync, existsSync, rmSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
@@ -18,7 +18,7 @@ const PORT = 4179;
 const URL = `http://localhost:${PORT}/`;
 const args = process.argv.slice(2);
 const only = args.find((a) => a.startsWith('--only='))?.slice(7);
-const wantOg = args.includes('--og');
+const forceSw = args.includes('--sw');
 
 if (!existsSync(resolve(root, 'dist/index.html'))) {
   console.error('dist/ not found. Run `npm run build` first.');
@@ -26,21 +26,24 @@ if (!existsSync(resolve(root, 'dist/index.html'))) {
 }
 mkdirSync(OUT, { recursive: true });
 
+const GPU = ['--use-angle=metal', '--ignore-gpu-blocklist', '--enable-gpu'];
 const SWIFTSHADER = ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'];
+const LAUNCH = forceSw || process.platform !== 'darwin' ? SWIFTSHADER : GPU;
 const DESKTOP = { width: 1440, height: 900 };
 const MOBILE = { width: 390, height: 844 };
 
 const resumeData = JSON.parse(readFileSync(resolve(root, 'src/content/resume.generated.json'), 'utf8'));
+const portfolioSrc = readFileSync(resolve(root, 'src/content/portfolio.ts'), 'utf8');
+const EMAIL = portfolioSrc.match(/email: '([^']+)'/)[1];
 const errors = [];
+const notes = [];
 const saved = [];
+const want = (name) => !only || name.includes(only);
 
-// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------
 
 function startPreview() {
-  const proc = spawn('npx', ['vite', 'preview', '--port', String(PORT), '--strictPort'], {
-    cwd: root,
-    stdio: ['ignore', 'pipe', 'pipe'],
-  });
+  const proc = spawn('npx', ['vite', 'preview', '--port', String(PORT), '--strictPort'], { cwd: root, stdio: ['ignore', 'pipe', 'pipe'] });
   return new Promise((res, rej) => {
     const timer = setTimeout(() => rej(new Error('vite preview did not start')), 20000);
     proc.stdout.on('data', (d) => {
@@ -58,255 +61,385 @@ function watch(page, label) {
     if (msg.type() === 'error') errors.push(`[${label}] console.error: ${msg.text()}`);
   });
   page.on('pageerror', (err) => errors.push(`[${label}] pageerror: ${err.message}`));
-  page.on('requestfailed', (req) => errors.push(`[${label}] request failed: ${req.url()}`));
+  page.on('requestfailed', (req) => {
+    if (req.url().startsWith(URL)) errors.push(`[${label}] request failed: ${req.url()}`);
+  });
   page.on('request', (req) => {
     const u = req.url();
-    if (!u.startsWith(URL) && !u.startsWith('data:') && !u.startsWith('blob:')) {
-      errors.push(`[${label}] request to another origin: ${u}`);
-    }
+    if (!u.startsWith(URL) && !u.startsWith('data:') && !u.startsWith('blob:')) errors.push(`[${label}] request to another origin: ${u}`);
   });
 }
 
-async function openPage(browser, label, { viewport, reducedMotion = 'no-preference', hasTouch = false } = {}) {
-  const context = await browser.newContext({
-    viewport,
-    deviceScaleFactor: 1,
-    reducedMotion,
-    hasTouch,
-    isMobile: hasTouch,
+async function newPage(browser, label, { viewport = DESKTOP, reducedMotion = 'no-preference', mobile = false, permissions = [] } = {}) {
+  const context = await browser.newContext({ viewport, deviceScaleFactor: 1, reducedMotion, hasTouch: mobile, isMobile: mobile, permissions });
+  // Popups from the palette (GitHub, LinkedIn…) must not load other origins during the test;
+  // the URLs they tried to open are recorded instead.
+  const blocked = [];
+  await context.route(/^https?:\/\/(?!localhost)/, (route) => {
+    blocked.push(route.request().url());
+    return route.abort();
   });
+  // Same-origin documents opened in a new tab (the resume PDF) are recorded too.
+  context.on('request', (req) => {
+    if (req.url().startsWith(URL) && /\.pdf$/.test(req.url())) blocked.push(req.url());
+  });
+  context.blocked = blocked;
   const page = await context.newPage();
   watch(page, label);
   await page.goto(URL, { waitUntil: 'networkidle' });
-  await page.waitForFunction(() => document.documentElement.dataset.hero, null, { timeout: 30000 });
   await page.evaluate(() => document.fonts.ready);
-  const info = await page.evaluate(() => document.querySelector('.hero-canvas')?.dataset.info);
-  if (info) console.log(`[${label}] ${info}`);
+  await page.waitForTimeout(1500);
   return page;
 }
 
-/** Scroll so the hero's sticky progress equals p (0..1). */
-async function scrollToProgress(page, p) {
-  await page.evaluate((p) => {
-    const hero = document.getElementById('top');
-    const travel = Math.max(0, hero.offsetHeight - window.innerHeight);
-    window.scrollTo({ top: hero.offsetTop + travel * p, behavior: 'instant' });
-  }, p);
-  await page.waitForTimeout(900); // let the scene ease to the new progress
-}
-
-async function shot(page, name, opts = {}) {
-  if (only && !name.includes(only)) return;
+async function shot(page, name) {
+  if (!want(name)) return;
   const path = resolve(OUT, `${name}.png`);
-  await page.screenshot({ path, ...opts });
+  await page.screenshot({ path });
   saved.push(path);
 }
 
-function want(name) {
-  return !only || name.includes(only);
+const settle = (page) =>
+  page.evaluate(
+    () =>
+      new Promise((res) => {
+        let last = -1;
+        let still = 0;
+        const tick = () => {
+          still = Math.abs(scrollY - last) < 0.5 ? still + 1 : 0;
+          last = scrollY;
+          if (still >= 5) res();
+          else setTimeout(tick, 80);
+        };
+        setTimeout(tick, 150);
+      }),
+  );
+
+async function scrollToP(page, p) {
+  await page.evaluate((p) => {
+    const b = document.getElementById('build');
+    window.scrollTo({ top: b.offsetTop + (p / 100) * innerHeight, behavior: 'instant' });
+  }, p);
+  await settle(page);
+  await page.waitForTimeout(1100);
 }
 
-// ---------------------------------------------------------------------------
+async function scrollToId(page, id, offset = 0) {
+  await page.evaluate(
+    ([id, offset]) => {
+      const el = document.getElementById(id);
+      window.scrollTo({ top: el.getBoundingClientRect().top + scrollY - offset, behavior: 'instant' });
+    },
+    [id, offset],
+  );
+  await settle(page);
+  await page.waitForTimeout(900);
+}
 
-async function captureSize(browser, size, viewport, hasTouch) {
-  if (!['p0', 'p05', 'p1', 'work', 'reverse-p0', 'pointer'].some((t) => want(`${size}-${t}`))) return;
-  const page = await openPage(browser, size, { viewport, hasTouch });
-  for (const [p, tag] of [
-    [0, 'p0'],
-    [0.5, 'p05'],
-    [1, 'p1'],
-  ]) {
-    await scrollToProgress(page, p);
-    await shot(page, `${size}-${tag}`);
-  }
-  await page.evaluate(() => document.getElementById('work').scrollIntoView({ behavior: 'instant' }));
-  await page.waitForTimeout(400);
-  await shot(page, `${size}-work`);
-  if (!hasTouch && (want(`${size}-pointer`))) {
-    // Sweep the pointer across the face, capture the disturbance, then confirm it settles.
-    await scrollToProgress(page, 0);
-    const { width, height } = viewport;
-    await page.mouse.move(width * 0.36, height * 0.3);
-    for (let k = 0; k <= 24; k++) {
-      await page.mouse.move(width * (0.36 + 0.22 * (k / 24)), height * (0.3 + 0.18 * Math.sin(k / 4)));
-      await page.waitForTimeout(16);
+// ---------------------------------------------------------------------------------------------
+
+async function desktop(browser) {
+  if (!want('desktop')) return;
+  const page = await newPage(browser, 'desktop');
+  const mode = await page.evaluate(() => document.documentElement.dataset.mode);
+  if (mode !== 'live') errors.push(`[desktop] expected live mode, got ${mode}`);
+  await shot(page, 'desktop-hero');
+
+  const acts = [
+    ['data', [45, 100, 155]],
+    ['model', [165, 220, 275]],
+    ['system', [285, 340, 395]],
+  ];
+  for (const [act, ps] of acts) {
+    for (const [k, p] of ps.entries()) {
+      await scrollToP(page, p);
+      await shot(page, `desktop-${act}-${['start', 'middle', 'end'][k]}`);
+      // HUD panels must never cover the act copy.
+      const overlap = await page.evaluate((act) => {
+        const copy = document.querySelector(`.act[data-act="${act}"] .act-copy`).getBoundingClientRect();
+        return [...document.querySelectorAll(`.act[data-act="${act}"] .callout[data-on]`)]
+          .map((c) => c.getBoundingClientRect())
+          .filter((r) => r.left < copy.right && r.right > copy.left && r.top < copy.bottom && r.bottom > copy.top).length;
+      }, act);
+      if (overlap) errors.push(`[desktop] ${overlap} callout panel(s) overlap the ${act} copy at p=${p}`);
     }
-    await page.waitForTimeout(120);
-    await shot(page, `${size}-pointer`);
-    await page.mouse.move(width * 0.95, height * 0.95);
-    await page.waitForTimeout(2200);
-    await shot(page, `${size}-pointer-settled`);
   }
-  // Reverse scroll: the bust must reassemble.
-  await scrollToProgress(page, 0.5);
-  await scrollToProgress(page, 0);
-  await page.waitForTimeout(800);
-  await shot(page, `${size}-reverse-p0`);
+  // Readouts show real values.
+  await scrollToP(page, 220);
+  const ro = await page.evaluate(() => [...document.querySelectorAll('.readouts [data-ro]')].map((e) => e.textContent).join(' | '));
+  notes.push(`readouts at p=220: ${ro}`);
+
+  await scrollToId(page, 'projects', 60);
+  await shot(page, 'desktop-projects');
+  await scrollToId(page, 'log-v0-3', 380);
+  await shot(page, 'desktop-log');
+  await scrollToId(page, 'toolbench', 0);
+  await page.waitForTimeout(3000);
+  await shot(page, 'desktop-toolbench-before');
+  await page.evaluate(() => document.querySelector('.bench-sort').click());
+  await page.waitForTimeout(3500);
+  await shot(page, 'desktop-toolbench-after');
+  await scrollToId(page, 'contact', 0);
+  await page.waitForTimeout(2400);
+  await shot(page, 'desktop-contact');
+
+  // Reverse: back to the start of the build, the hero must be exploded again.
+  await scrollToP(page, 200);
+  await scrollToP(page, 0);
+  await shot(page, 'desktop-reverse-hero');
+
+  // Lifecycle: paused over the Log, running in the build, paused in a hidden tab.
+  const running = () => page.evaluate(() => document.querySelector('.webgl canvas')?.dataset.running);
+  await scrollToId(page, 'log-v0-2', 300);
+  await page.waitForTimeout(900);
+  const offstage = await running();
+  if (offstage !== '0') errors.push(`[lifecycle] still rendering over the Log (${offstage})`);
+  await scrollToP(page, 100);
+  const back = await running();
+  if (back !== '1') errors.push(`[lifecycle] did not resume in the build (${back})`);
+  await page.evaluate(() => {
+    Object.defineProperty(document, 'hidden', { configurable: true, get: () => true });
+    document.dispatchEvent(new Event('visibilitychange'));
+  });
+  const hidden = await running();
+  if (hidden !== '0') errors.push(`[lifecycle] still rendering in a hidden tab (${hidden})`);
+  notes.push(`lifecycle: offstage ${offstage}, build ${back}, hidden tab ${hidden}`);
   await page.context().close();
 }
 
-async function checkContent(browser) {
-  const page = await openPage(browser, 'content', { viewport: DESKTOP });
+async function mobile(browser) {
+  if (!want('mobile')) return;
+  const page = await newPage(browser, 'mobile', { viewport: MOBILE, mobile: true });
+  const mode = await page.evaluate(() => document.documentElement.dataset.mode);
+  if (mode !== 'phone') errors.push(`[mobile] expected phone mode, got ${mode}`);
+  await shot(page, 'mobile-hero');
+  for (const id of ['data', 'model', 'system', 'projects', 'log', 'toolbench', 'contact']) {
+    await scrollToId(page, id, 60);
+    await shot(page, `mobile-${id}`);
+  }
+  const r = await page.evaluate(() => ({
+    frames: document.querySelectorAll('.act .frame img').length,
+    rail: getComputedStyle(document.querySelector('.rail')).display,
+    cursor: !!document.querySelector('.cursor-ring'),
+    overflow: document.documentElement.scrollWidth > innerWidth + 1,
+  }));
+  if (r.frames !== 3) errors.push(`[mobile] ${r.frames} act frames shown, expected 3`);
+  if (r.rail !== 'none') errors.push('[mobile] pipeline rail is visible');
+  if (r.cursor) errors.push('[mobile] custom cursor is mounted');
+  if (r.overflow) errors.push('[mobile] page scrolls horizontally');
+  await page.context().close();
+}
+
+async function palette(browser) {
+  if (!want('palette')) return;
+  const page = await newPage(browser, 'palette', { permissions: ['clipboard-read', 'clipboard-write'] });
+  const isOpen = () => page.evaluate(() => document.querySelector('dialog.palette').open);
+  for (const combo of ['Meta+K', 'Control+K', '/']) {
+    await page.keyboard.press(combo);
+    await page.waitForTimeout(120);
+    if (!(await isOpen())) errors.push(`[palette] ${combo} did not open the palette`);
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(120);
+    if (await isOpen()) errors.push(`[palette] Escape did not close it after ${combo}`);
+  }
+  const run = async (query) => {
+    await page.keyboard.press('Control+K');
+    await page.waitForTimeout(100);
+    await page.keyboard.type(query, { delay: 15 });
+    await page.keyboard.press('Enter');
+  };
+  // Every "Go to" action, keyboard only.
+  for (const [query, id, focusId] of [
+    ['projects', 'projects', 'projects-title'],
+    ['papers', 'papers', 'papers'],
+    ['log', 'log', 'log-title'],
+    ['toolbench', 'toolbench', 'toolbench-title'],
+    ['contact', 'contact', 'contact-title'],
+    ['data', 'data', 'act-data-title'],
+    ['model', 'model', 'act-model-title'],
+    ['system', 'system', 'act-system-title'],
+    ['top', 'top', 'hero-title'],
+  ]) {
+    await run(query);
+    await page.waitForTimeout(400);
+    await settle(page);
+    const r = await page.evaluate(
+      ([id, focusId]) => {
+        const reg = document.getElementById(id);
+        return {
+          focus: document.activeElement?.id,
+          hash: location.hash,
+          visible: id === 'top' ? scrollY < 5 : (() => {
+            const t = reg.querySelector('h2, h3, .act-title') ?? reg;
+            const b = t.getBoundingClientRect();
+            return b.top >= 0 && b.bottom <= innerHeight && getComputedStyle(t.closest('.act-copy') ?? t).opacity !== '0';
+          })(),
+        };
+      },
+      [id, focusId],
+    );
+    if (r.focus !== focusId) errors.push(`[palette] "${query}" focused ${r.focus}, expected ${focusId}`);
+    if (!r.visible) errors.push(`[palette] "${query}" did not bring its heading into view`);
+  }
+  // Copy email.
+  await run('copy email');
+  await page.waitForTimeout(250);
+  const clip = await page.evaluate(() => navigator.clipboard.readText());
+  const status = await page.evaluate(() => document.querySelector('.palette-status')?.textContent);
+  if (clip !== EMAIL) errors.push(`[palette] clipboard has "${clip}"`);
+  if (status !== 'Copied') errors.push(`[palette] copy status is "${status}"`);
+  await page.waitForTimeout(1300);
+  // Links open in a new tab.
+  for (const [query, expect] of [
+    ['open resume', /\/resume\.pdf$/],
+    ['github', /github\.com\/Elaakarsh31/],
+    ['linkedin', /linkedin\.com\/in\/aakarsharora/],
+    ['scholar', /scholar\.google\.com/],
+  ]) {
+    const ctx = page.context();
+    const before = ctx.blocked.length;
+    const popup = ctx.waitForEvent('page', { timeout: 5000 }).catch(() => null);
+    await run(query);
+    const p = await popup;
+    if (!p) {
+      errors.push(`[palette] "${query}" did not open a tab`);
+      continue;
+    }
+    await p.waitForLoadState('commit').catch(() => {});
+    await page.waitForTimeout(300);
+    const opened = ctx.blocked.slice(before).find((u) => expect.test(u)) ?? p.url();
+    if (!expect.test(opened)) errors.push(`[palette] "${query}" opened ${opened || '(nothing)'}`);
+    await p.close();
+    await page.waitForTimeout(200);
+  }
+  // Talk to the bot.
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+  await page.waitForTimeout(600);
+  await run('bot');
+  await page.waitForTimeout(400);
+  const said = await page.evaluate(() => document.querySelector('.bot-speech')?.textContent);
+  if (!said) errors.push('[palette] the bot said nothing');
+  notes.push(`palette: shortcuts, ${9} jumps, copy (${clip}), 4 links, bot ("${said}")`);
+  await page.context().close();
+}
+
+async function content(browser) {
+  if (!want('content')) return;
+  const page = await newPage(browser, 'content');
+  const skillSet = new Set(resumeData.skills.flatMap((s) => s.items));
   const r = await page.evaluate(() => ({
     skills: document.querySelectorAll('[data-skill]').length,
-    projects: document.querySelectorAll('#work .project').length,
-    projectDetails: document.querySelectorAll('#work .project details').length,
-    expDetails: document.querySelectorAll('#experience details').length,
+    tags: [...document.querySelectorAll('.tag[data-tag]')].map((e) => e.dataset.tag),
+    sheets: document.querySelectorAll('.sheet').length,
+    papers: document.querySelectorAll('.paper').length,
+    log: document.querySelectorAll('ol.log-list > li.log-entry').length,
     blank: [...document.querySelectorAll('a[target="_blank"]')].filter((a) => a.rel !== 'noopener noreferrer').length,
     phone: /857\D?351/.test(document.body.innerText),
+    title: document.title,
   }));
-  const expect = resumeData.counts.skills;
-  if (r.skills !== expect) errors.push(`[content] ${r.skills} skills on the page, ${expect} in the .tex`);
-  if (r.projects !== 9) errors.push(`[content] expected 9 projects, found ${r.projects}`);
-  if (r.projectDetails !== r.projects) errors.push(`[content] ${r.projects - r.projectDetails} projects without Details`);
+  if (r.skills !== resumeData.counts.skills) errors.push(`[content] ${r.skills} skills on the page, ${resumeData.counts.skills} in the .tex`);
+  const notSkills = r.tags.filter((t) => !skillSet.has(t));
+  if (r.tags.length !== 18) errors.push(`[content] ${r.tags.length} toolbench tags, expected 18`);
+  if (notSkills.length) errors.push(`[content] tags not in the .tex: ${notSkills.join(', ')}`);
+  if (r.sheets !== 4) errors.push(`[content] ${r.sheets} spec sheets, expected 4`);
+  if (r.papers !== 3) errors.push(`[content] ${r.papers} papers, expected 3`);
+  if (r.log !== 8) errors.push(`[content] ${r.log} log entries, expected 8`);
   if (r.blank) errors.push(`[content] ${r.blank} new-tab links without rel="noopener noreferrer"`);
-  if (r.phone) errors.push('[content] phone number visible on page');
+  if (r.phone) errors.push('[content] phone number visible on the page');
+  if (r.title !== 'Aakarsh Arora | Data Scientist, ML Researcher, AI Engineer') errors.push(`[content] title is "${r.title}"`);
 
-  // Anchors land on their sections.
-  for (const id of ['work', 'about', 'contact']) {
-    await page.click(`.nav a[href="#${id}"]`);
-    // Wait for smooth scrolling to settle.
-    await page.evaluate(
-      () =>
-        new Promise((res) => {
-          let last = -1;
-          let still = 0;
-          const tick = () => {
-            still = window.scrollY === last ? still + 1 : 0;
-            last = window.scrollY;
-            if (still >= 6) res();
-            else setTimeout(tick, 100);
-          };
-          setTimeout(tick, 300);
-        }),
-    );
-    const { top, atEnd } = await page.evaluate((id) => {
-      const max = document.documentElement.scrollHeight - window.innerHeight;
-      return { top: document.getElementById(id).getBoundingClientRect().top, atEnd: window.scrollY >= max - 2 };
-    }, id);
-    // Sections near the end of the page cannot reach the top; landing at the end with the section in view is correct.
-    const ok = (top >= -2 && top <= 120) || (atEnd && top < 900);
-    if (!ok) errors.push(`[content] #${id} landed at ${Math.round(top)}px`);
-  }
-
-  // Tab reaches every link and summary, and focus is visible.
-  await page.evaluate(() => window.scrollTo(0, 0));
-  const focusables = await page.evaluate(() => document.querySelectorAll('a[href], summary').length);
+  // Tab reaches every visible link, button and disclosure, each with a visible focus ring.
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+  const total = await page.evaluate(() => {
+    const els = [...document.querySelectorAll('a[href], button, summary')].filter((el) => {
+      if (el.closest('dialog') || el.closest('details:not([open])') && el.tagName !== 'SUMMARY') return false;
+      if (el.closest('[hidden]')) return false;
+      return el.getClientRects().length > 0;
+    });
+    els.forEach((el, i) => (el.dataset.tabIndexCheck = String(i)));
+    return els.length;
+  });
   const seen = new Set();
   let noRing = 0;
-  for (let k = 0; k < focusables + 5; k++) {
+  for (let k = 0; k < total + 15; k++) {
     await page.keyboard.press('Tab');
     const info = await page.evaluate(() => {
       const el = document.activeElement;
-      if (!el || el === document.body) return null;
+      if (!el || el === document.body || !el.dataset.tabIndexCheck) return null;
       const cs = getComputedStyle(el);
-      const idx = [...document.querySelectorAll('a[href], summary')].indexOf(el);
-      return { idx, ring: cs.outlineStyle !== 'none' && parseFloat(cs.outlineWidth) > 0 };
+      return { i: el.dataset.tabIndexCheck, ring: cs.outlineStyle !== 'none' && parseFloat(cs.outlineWidth) > 0 };
     });
-    if (info && info.idx >= 0) {
-      seen.add(info.idx);
+    if (info) {
+      seen.add(info.i);
       if (!info.ring) noRing++;
     }
   }
-  if (seen.size < focusables) errors.push(`[content] Tab reached ${seen.size} of ${focusables} links/summaries`);
+  if (seen.size < total) errors.push(`[content] Tab reached ${seen.size} of ${total} links, buttons and disclosures`);
   if (noRing) errors.push(`[content] ${noRing} focused elements without a visible outline`);
-
-  console.log(
-    `[content] ${r.skills}/${expect} skills, ${r.projects} projects with ${r.projectDetails} Details, ` +
-      `${r.expDetails} experience Details, Tab reached ${seen.size}/${focusables}`,
-  );
+  notes.push(`content: ${r.skills} skills, ${r.tags.length} tags, ${r.sheets} sheets, ${r.papers} papers, ${r.log} log entries, Tab ${seen.size}/${total}`);
   await page.context().close();
 }
 
-// ---------------------------------------------------------------------------
+async function reducedMotion(browser) {
+  if (!want('reduced')) return;
+  const page = await newPage(browser, 'reduced-motion', { reducedMotion: 'reduce' });
+  await shot(page, 'reduced-motion-hero');
+  await scrollToId(page, 'model', 60);
+  await shot(page, 'reduced-motion-model');
+  const r = await page.evaluate(() => ({
+    mode: document.documentElement.dataset.mode,
+    canvas: !!document.querySelector('.webgl canvas'),
+    sticky: getComputedStyle(document.querySelector('.stage')).position,
+    lenis: document.documentElement.classList.contains('lenis'),
+    cursor: !!document.querySelector('.cursor-ring'),
+    frames: document.querySelectorAll('.frame img').length,
+    callouts: document.querySelectorAll('.callout').length,
+  }));
+  if (r.mode !== 'static') errors.push(`[reduced-motion] mode ${r.mode}`);
+  if (r.canvas) errors.push('[reduced-motion] WebGL canvas is mounted');
+  if (r.sticky === 'sticky') errors.push('[reduced-motion] stage is pinned');
+  if (r.lenis) errors.push('[reduced-motion] smooth scrolling is on');
+  if (r.cursor) errors.push('[reduced-motion] custom cursor is mounted');
+  if (r.frames !== 4) errors.push(`[reduced-motion] ${r.frames} still frames, expected 4`);
+  notes.push(`reduced motion: ${JSON.stringify(r)}`);
+  await page.context().close();
+}
 
+async function contextLoss(browser) {
+  if (!want('context')) return;
+  const page = await newPage(browser, 'context-lost');
+  await page.evaluate(() => {
+    const c = document.querySelector('.webgl canvas');
+    const gl = c.getContext('webgl2') || c.getContext('webgl');
+    gl.getExtension('WEBGL_lose_context').loseContext();
+  });
+  await page.waitForTimeout(800);
+  const r = await page.evaluate(() => ({ mode: document.documentElement.dataset.mode, canvas: !!document.querySelector('.webgl canvas'), frames: document.querySelectorAll('.frame img').length }));
+  if (r.mode !== 'static' || r.canvas || r.frames !== 4) errors.push(`[context-lost] did not fall back: ${JSON.stringify(r)}`);
+  await shot(page, 'context-lost');
+  await page.context().close();
+}
+
+// ---------------------------------------------------------------------------------------------
+
+rmSync(resolve(OUT, 'video'), { recursive: true, force: true });
 const server = await startPreview();
 let browser;
 try {
-  browser = await chromium.launch({ args: SWIFTSHADER });
-
-  await captureSize(browser, 'desktop', DESKTOP, false);
-  await captureSize(browser, 'mobile', MOBILE, true);
-
-  if (want('reduced-motion')) {
-    const page = await openPage(browser, 'reduced-motion', { viewport: DESKTOP, reducedMotion: 'reduce' });
-    await shot(page, 'reduced-motion');
-    const r = await page.evaluate(() => ({
-      heroH: document.getElementById('top').offsetHeight,
-      vh: window.innerHeight,
-      sticky: getComputedStyle(document.querySelector('.hero-stage')).position,
-      running: document.querySelector('.hero-canvas')?.dataset.running ?? 'never',
-    }));
-    if (r.heroH > r.vh + 1) errors.push(`[reduced-motion] hero is ${r.heroH}px tall, viewport ${r.vh}px`);
-    if (r.sticky === 'sticky') errors.push('[reduced-motion] hero stage is still sticky');
-    if (r.running === '1') errors.push('[reduced-motion] animation loop is running');
-    console.log(`[reduced-motion] hero ${r.heroH}px (viewport ${r.vh}px), stage ${r.sticky}, loop ${r.running}`);
-    await page.context().close();
-  }
-
-  if (!only || want('context-lost')) {
-    const page = await openPage(browser, 'lifecycle', { viewport: DESKTOP });
-    const state = () => page.evaluate(() => document.querySelector('.hero-canvas')?.dataset.running);
-    const log = [];
-    log.push(`start ${await state()}`);
-    // Offscreen: scroll well past the hero.
-    await page.evaluate(() => document.getElementById('experience').scrollIntoView({ behavior: 'instant' }));
-    await page.waitForTimeout(400);
-    const off = await state();
-    log.push(`offscreen ${off}`);
-    if (off !== '0') errors.push(`[lifecycle] loop still running offscreen (${off})`);
-    await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
-    await page.waitForTimeout(400);
-    const back = await state();
-    log.push(`back ${back}`);
-    if (back !== '1') errors.push(`[lifecycle] loop did not resume (${back})`);
-    // Hidden tab.
-    await page.evaluate(() => {
-      Object.defineProperty(document, 'hidden', { configurable: true, get: () => true });
-      document.dispatchEvent(new Event('visibilitychange'));
-    });
-    const hidden = await state();
-    log.push(`hidden ${hidden}`);
-    if (hidden !== '0') errors.push(`[lifecycle] loop still running in a hidden tab (${hidden})`);
-    await page.evaluate(() => {
-      Object.defineProperty(document, 'hidden', { configurable: true, get: () => false });
-      document.dispatchEvent(new Event('visibilitychange'));
-    });
-    log.push(`visible ${await state()}`);
-    // Context loss → static hero.
-    await page.evaluate(() => {
-      const c = document.querySelector('.hero-canvas');
-      const gl = c.getContext('webgl2') || c.getContext('webgl');
-      gl.getExtension('WEBGL_lose_context').loseContext();
-    });
-    await page.waitForTimeout(500);
-    const after = await page.evaluate(() => ({
-      hero: document.documentElement.dataset.hero,
-      canvas: !!document.querySelector('.hero-canvas'),
-    }));
-    log.push(`context lost → ${after.hero}, canvas ${after.canvas ? 'present' : 'removed'}`);
-    if (after.hero !== 'fallback' || after.canvas) errors.push('[lifecycle] context loss did not fall back');
-    await shot(page, 'context-lost');
-    console.log(`[lifecycle] ${log.join(', ')}`);
-    await page.context().close();
-  }
-
-  if (!only) await checkContent(browser);
-
-  if (wantOg) {
-    const page = await openPage(browser, 'og', { viewport: { width: 1200, height: 630 } });
-    await page.waitForTimeout(800);
-    const path = resolve(root, 'public/og.png');
-    await page.screenshot({ path });
-    saved.push(path);
-    await page.context().close();
-  }
-
+  browser = await chromium.launch({ args: LAUNCH });
+  await desktop(browser);
+  await mobile(browser);
+  await palette(browser);
+  await content(browser);
+  await reducedMotion(browser);
+  await contextLoss(browser);
   await browser.close();
 
   if (want('no-webgl')) {
     browser = await chromium.launch({ args: ['--disable-webgl', '--disable-webgl2', '--disable-3d-apis'] });
-    const page = await openPage(browser, 'no-webgl', { viewport: DESKTOP });
+    const page = await newPage(browser, 'no-webgl');
+    const r = await page.evaluate(() => ({ mode: document.documentElement.dataset.mode, frames: document.querySelectorAll('.frame img').length }));
+    if (r.mode !== 'static' || r.frames !== 4) errors.push(`[no-webgl] ${JSON.stringify(r)}`);
     await shot(page, 'no-webgl');
     await browser.close();
   }
@@ -315,9 +448,10 @@ try {
   server.kill();
 }
 
-console.log(`\nSaved ${saved.length} screenshots:\n  ${saved.join('\n  ')}`);
+console.log(`\n${notes.join('\n')}`);
+console.log(`\nSaved ${saved.length} screenshots in ${OUT}`);
 if (errors.length) {
   console.error(`\nFAILED with ${errors.length} problem(s):\n  ${errors.join('\n  ')}`);
   process.exit(1);
 }
-console.log('\nNo console errors, page errors or cross-origin requests.');
+console.log('\nAll checks passed. No console errors, page errors or requests to other origins.');

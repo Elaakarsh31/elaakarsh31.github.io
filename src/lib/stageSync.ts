@@ -4,6 +4,7 @@
 import { gsap } from 'gsap';
 import { portfolio } from '../content/portfolio';
 import { plateLockAt } from '../three/timing';
+import { playClick } from './sound';
 import { BUILD_LENGTH, stage } from './stage';
 
 function setFlag(el: Element & { dataset: DOMStringMap }, key: string, on: boolean) {
@@ -25,6 +26,11 @@ export function startStageSync(root: HTMLElement) {
   const tick = () => {
     const p = stage.p;
     if (p === last) return;
+    // A click when a plate locks while scrolling forward.
+    for (let k = 0; k < plateTags.length; k++) {
+      const at = plateLockAt(k);
+      if (last < at && p >= at && p - last < 20) playClick();
+    }
     last = p;
     for (const c of callouts) {
       const r = timing.get(c.dataset.callout!)!;

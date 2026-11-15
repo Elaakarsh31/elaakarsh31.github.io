@@ -36,6 +36,8 @@ export type Callout = {
   anchor: string;
   /** Timeline position (vh of scroll inside the build) where the panel appears. */
   at: number;
+  /** Panel position in the HUD column, top to bottom, matching where its part sits so leader lines don't cross. */
+  slot: number;
   /** Shown when the panel is expanded. */
   detail: string;
   bullet?: BulletRef;
@@ -172,6 +174,7 @@ export const portfolio = {
           text: 'Hexbit: records published on time went from 75% to 90%',
           anchor: 'frag-listing',
           at: 55,
+          slot: 1,
           detail:
             'Pipelines over seller catalog and listing-update data raised the share of records published by the scheduled cutoff from 75% to 90%.',
           bullet: { source: 'experience', company: 'Hexbit', index: 0 },
@@ -182,6 +185,7 @@ export const portfolio = {
           text: 'Zingroll: social posts collected and cleaned for fine-tuning',
           anchor: 'frag-post',
           at: 85,
+          slot: 2,
           detail:
             'Collected unstructured social media data, tweets and posts, and fine-tuned Hugging Face models to generate dark-humor memes.',
           bullet: { source: 'experience', company: 'Zingroll', index: 0 },
@@ -192,6 +196,7 @@ export const portfolio = {
           text: 'Fidelity: fields pulled from scanned documents with Textract',
           anchor: 'refinery',
           at: 110,
+          slot: 3,
           detail:
             'An LLM document-validation pipeline on AWS (S3, Textract, Claude) for student-debt workitems.',
           links: [{ href: '#log-v0-6', label: 'Log v0.6, Fidelity' }],
@@ -214,6 +219,7 @@ export const portfolio = {
           text: 'GPT-2 style Transformer, 7.24M parameters, written from scratch',
           anchor: 'layer-1',
           at: 185,
+          slot: 4,
           detail:
             'A decoder-only Transformer written from scratch in PyTorch and trained on Tiny Shakespeare, with a hyperparameter grid search and ablations on context length and positional embeddings.',
           bullet: { source: 'projects', title: 'GPT-2 Shakespeare Text Generator', index: 0 },
@@ -224,6 +230,7 @@ export const portfolio = {
           text: 'Perplexity from 12.07 to 4.56 against a bigram baseline',
           anchor: 'filaments',
           at: 205,
+          slot: 3,
           detail:
             'The loss readout on this stage runs from 2.491 to 1.517: the cross-entropy that those two perplexities imply (ln 12.07 and ln 4.56).',
           links: [{ href: '#project-gpt2', label: 'GPT-2 spec sheet' }],
@@ -233,6 +240,7 @@ export const portfolio = {
           text: 'Fine-tuned BERT, Flan-T5 and Llama for numerical reasoning',
           anchor: 'layer-3',
           at: 225,
+          slot: 2,
           detail: 'SemEval-2024 Task 7: questions that depend on the numbers in a text.',
           bullet: { source: 'projects', title: 'Numerical Reasoning with LLMs', index: 1 },
           links: [{ href: links.numericCode, label: 'Code', external: true }],
@@ -242,6 +250,7 @@ export const portfolio = {
           text: 'Six papers, first author on each',
           anchor: 'crown',
           at: 245,
+          slot: 1,
           detail: 'Three of them are listed under Projects, with venue, year and links.',
           links: [
             { href: '#papers', label: 'Papers' },
@@ -266,6 +275,7 @@ export const portfolio = {
           text: 'SOP agent: every gate runs in plain Python, covered by 31 tests',
           anchor: 'plate-gates',
           at: 303,
+          slot: 3,
           detail:
             'The LLM extracts details and writes replies, but every gate (identity match, representative consent, which guidance can be shared) runs in plain Python, so the model cannot talk its way past a check.',
           links: [{ href: '#project-sop', label: 'SOP agent spec sheet' }],
@@ -275,6 +285,7 @@ export const portfolio = {
           text: 'StoryWeaver: scenes generated in parallel, human approval before render',
           anchor: 'plate-api',
           at: 348,
+          slot: 1,
           detail:
             'A LangGraph pipeline splits a book into scenes, generates them in parallel, keeps characters consistent with a locked persona schema, and pauses for human approval before rendering.',
           links: [{ href: '#project-storyweaver', label: 'StoryWeaver spec sheet' }],
@@ -284,6 +295,7 @@ export const portfolio = {
           text: 'Fidelity: LLM-as-judge, low-confidence fields go to a human',
           anchor: 'plate-human-review',
           at: 333,
+          slot: 2,
           detail:
             'An LLM-as-judge returns a verdict, confidence and reason per field, and low-confidence fields go to human review.',
           links: [{ href: '#log-v0-6', label: 'Log v0.6, Fidelity' }],
@@ -491,7 +503,7 @@ export const portfolio = {
     // Every name must match a skill in the .tex exactly.
     tags: [
       { name: 'SQL', tray: 'data' },
-      { name: 'pandas', tray: 'data' },
+      { name: 'Pandas', tray: 'data' },
       { name: 'PySpark', tray: 'data' },
       { name: 'Delta Lake', tray: 'data' },
       { name: 'PostgreSQL', tray: 'data' },

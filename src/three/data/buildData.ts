@@ -150,8 +150,9 @@ export function buildData() {
     group.add(card, block);
     root.add(group);
     // Messy starting arrangement left of the gate.
-    const scatter = new Vector3(-3.42 + rng() * 0.78, 0.32 + rng() * 0.95, -0.35 + rng() * 1.35);
-    const enter = scatter.clone().add(new Vector3(-2.2 - rng(), 0.6 + rng() * 0.5, -0.4));
+    const scatter = new Vector3(-3.12 + rng() * 0.62, 0.32 + rng() * 0.95, -0.35 + rng() * 1.35);
+    // They fall in from above the bench, so they never cross the hero copy.
+    const enter = scatter.clone().add(new Vector3(-0.3 + rng() * 0.6, 2.4 + rng() * 0.8, -0.6));
     // Mostly facing the camera, tilted and turning slowly, so the faces read.
     const baseRot = new Euler((rng() - 0.5) * 0.9, (rng() - 0.5) * 1.1, (rng() - 0.5) * 1.3);
     const spin = new Vector3((rng() - 0.5) * 0.35, (rng() - 0.5) * 0.45, (rng() - 0.5) * 0.4);
@@ -225,7 +226,7 @@ export function buildData() {
       it.block.scale.setScalar(Math.max(0.001, blockScale));
     }
     // The gate rises out of the bench as the hero clears, powers up for Act 1, and idles after.
-    const rise = easeInOut(seg(p, 8, 40)) * (1 - easeInOut(seg(p, 148, 172)));
+    const rise = easeInOut(seg(p, 24, 46)) * (1 - easeInOut(seg(p, 148, 172)));
     gate.position.y = REFINERY.y - (1 - rise) * 1.25;
     gate.visible = rise > 0.001;
     const on = seg(p, 30, 50) * (1 - 0.7 * seg(p, 135, 160)) + (highlightData ? 0.8 : 0);

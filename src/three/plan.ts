@@ -17,7 +17,7 @@ const B = new Vector3();
 const point = new Vector3();
 
 export const HOVER_BESIDE = new Vector3(0.82, 1.6, 0.7);
-const HERD_START = new Vector3(-3.05, 1.22, -0.25);
+const HERD_START = new Vector3(-2.75, 1.38, -0.45);
 const POWER_SPOT = new Vector3(-0.92, 1.3, 1.05);
 
 const WELD_OFFSET = new Vector3(0.36, 0.1, 0.22);
@@ -47,9 +47,9 @@ function herdPos(p: number, d: DataHandles, out: Vector3) {
   const f = Math.min(11, Math.max(0, (p - 70) / 4.6));
   const j = Math.floor(f);
   const k = easeInOut(f - j);
-  d.itemPosition(j, A).add(B.set(-0.24, 0.2, -0.16));
+  d.itemPosition(j, A).add(B.set(0.02, 0.3, -0.22));
   if (j < 11) {
-    d.itemPosition(j + 1, P).add(B.set(-0.24, 0.2, -0.16));
+    d.itemPosition(j + 1, P).add(B.set(0.02, 0.3, -0.22));
     A.lerp(P, k);
   }
   return out.copy(A);

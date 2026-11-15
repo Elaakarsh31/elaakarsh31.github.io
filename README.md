@@ -1,95 +1,105 @@
 # Aakarsh Arora: portfolio
 
-A static portfolio site. The hero is a head-and-shoulders bust made of luminous particles (Three.js, one `Points` object with an original shader) in front of a giant HTML greeting. It turns and dissolves as you scroll and reacts to the cursor. Below it are Work, Publications, Experience, Skills, Education, About and Contact.
+A static portfolio that tells one story: **data → model → system**. In a dark engineering workshop, a small robot builds one machine in three acts as you scroll. Raw data fragments are refined into clean blocks. The blocks are fabricated into a model core. Housing plates lock on until the machine powers on. Holographic callouts pin real facts from the resume to the parts they describe.
 
-Vite + React + TypeScript. No backend, no API keys, and no requests to other origins at runtime, because fonts are self-hosted with `@fontsource`.
+Vite + React + TypeScript, with Three.js through React Three Fiber, GSAP ScrollTrigger and Lenis. Rapier runs the toolbench physics. There is no backend and there are no API keys. Nothing is requested from another origin at runtime: fonts are self-hosted with `@fontsource`, and Rapier's WASM is inlined.
 
 ## Commands
 
 ```sh
-npm install                 # install dependencies
-npx playwright install chromium   # once, only needed for `npm run shots`
+npm install
+npx playwright install chromium   # once, for shots, frames and video
 
-npm run dev                 # dev server at http://localhost:5173 (regenerates resume data first)
-npm run build               # type-check and build to dist/ (regenerates resume data first)
-npm run preview             # serve dist/ at http://localhost:4173
-npm run shots               # screenshots of the production build into screenshots/ (run `npm run build` first)
-npm run links               # request every URL in src/content/portfolio.ts and list any that are not 200
-npm run resume              # only regenerate src/content/resume.generated.json
+npm run dev       # dev server at http://localhost:5173 (regenerates resume data first)
+npm run build     # type-check and build to dist/ (regenerates resume data first)
+npm run preview   # serve dist/ at http://localhost:4173
+
+npm run shots     # full verification + screenshots into screenshots/ (build first)
+npm run video     # record one full scroll, then a frame every 0.5 s into screenshots/video/ (needs ffmpeg)
+npm run frames    # capture the still frames and the OG image from the real scene (build first, then build again)
+npm run links     # request every URL in src/content/portfolio.ts and list any that are not 200
+npm run resume    # only regenerate src/content/resume.generated.json
 ```
 
-`npm run shots` serves `dist/` with `vite preview` and saves these captures to `screenshots/`:
-- desktop (1440×900) and mobile (390×844) at hero progress 0, 0.5 and 1
-- the Work section
-- the bust after scrolling back up
-- a pointer sweep and the frame 2 seconds after it
-- a reduced-motion run, a run with WebGL disabled, and a context-loss run
+`npm run shots` serves `dist/` and checks the following. It fails on any console error, page error or request to another origin.
+- Screenshots at 1440×900 and 390×844: the hero; the start, middle and end of each act; projects; the log; the toolbench before and after sorting; contact.
+- No HUD panel overlaps the act copy.
+- Readouts show live values.
+- Rendering pauses offscreen and in a hidden tab.
+- The command palette:
+  - opens with ⌘K, Ctrl K and "/"
+  - every action works from the keyboard alone: jumps land with focus, the email is in the clipboard, links open in new tabs, and the bot replies
+- Content:
+  - the skill count matches the `.tex`, and every toolbench tag is a `.tex` skill
+  - no phone number appears on the page
+  - every new-tab link has `rel="noopener noreferrer"`
+- Tab reaches every link, button and disclosure with a visible focus ring.
+- Reduced motion and WebGL disabled each fall back to still frames, and so does a lost WebGL context.
 
-It also checks the following, and fails on any console error, page error or cross-origin request:
-- the skill count matches the `.tex`
-- every project has Details
-- the nav anchors land on their sections
-- Tab reaches every link
-- the loop pauses offscreen and in a hidden tab
+On macOS the scripts render with the GPU (ANGLE Metal). Pass `-- --sw` to use SwiftShader instead, which is also the default on other platforms.
 
-`npm run shots -- --og` also rewrites `public/og.png`, a 1200×630 frame of the hero. `npm run shots -- --only=desktop-p0` captures a subset.
-
-## Where to edit content
+## Where to edit
 
 | What | Where |
 | --- | --- |
-| Full details: every experience, project, publication, education entry and skill | `content/Aakarsh_Arora_Full_Resume.tex` |
-| Short copy: tagline, summaries, stacks, links, featured flags, About, contact, `showDetails` | `src/content/portfolio.ts` |
+| Dates, bullets, publications, every skill | `content/Aakarsh_Arora_Full_Resume.tex` (source of truth) |
+| Hero copy, act titles and lines, callouts, spec sheets, papers, log notes, toolbench tags, contact | `src/content/portfolio.ts` |
+| The bot's lines | `portfolio.bot.lines` in `src/content/portfolio.ts` |
+| The bot's name | `portfolio.bot.name` in the same file. It is empty by default, and with no name the bot shows none anywhere. |
+| The one-page resume | `public/resume.pdf` |
+| Optional project previews | `public/projects/<id>.png` (or `.jpg`, `.webp`, `.svg`) with `<id>` one of `sop`, `storyweaver`, `ecosurve`, `gpt2`. They replace the code-drawn schematic. |
 
-The `.tex` is the source of truth. `scripts/resume-to-json.mjs` parses it into `src/content/resume.generated.json` before every `dev` and `build`, so editing the `.tex` is all it takes:
-- Lines starting with `%` are ignored.
-- LaTeX becomes plain text with bold, italic, code and links.
-- `[Code]`, `[Paper]` and `[Live Demo]` links are lifted out of bullet text and attached to the entry.
-- The script fails with a clear message if any LaTeX command would reach the page.
+`scripts/resume-to-json.mjs` parses the `.tex` into `src/content/resume.generated.json` before every `dev` and `build`.
+- It reads nothing above `\section{Experience}`, so the header and its phone number never reach the page.
+- It fails with a clear message if any LaTeX would leak through.
 
-Entries in `portfolio.ts` are matched to the resume by title (`resumeTitle`) or company (`resumeCompany`). The match ignores case and punctuation, and treats `&` and "and" as the same. Links in `portfolio.ts` take precedence over links in the `.tex`.
+Entries in `portfolio.ts` match the resume by title or company, ignoring case and punctuation. Fidelity has `showDetails: false`, so its log entry has no "More" disclosure.
 
-To show Fidelity's full bullets, set `showDetails: true` on that entry. The bullets are already in the generated data.
+Callouts carry:
+- `at`: when the callout appears on the timeline
+- `anchor`: the part its leader line points at
+- `slot`: its position in the HUD column, ordered top to bottom so leader lines don't cross
 
-## Adding a resume PDF
+## How the page works
 
-Put a one-page PDF at `public/resume.pdf` and rebuild. A "Resume (PDF)" link appears under Contact. The link is only rendered when the file exists at build time, and its href respects `BASE_PATH`.
-
-Keep personal phone numbers out of any PDF you publish.
-
-## Adding a real portrait model
-
-Put a model at `public/models/portrait.glb` and rebuild. Without it, the site uses the procedural bust.
-
-The model should be:
-- binary glTF (`.glb`), uncompressed: no Draco, no meshopt. In Blender, export glTF Binary with compression off.
-- head and shoulders, facing +Z (glTF's default front)
-- ideally under 10 MB and 100k triangles
-
-The visible mesh triangles are sampled by area with world transforms applied, then centered and framed. If the mesh has a base-color texture, each point's brightness comes from it. Otherwise it comes from `COLOR_0` vertex colors if present. This lets eyes, brows and lips read.
-
-For a full-head or full-body model, lower `glbKeepTopFraction` in `src/hero/config.ts` to keep only the top part, for example `0.25`. A compressed file logs a console message and falls back to the procedural bust.
-
-Other portrait tunables (point counts, DPR caps, framing, grid resolution) are in the same config file. The shaders are in `src/hero/shaders/`.
+- **Modes** (`src/lib/env.ts`) are set on `<html data-mode>`:
+  - `live`: desktop or tablet with WebGL and motion allowed. The pinned build, the HUD and the physics bench run here.
+  - `phone`: under 768px. The hero is live; the acts use still frames with callouts as lists, and the toolbench shows tags as chips.
+  - `static`: reduced motion, no WebGL, or a lost context. Every section sits in normal flow beside its still frame.
+- **The build** (`src/components/Build.tsx`, `src/lib/timeline.ts`):
+  - `#build` is 500vh tall with a sticky 100vh stage.
+  - One GSAP timeline, scrubbed by ScrollTrigger and driven by Lenis, tweens `stage.p` from 0 to 400 (vh of scroll). It also handles the act copy.
+  - Every scene state is a pure function of `p` (`src/three/timing.ts`, `choreo.ts`, `plan.ts`), so scrolling back plays the build in reverse.
+- **The scene** (`src/three/`) is built from primitives in code:
+  - the machine (`machine/`), Act 1's fragments, refinery and blocks (`data/`), and the bot (`bot/`)
+  - hologram and fabricate shaders (`materials/`)
+  - the physics toolbench (`toolbench/`, loaded lazily)
+  - `HudSync.tsx` pins the DOM HUD (leader lines, plate and tray labels, the bot's speech tag) to 3D anchors every frame. All HUD text is real DOM text.
+- **URL switches:**
+  - `?static` forces the static layout.
+  - `?p=123` holds the build at a timeline position.
+  - `?frame=hero|data|model|system|og` renders one still frame with no UI. `npm run frames` uses it.
 
 ## Deployment
 
-`.github/workflows/deploy.yml` builds the site on every push to `main` and deploys `dist/` to GitHub Pages with `actions/upload-pages-artifact` and `actions/deploy-pages`.
+`.github/workflows/deploy.yml` builds on every push to `main` and deploys `dist/` to GitHub Pages.
 
-1. In the repository, go to Settings → Pages → Build and deployment and set **Source: GitHub Actions**.
-2. The workflow assumes the repository is named `elaakarsh31.github.io`, which serves from the root with `BASE_PATH=/`. For any other repository name, the site is served at `https://<user>.github.io/<repo>/`. In that case, set `BASE_PATH: /<repo>/` in the workflow's build step.
-3. Canonical and Open Graph URLs default to `https://elaakarsh31.github.io` plus the base path. For a custom domain, set `SITE_URL` in the build step, for example `SITE_URL: https://example.com`.
+1. In the repository, set Settings → Pages → Build and deployment → **Source: GitHub Actions**.
+2. The workflow assumes the repository is named `elaakarsh31.github.io` (served from `/`). For another name, set `BASE_PATH: /<repo>/` in the build step.
+3. Canonical and Open Graph URLs default to `https://elaakarsh31.github.io` plus the base path. For a custom domain, set `SITE_URL` in the build step.
 
 ## Layout
 
 ```
 content/Aakarsh_Arora_Full_Resume.tex   resume source of truth
 scripts/resume-to-json.mjs              .tex → src/content/resume.generated.json
-scripts/shots.mjs                       Playwright screenshots and checks
+scripts/shots.mjs                       Playwright verification and screenshots
+scripts/video.mjs                       full-scroll recording and frame extraction
+scripts/frames.mjs                      still frames and OG image from the real scene
 scripts/check-links.mjs                 link checker
-src/content/portfolio.ts                short copy, links and flags (typed)
-src/content/resume.ts                   types and title matching for the generated data
-src/components/                         page sections
-src/hero/                               HeroScene (React mount), scene, bust (SDF + marching cubes), glb, config
-src/hero/shaders/                       particle vertex and fragment shaders
+src/content/                            portfolio.ts (copy), resume.ts (typed resume data)
+src/components/                         sections, HUD, palette, rail, dock, cursor
+src/lib/                                modes, scroll, timeline, stage state, spy, sound
+src/three/                              canvas, studio, machine, bot, data, toolbench, HUD sync
+public/frames/                          still frames (generated), og.png (generated), resume.pdf
 ```

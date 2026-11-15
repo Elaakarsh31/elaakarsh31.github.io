@@ -107,7 +107,7 @@ export const fragWindow = (j: number): [number, number] => {
 };
 
 /** Fragments drift in during the hero exit. */
-export const fragmentsIn = (p: number) => easeOut(seg(p, 14, 46));
+export const fragmentsIn = (p: number) => easeOut(seg(p, 28, 52));
 
 /** Window in which block j lifts into its layer during Act 2. */
 export function blockLiftWindow(j: number): [number, number] {

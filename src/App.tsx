@@ -11,6 +11,7 @@ import { Projects } from './components/Projects';
 import { ResumeBand } from './components/ResumeBand';
 import { ResumeButton } from './components/ResumeButton';
 import { SocialDock } from './components/SocialDock';
+import { SoundToggle } from './components/SoundToggle';
 import { Toolbench } from './components/Toolbench';
 import { portfolio } from './content/portfolio';
 import { captureFrame, isCapture } from './three/capture';
@@ -95,7 +96,7 @@ function Site() {
         <span>{portfolio.site.name}</span>
         <a href="#top">Back to top</a>
       </footer>
-      <SocialDock />
+      <SocialDock extra={mode !== 'static' ? <SoundToggle /> : undefined} />
       <ResumeButton />
       <CommandPalette />
       {mode !== 'static' && <BotSpeech />}
