@@ -1,0 +1,4646 @@
+{
+  "source": "content/Aakarsh_Arora_Full_Resume.tex",
+  "experience": [
+    {
+      "role": "Data Scientist",
+      "company": "Fidelity Investments",
+      "dates": "July 2025 – Dec 2025",
+      "location": "Boston, USA",
+      "tools": [
+        "Python",
+        "SQL",
+        "AWS (S3, Textract, Athena, CloudWatch, IAM)",
+        "Claude",
+        "LLM Pipelines",
+        "LLM-as-Judge",
+        "LLM Evaluation",
+        "Prompt Engineering",
+        "Parquet",
+        "Data Contracts",
+        "Bootstrap CIs",
+        "Error Analysis"
+      ],
+      "bullets": [
+        [
+          {
+            "t": "b",
+            "c": [
+              "Architected"
+            ]
+          },
+          " an end-to-end LLM document-validation pipeline (documents in S3, ",
+          {
+            "t": "b",
+            "c": [
+              "Amazon Textract"
+            ]
+          },
+          " OCR, Claude 3.5 Sonnet extraction, JSON persisted back to S3, and automated scoring against BOLD reference data) covering ",
+          {
+            "t": "b",
+            "c": [
+              "~1,300+"
+            ]
+          },
+          " student-debt documents."
+        ],
+        [
+          "Automated verification of ",
+          {
+            "t": "b",
+            "c": [
+              "BOLD"
+            ]
+          },
+          " data, the loan details participants enter when submitting student-loan proof, against the uploaded document; a document ",
+          {
+            "t": "b",
+            "c": [
+              "qualified"
+            ]
+          },
+          " only if it backed those entries on all four key fields: loan account number and loan servicer (LSP) name, plus borrower name and loan balance (enrollment) or payment amount and date (payments)."
+        ],
+        [
+          "Engineered the ingestion layer for ",
+          {
+            "t": "b",
+            "c": [
+              "~1,300+"
+            ]
+          },
+          " documents across ",
+          {
+            "t": "b",
+            "c": [
+              "1,000+"
+            ]
+          },
+          " unlabeled workitems: generated document metadata, ran ",
+          {
+            "t": "b",
+            "c": [
+              "batched"
+            ]
+          },
+          " Textract jobs with explicit failure-key tracking to avoid mid-run data loss, and joined the BOLD reference CSV to ",
+          {
+            "t": "b",
+            "c": [
+              "850"
+            ]
+          },
+          " documents on workitem and document ID."
+        ],
+        [
+          "Introduced ",
+          {
+            "t": "b",
+            "c": [
+              "data contracts"
+            ]
+          },
+          " for document metadata and extraction JSON, checking required identifiers, field types, and reference-join cardinality before scoring; quarantined nonconforming records with reason codes while retaining their S3 source paths for remediation."
+        ],
+        [
+          "Built ",
+          {
+            "t": "b",
+            "c": [
+              "custom field-level metrics"
+            ]
+          },
+          " beyond exact string matching and used them to scale evaluation from a 113-document pilot to ",
+          {
+            "t": "b",
+            "c": [
+              "850"
+            ]
+          },
+          " documents, showing the pilot overstated field accuracy (borrower name fell from 99% to 87.6% at scale) while reporting ",
+          {
+            "t": "b",
+            "c": [
+              "98.7%"
+            ]
+          },
+          " loan balance, ",
+          {
+            "t": "b",
+            "c": [
+              "91.3%"
+            ]
+          },
+          " loan account number, ",
+          {
+            "t": "b",
+            "c": [
+              "90.5%"
+            ]
+          },
+          " LSP name, and ",
+          {
+            "t": "b",
+            "c": [
+              "87.6%"
+            ]
+          },
+          " borrower name accuracy at scale."
+        ],
+        [
+          "Built an automated ",
+          {
+            "t": "b",
+            "c": [
+              "LLM-as-judge"
+            ]
+          },
+          " on Claude Sonnet 3.5 that emitted structured ",
+          {
+            "t": "b",
+            "c": [
+              "pass/fail, confidence score, and written reasoning"
+            ]
+          },
+          " per field, replacing brittle exact-match scoring with contextual adjudication."
+        ],
+        [
+          "Routed normalized extractor/reference disagreements and extraction uncertainty flags to the LLM judge, reducing judge API calls for an 850-document scoring pass from 850 to 595 by bypassing adjudication on unflagged agreements."
+        ],
+        [
+          "Designed a ",
+          {
+            "t": "b",
+            "c": [
+              "prompt feedback loop"
+            ]
+          },
+          " in which a second LLM audited ",
+          {
+            "t": "b",
+            "c": [
+              "568"
+            ]
+          },
+          " judgment errors and iteratively rewrote the judge prompt, lifting the judge's document qualification rate from ",
+          {
+            "t": "b",
+            "c": [
+              "76.1% to 77.8%"
+            ]
+          },
+          " and field accuracy by ",
+          {
+            "t": "b",
+            "c": [
+              "1–2 points"
+            ]
+          },
+          " across 3 of 4 fields."
+        ],
+        [
+          "Defined subsequent ",
+          {
+            "t": "b",
+            "c": [
+              "workitem-grouped prompt comparisons"
+            ]
+          },
+          " with ",
+          {
+            "t": "b",
+            "c": [
+              "bootstrap confidence intervals"
+            ]
+          },
+          " for paired accuracy differences, keeping prompt development separate from final evaluation."
+        ],
+        [
+          {
+            "t": "b",
+            "c": [
+              "Root-caused"
+            ]
+          },
+          " the ",
+          {
+            "t": "b",
+            "c": [
+              "27"
+            ]
+          },
+          " documents where judge and extractor disagreed, labelling ",
+          {
+            "t": "b",
+            "c": [
+              "108"
+            ]
+          },
+          " field-level decisions into a taxonomy — false negatives (",
+          {
+            "t": "b",
+            "c": [
+              "76.9%"
+            ]
+          },
+          "), true negatives (15.7%), false positives (1.9%), true positives (5.6%) — isolating formatting variance, LSP name aliasing, and middle-initial drift as the dominant error drivers."
+        ],
+        [
+          {
+            "t": "b",
+            "c": [
+              "Demonstrated"
+            ]
+          },
+          " that a large share of apparent model failures were ",
+          {
+            "t": "b",
+            "c": [
+              "errors in the BOLD ground truth itself"
+            ]
+          },
+          ", evidencing documents that named MOHELA and Olympic SLT where reference data recorded Sallie Mae and Firstmark — reframing how qualification rate was interpreted by the business."
+        ],
+        [
+          "Designed and benchmarked ",
+          {
+            "t": "b",
+            "c": [
+              "3 ontology-guided extraction prompts"
+            ]
+          },
+          " (base, v3, v4): adding detailed extraction rules, page/line provenance tracking and uncertainty flags lifted qualification from ",
+          {
+            "t": "b",
+            "c": [
+              "69.3% to 76.4%"
+            ]
+          },
+          ", and moving document and ontology context mid-prompt reached ",
+          {
+            "t": "b",
+            "c": [
+              "76.6%"
+            ]
+          },
+          ", on par with the original extraction prompt (76.7%)."
+        ],
+        [
+          "Built student-payment verification as ",
+          {
+            "t": "b",
+            "c": [
+              "Textract OCR plus a single all-in-one prompt"
+            ]
+          },
+          " performing extraction, BOLD matching, and presence validation, reaching ",
+          {
+            "t": "b",
+            "c": [
+              "90.3%"
+            ]
+          },
+          " BOLD qualification and an ",
+          {
+            "t": "b",
+            "c": [
+              "85.2%"
+            ]
+          },
+          " pass rate on all four key fields."
+        ],
+        [
+          "Reached ",
+          {
+            "t": "b",
+            "c": [
+              "97.6%"
+            ]
+          },
+          " LSP name, ",
+          {
+            "t": "b",
+            "c": [
+              "93.5%"
+            ]
+          },
+          " payment date, and ",
+          {
+            "t": "b",
+            "c": [
+              "92.2%"
+            ]
+          },
+          " loan account number match against BOLD on payment workitems, with only ",
+          {
+            "t": "b",
+            "c": [
+              "7.1%"
+            ]
+          },
+          " of workitems mismatching on more than one field."
+        ],
+        [
+          {
+            "t": "b",
+            "c": [
+              "Diagnosed"
+            ]
+          },
+          " systematic failure modes with document-level evidence — OCR digit confusion ('6' read as '8' in account numbers), payment-count and $1-tolerance mismatches, and historical-vs-scheduled payment misalignment — converting anecdotal errors into a prioritized remediation backlog."
+        ],
+        [
+          {
+            "t": "b",
+            "c": [
+              "Quantified"
+            ]
+          },
+          " an upstream data gap where BOLD records lacked document IDs on multi-attachment workitems, scoping the ",
+          {
+            "t": "b",
+            "c": [
+              "<50% addressable volume"
+            ]
+          },
+          " and aligning remediation to the Q1 Snowflake load."
+        ],
+        [
+          "Versioned extraction prompts and prompt hashes, model identifiers, BOLD snapshot references and scoring-code revisions in ",
+          {
+            "t": "b",
+            "c": [
+              "S3 run manifests"
+            ]
+          },
+          ", linking each extraction and judge output to its input document and configuration so scoring changes could be traced to the exact pipeline revision."
+        ],
+        [
+          "Instrumented ingestion and scoring with ",
+          {
+            "t": "b",
+            "c": [
+              "Amazon CloudWatch"
+            ]
+          },
+          " progress metrics, changing the ",
+          {
+            "t": "b",
+            "c": [
+              "configured inactivity-alarm threshold from 25 to 5 minutes"
+            ]
+          },
+          " so stalled stages trigger an alert under the configured monitoring policy."
+        ],
+        [
+          "Published field-level scoring outputs as ",
+          {
+            "t": "b",
+            "c": [
+              "Parquet"
+            ]
+          },
+          " tables behind ",
+          {
+            "t": "b",
+            "c": [
+              "SQL reporting views in Amazon Athena"
+            ]
+          },
+          ", reconciling document counts and slicing field errors by lender and document type; replacing repeated JSON preparation cut recurring active analyst effort per 850-document evaluation report from ",
+          {
+            "t": "b",
+            "c": [
+              "18 to 6 minutes"
+            ]
+          },
+          ", excluding initial Parquet publication."
+        ],
+        [
+          "Separated raw-document and derived-metric access with ",
+          {
+            "t": "b",
+            "c": [
+              "AWS IAM"
+            ]
+          },
+          " policies scoped to S3 prefixes, and removed borrower identifiers from analytical exports so reporting consumers could inspect scoring trends without receiving document text or direct personal identifiers."
+        ],
+        [
+          "Documented pipeline architecture, ",
+          {
+            "t": "b",
+            "c": [
+              "metric definitions"
+            ]
+          },
+          ", and comparative evaluation results across ",
+          {
+            "t": "b",
+            "c": [
+              "7 Confluence pages"
+            ]
+          },
+          " tied to Jira delivery tickets, giving business stakeholders a reproducible audit trail."
+        ]
+      ],
+      "links": []
+    },
+    {
+      "role": "Machine Learning Engineer",
+      "company": "Zingroll",
+      "dates": "Jan 2024 – Aug 2024",
+      "location": "New Delhi, India",
+      "tools": [
+        "Python",
+        "SQL",
+        "pandas",
+        "AWS SageMaker",
+        "HuggingFace",
+        "LLMs",
+        "Apache Airflow",
+        "MLflow",
+        "Docker",
+        "Terraform",
+        "CloudWatch",
+        "CI/CD",
+        "REST APIs",
+        "Guardrails",
+        "A/B Testing",
+        "Power Analysis",
+        "PSI Drift Monitoring"
+      ],
+      "bullets": [
+        [
+          "Built a scalable preprocessing pipeline for 1M+ noisy tweets and social media posts, improving LLM training quality through deduplication, normalization, and metadata enrichment."
+        ],
+        [
+          "Orchestrated ingestion, preprocessing, and training-data export with ",
+          {
+            "t": "b",
+            "c": [
+              "Apache Airflow"
+            ]
+          },
+          " dependencies and task-level retries, reducing manual setup per successful data refresh from ",
+          {
+            "t": "b",
+            "c": [
+              "35 to 10 minutes"
+            ]
+          },
+          " and retaining raw input snapshots for reruns."
+        ],
+        [
+          "Fine-tuned HuggingFace models on Amazon SageMaker for humorous meme generation, reducing inference latency by 30% while improving content relevance through prompt optimization."
+        ],
+        [
+          "Designed a ",
+          {
+            "t": "b",
+            "c": [
+              "topic-blocked A/B evaluation"
+            ]
+          },
+          " of meme prompts using random assignment, blinded relevance scoring and ",
+          {
+            "t": "b",
+            "c": [
+              "a priori power analysis"
+            ]
+          },
+          ", keeping final evaluation separate from prompt tuning."
+        ],
+        [
+          "Developed RESTful APIs to serve LLM-generated content and integrated automated moderation, reducing invalid generations before deployment."
+        ],
+        [
+          "Set a ",
+          {
+            "t": "b",
+            "c": [
+              "deadline covering all generation-provider retries"
+            ]
+          },
+          " and a circuit breaker, reducing the ",
+          {
+            "t": "b",
+            "c": [
+              "configured maximum wait for an unavailable provider from 60 to 15 seconds"
+            ]
+          },
+          "."
+        ],
+        [
+          "Added CI/CD release gates that checked candidate content-generation configurations against the incumbent for moderation violations and task relevance, blocking promotion when either acceptance threshold failed."
+        ],
+        [
+          "Automated model training and deployment workflows using Docker and SageMaker, accelerating experimentation and shortening release cycles."
+        ],
+        [
+          "Codified SageMaker endpoint, execution-role and scaling configuration in Terraform with CI plan checks, reducing manual environment setup from 45 minutes to 18 minutes through reusable, versioned deployment definitions."
+        ],
+        [
+          "Versioned content-generation artifacts in MLflow, packaging HuggingFace model references, prompts and moderation settings into ",
+          {
+            "t": "b",
+            "c": [
+              "versioned inference bundles"
+            ]
+          },
+          " tied to their Docker image digests and linking each SageMaker release to a prior approved version; restoring API rollback-and-health-check time from ",
+          {
+            "t": "b",
+            "c": [
+              "18 to 5 minutes"
+            ]
+          },
+          "."
+        ],
+        [
+          "Monitored input drift with Pandas ",
+          {
+            "t": "b",
+            "c": [
+              "population stability index"
+            ]
+          },
+          " checks on tweet-length and language distributions, moving them from ",
+          {
+            "t": "b",
+            "c": [
+              "weekly to daily"
+            ]
+          },
+          " to shorten the schedule-derived maximum alert delay from ",
+          {
+            "t": "b",
+            "c": [
+              "7 days to 24 hours"
+            ]
+          },
+          " for persistent, threshold-crossing shifts, and published input-length PSI, moderation rejection rate and serving 5xx rate as CloudWatch metrics; drift alerts queued data curation and candidate revalidation, while service-error alerts paused release promotion and triggered endpoint health checks."
+        ],
+        [
+          "Configured ",
+          {
+            "t": "b",
+            "c": [
+              "CloudWatch alarms"
+            ]
+          },
+          " on provider failures and moderation-rejection rates by model/prompt release, reducing average detection delay for threshold-breaching releases from ",
+          {
+            "t": "b",
+            "c": [
+              "30 to 8 minutes"
+            ]
+          },
+          "."
+        ]
+      ],
+      "links": []
+    },
+    {
+      "role": "Software Engineer",
+      "company": "Hexbit",
+      "dates": "Feb 2023 – Aug 2023",
+      "location": "New Delhi, India",
+      "tools": [
+        "Python",
+        "SQL",
+        "PySpark",
+        "Databricks",
+        "Delta Lake",
+        "dbt",
+        "ETL",
+        "Feature Tables",
+        "Django",
+        "REST APIs",
+        "Docker",
+        "CI/CD",
+        "GitHub Actions",
+        "Data Quality Checks"
+      ],
+      "bullets": [
+        [
+          "Designed ",
+          {
+            "t": "b",
+            "c": [
+              "Databricks ETL pipelines using Python and SQL"
+            ]
+          },
+          " to normalize and transform millions of seller-catalog, price, availability and listing-update records into structured datasets consumed by downstream ML services; standardized seller-item and source identifiers and replayed missed updates, increasing eligible seller-item records published with required attributes by the scheduled cutoff from ",
+          {
+            "t": "b",
+            "c": [
+              "75% to 90%, a 20% relative improvement"
+            ]
+          },
+          "."
+        ],
+        [
+          "Built ",
+          {
+            "t": "b",
+            "c": [
+              "seller-item feature tables"
+            ]
+          },
+          " containing price, listing availability, title length, required-attribute missingness, and update recency, documenting feature definitions and null handling at one row per seller, item, and snapshot date."
+        ],
+        [
+          "Profiled missing values, duplicate identifiers, price distributions, and category frequencies by source and ingestion batch, producing exception summaries to identify inconsistent mappings and malformed updates before feature publication."
+        ],
+        [
+          "Added ",
+          {
+            "t": "b",
+            "c": [
+              "SQL schema and nullability checks"
+            ]
+          },
+          " for required seller-item identifiers, price and other numeric fields, and source timestamps before ETL publication; quarantined malformed records with batch identifiers and reproducible rejection reasons, reducing ",
+          {
+            "t": "b",
+            "c": [
+              "downstream batch failures from 8% to 3%"
+            ]
+          },
+          " across comparable scheduled runs while tracking validation rejects separately."
+        ],
+        [
+          "Gated ",
+          {
+            "t": "b",
+            "c": [
+              "Databricks feature-batch publication on schema, null-rate, and freshness checks"
+            ]
+          },
+          ", quarantining failed batches and retaining the last approved snapshot with its timestamp; downstream training refreshes required valid inputs and model revalidation before release eligibility."
+        ],
+        [
+          "Implemented incremental ",
+          {
+            "t": "b",
+            "c": [
+              "PySpark loads into Delta Lake"
+            ]
+          },
+          " using source-key merges, an update-time watermark, and a bounded lookback for late changes; reduced a routine catalog-table refresh from ",
+          {
+            "t": "b",
+            "c": [
+              "50 to 20 minutes"
+            ]
+          },
+          " compared with rebuilding the full downstream table."
+        ],
+        [
+          "Used ",
+          {
+            "t": "b",
+            "c": [
+              "PySpark partition pruning and early column projection in Databricks"
+            ]
+          },
+          " to avoid irrelevant input partitions and unused fields, reducing the existing million-record ",
+          {
+            "t": "b",
+            "c": [
+              "training-data preparation batch from 42 to 29 minutes"
+            ]
+          },
+          " while preserving the required output."
+        ],
+        [
+          "Cached reused ",
+          {
+            "t": "b",
+            "c": [
+              "PySpark intermediates"
+            ]
+          },
+          " after catalog normalization and seller-item joins in Databricks, reducing ",
+          {
+            "t": "b",
+            "c": [
+              "feature-table refresh time from 40 to 28 minutes"
+            ]
+          },
+          " by avoiding repeated execution of transformations shared across feature outputs."
+        ],
+        [
+          "Modeled ",
+          {
+            "t": "b",
+            "c": [
+              "pipeline-execution facts and source-dataset dimensions in a dimensional data mart"
+            ]
+          },
+          ", using ",
+          {
+            "t": "b",
+            "c": [
+              "dbt SQL transformations"
+            ]
+          },
+          " at a documented run/source/attempt grain; added ",
+          {
+            "t": "b",
+            "c": [
+              "not-null, uniqueness, and relationship tests"
+            ]
+          },
+          " to support consistent reporting of received records, published records, rejects, and refresh duration."
+        ],
+        [
+          "Centralized ",
+          {
+            "t": "b",
+            "c": [
+              "feature transformations shared by batch preparation and Django inference endpoints"
+            ]
+          },
+          ", adding ",
+          {
+            "t": "b",
+            "c": [
+              "schema and null-handling contract tests"
+            ]
+          },
+          " that compared representative records across both paths to detect ",
+          {
+            "t": "b",
+            "c": [
+              "training-serving skew"
+            ]
+          },
+          " before backend releases."
+        ],
+        [
+          "Developed secure ",
+          {
+            "t": "b",
+            "c": [
+              "REST APIs with Django and JWT authentication"
+            ]
+          },
+          " for catalog lookup, approved datasets, feature tables and feature snapshots, and batch and pipeline-run status, enforcing server-side role-based permissions, restricting administrative operations, returning consistent errors for unauthorized requests, and protecting internal ML endpoints."
+        ],
+        [
+          "Optimized ",
+          {
+            "t": "b",
+            "c": [
+              "SQL schemas and query execution"
+            ]
+          },
+          " behind Django ML-data APIs for catalog and seller-item lookups and feature-snapshot reads, using composite seller-item indexes, narrower result projections and removal of redundant joins and columns; reduced ",
+          {
+            "t": "b",
+            "c": [
+              "median API response time from 240 to 205 ms, approximately 15%"
+            ]
+          },
+          ", under the same dataset, authenticated request mix, result sizes, concurrent load and database configuration."
+        ],
+        [
+          "Added ",
+          {
+            "t": "b",
+            "c": [
+              "cursor-paginated reads to Django ML APIs"
+            ]
+          },
+          " using stable indexed ordering and bounded database queries, applying limits before ORM materialization and response serialization; reduced ",
+          {
+            "t": "b",
+            "c": [
+              "peak per-request response-buffer memory from 180 to 70 MB"
+            ]
+          },
+          " for the same catalog export workload, with tests covering cursor progression, page boundaries, empty pages, and traversal without skipped or duplicated records."
+        ],
+        [
+          "Added ",
+          {
+            "t": "b",
+            "c": [
+              "GitHub Actions CI/CD checks"
+            ]
+          },
+          " for ETL and API changes, running ",
+          {
+            "t": "b",
+            "c": [
+              "pytest unit and integration tests"
+            ]
+          },
+          " for transformation rules, schema compatibility, duplicate-safe reloads, and JWT access boundaries before allowing deployment."
+        ],
+        [
+          {
+            "t": "b",
+            "c": [
+              "Dockerized backend services and automated deployment workflows"
+            ]
+          },
+          ", maintaining consistent development and production environments and dependencies, running pre-release smoke checks for endpoint health, JWT authentication and permissions, dataset access, validation errors, pagination, and feature- and response-schema compatibility, and retaining versioned container images to support rollback after unsuccessful releases."
+        ]
+      ],
+      "links": []
+    },
+    {
+      "role": "Research Assistant",
+      "company": "KIIT University",
+      "dates": "Mar 2022 – Jan 2023",
+      "location": "Bhubaneswar, India",
+      "tools": [
+        "Python",
+        "PyTorch",
+        "Attention U-Net",
+        "Medical Image Segmentation",
+        "Computer Vision",
+        "Transformers",
+        "NLP",
+        "Forecasting",
+        "Backtesting",
+        "statsmodels"
+      ],
+      "bullets": [
+        [
+          "Implemented ",
+          {
+            "t": "b",
+            "c": [
+              "Attention UNET"
+            ]
+          },
+          " for ",
+          {
+            "t": "b",
+            "c": [
+              "medical image segmentation"
+            ]
+          },
+          ", achieving ",
+          {
+            "t": "b",
+            "c": [
+              "97%"
+            ]
+          },
+          " F1-Score."
+        ],
+        [
+          "Compared binary cross-entropy with Dice+BCE for Attention U-Net using source-image-disjoint splits, improving boundary F1 from 0.81 to 0.85 with the combined loss at the same foreground threshold while reporting foreground precision-recall separately."
+        ],
+        [
+          "Built ",
+          {
+            "t": "b",
+            "c": [
+              "Transformer sequence models"
+            ]
+          },
+          " for biomedical text analysis, increasing disease prediction accuracy by ",
+          {
+            "t": "b",
+            "c": [
+              "20%"
+            ]
+          },
+          "."
+        ],
+        [
+          "Developed ",
+          {
+            "t": "b",
+            "c": [
+              "forecasting models for Distributed Energy Resource"
+            ]
+          },
+          " integration, improving prediction accuracy by 18%, and validated them with ",
+          {
+            "t": "b",
+            "c": [
+              "rolling-origin backtesting"
+            ]
+          },
+          " against seasonal-naive baselines and ",
+          {
+            "t": "b",
+            "c": [
+              "statsmodels"
+            ]
+          },
+          " residual diagnostics, reporting horizon-specific MAE and prediction-interval coverage."
+        ],
+        [
+          "Applied ",
+          {
+            "t": "b",
+            "c": [
+              "dimensionality reduction techniques (PCA)"
+            ]
+          },
+          " to optimize large-scale datasets for predictive modeling."
+        ]
+      ],
+      "links": []
+    }
+  ],
+  "projects": [
+    {
+      "title": "SOP-Guided Insurance Claims Agent",
+      "date": "Sept 2026",
+      "bullets": [
+        [
+          "Architected a ",
+          {
+            "t": "b",
+            "c": [
+              "deterministic agentic workflow"
+            ]
+          },
+          " as a 6-node ",
+          {
+            "t": "b",
+            "c": [
+              "LangGraph"
+            ]
+          },
+          " ",
+          {
+            "t": "code",
+            "c": [
+              "StateGraph"
+            ]
+          },
+          " enforcing a fixed 4-phase SOP (",
+          {
+            "t": "code",
+            "c": [
+              "VERIFY_ID"
+            ]
+          },
+          ", ",
+          {
+            "t": "code",
+            "c": [
+              "RESOLVE_INTENT"
+            ]
+          },
+          ", ",
+          {
+            "t": "code",
+            "c": [
+              "PROCESS_CASE"
+            ]
+          },
+          ", ",
+          {
+            "t": "code",
+            "c": [
+              "POST_PROCESS"
+            ]
+          },
+          "), where ",
+          {
+            "t": "b",
+            "c": [
+              "Python owns control flow"
+            ]
+          },
+          ", phase gates and allowed actions, and the LLM is confined to three narrow jobs: structured extraction, intent classification, and phrasing a reply from a per-turn brief; conditional-edge fall-through lets multiple phases complete in a single turn without repeating steps."
+        ],
+        [
+          "Replaced multi-call parsing with a ",
+          {
+            "t": "b",
+            "c": [
+              "single structured-output Gemini call"
+            ]
+          },
+          " into a nested ",
+          {
+            "t": "b",
+            "c": [
+              "Pydantic"
+            ]
+          },
+          " schema (identity, caller, request, mood, closing), using ",
+          {
+            "t": "code",
+            "c": [
+              "Field"
+            ]
+          },
+          " descriptions as the extraction spec to normalize messy speech (spoken dates to ISO, “at … dot com” to email, digits-only phones, leading-zero ID digits), classify a ",
+          {
+            "t": "b",
+            "c": [
+              "7-class intent taxonomy"
+            ]
+          },
+          ", and capture claim type, status and period hints stated mid-verification so the right claim is resolved later without re-asking."
+        ],
+        [
+          "Enforced ",
+          {
+            "t": "b",
+            "c": [
+              "data-minimizing guardrails"
+            ]
+          },
+          " where gates are enforced by what the model is given, not what it is told: claim records never enter the LLM context before verification, and a single ",
+          {
+            "t": "code",
+            "c": [
+              "briefs.py"
+            ]
+          },
+          " module is the only ",
+          {
+            "t": "b",
+            "c": [
+              "leak surface"
+            ]
+          },
+          ", so no prompt pressure or jailbreak can surface an unverified fact."
+        ],
+        [
+          "Built an ",
+          {
+            "t": "b",
+            "c": [
+              "identity-verification gate"
+            ]
+          },
+          " requiring 3 of 5 factors that must all belong to ",
+          {
+            "t": "b",
+            "c": [
+              "one policyholder"
+            ]
+          },
+          ": the first match pins a party so details borrowed from different records cannot combine, matched fields are ",
+          {
+            "t": "b",
+            "c": [
+              "locked"
+            ]
+          },
+          " so verification cannot be flipped back, policy numbers are excluded as a factor, and names, emails and phones are normalized and matched against record aliases."
+        ],
+        [
+          "Separated ",
+          {
+            "t": "b",
+            "c": [
+              "identity from authorization"
+            ]
+          },
+          ": third-party callers must appear on the representative list and the policyholder must approve through a ",
+          {
+            "t": "b",
+            "c": [
+              "polled consent check"
+            ]
+          },
+          ", with approve, deny and timeout-to-human-escalation paths configurable via environment variable for scenario testing."
+        ],
+        [
+          "Made answers ",
+          {
+            "t": "b",
+            "c": [
+              "retrieved, not generated"
+            ]
+          },
+          ": approved guidance is routed from a JSON guideline table by intent and keyword, templated with the claim id and required documents, and passed to the model to rephrase only; grounding is ",
+          {
+            "t": "b",
+            "c": [
+              "scoped by intent"
+            ]
+          },
+          " (amounts only on money questions, deadlines only on appeal questions), and state hints disambiguate near-duplicate claims."
+        ],
+        [
+          "Added a read-only ",
+          {
+            "t": "b",
+            "c": [
+              "Model Context Protocol (MCP)"
+            ]
+          },
+          " adapter with typed arguments for the existing guidance lookup, validating each call against server-held phase and intent state before returning approved text to external clients."
+        ],
+        [
+          "Designed ",
+          {
+            "t": "b",
+            "c": [
+              "emotion-aware escalation"
+            ]
+          },
+          ": per-turn mood and refusal detection prepends a tone note that changes wording but ",
+          {
+            "t": "b",
+            "c": [
+              "never the gate"
+            ]
+          },
+          ", a refused detail triggers an alternative instead of insisting, and friction and off-topic counters escalate to a human after repeated difficult turns; explicit transfer requests short-circuit routing from any phase, and calls close with a recap plus an optional emailed summary."
+        ],
+        [
+          "Validated the deterministic gates with a ",
+          {
+            "t": "b",
+            "c": [
+              "31-case unit test suite"
+            ]
+          },
+          " (identity, claim resolution, consent) at ",
+          {
+            "t": "b",
+            "c": [
+              "100% pass rate"
+            ]
+          },
+          " and ",
+          {
+            "t": "b",
+            "c": [
+              "97.8% statement coverage"
+            ]
+          },
+          ", covering adversarial cases such as identity details borrowed from ",
+          {
+            "t": "b",
+            "c": [
+              "three different policyholders"
+            ]
+          },
+          ", a pinned party rejecting another person's correct detail, representatives of the wrong policyholder, misremembered claim periods, and consent timeouts that must never approve; the full suite runs offline with ",
+          {
+            "t": "b",
+            "c": [
+              "no LLM calls"
+            ]
+          },
+          " in under 5 ms."
+        ],
+        [
+          "Wired the existing offline gate tests into ",
+          {
+            "t": "b",
+            "c": [
+              "GitHub Actions"
+            ]
+          },
+          " and Docker image checks, blocking demo releases on authorization regressions and retaining the previous image for rollback."
+        ],
+        [
+          "Built an out-of-band ",
+          {
+            "t": "b",
+            "c": [
+              "LLM-as-judge reply evaluator"
+            ]
+          },
+          " for grounding in the approved brief, intent relevance, and handoff wording, keeping response-quality findings separate from the existing deterministic, no-LLM gate tests."
+        ],
+        [
+          "Instrumented FastAPI requests and LangGraph nodes with ",
+          {
+            "t": "b",
+            "c": [
+              "OpenTelemetry traces"
+            ]
+          },
+          " carrying phase, provider latency, and HTTP status while excluding raw caller inputs and credentials, separating model delays from workflow errors."
+        ],
+        [
+          "Shipped as a ",
+          {
+            "t": "b",
+            "c": [
+              "FastAPI"
+            ]
+          },
+          " service with REST endpoints (",
+          {
+            "t": "code",
+            "c": [
+              "/api/start"
+            ]
+          },
+          ", ",
+          {
+            "t": "code",
+            "c": [
+              "/api/chat"
+            ]
+          },
+          ", ",
+          {
+            "t": "code",
+            "c": [
+              "/api/state"
+            ]
+          },
+          ", ",
+          {
+            "t": "code",
+            "c": [
+              "/healthz"
+            ]
+          },
+          "), mapping each session to a LangGraph thread persisted by a ",
+          {
+            "t": "b",
+            "c": [
+              "checkpointer"
+            ]
+          },
+          ", per-request bring-your-own-key via ",
+          {
+            "t": "code",
+            "c": [
+              "ContextVar"
+            ]
+          },
+          " (never stored), model failures surfaced as HTTP 503, a live debug UI showing phase and state transitions, and a terminal client; ",
+          {
+            "t": "b",
+            "c": [
+              "containerized with Docker"
+            ]
+          },
+          " and deployed on ",
+          {
+            "t": "b",
+            "c": [
+              "Render"
+            ]
+          },
+          "."
+        ]
+      ],
+      "links": [
+        {
+          "kind": "demo",
+          "url": "https://sop-guided-agent.onrender.com/"
+        },
+        {
+          "kind": "code",
+          "url": "https://github.com/Elaakarsh31/SOP-Guided-Agent"
+        }
+      ],
+      "stack": [
+        "Python",
+        "LangGraph",
+        "Gemini",
+        "Pydantic",
+        "FastAPI",
+        "MCP",
+        "Guardrails",
+        "REST APIs",
+        "Docker",
+        "Unit Testing"
+      ]
+    },
+    {
+      "title": "StoryWeaver AI",
+      "date": "July 2026",
+      "bullets": [
+        [
+          "Architected a ",
+          {
+            "t": "b",
+            "c": [
+              "multi-agent LangGraph pipeline"
+            ]
+          },
+          " converting unstructured book text into narrated scene videos, using ",
+          {
+            "t": "code",
+            "c": [
+              "Send()"
+            ]
+          },
+          " map-reduce fan-out to parallelize prompt and image generation across 12 scenes and ",
+          {
+            "t": "b",
+            "c": [
+              "LangGraph state reducers"
+            ]
+          },
+          " (",
+          {
+            "t": "code",
+            "c": [
+              "Annotated[list, operator.add]"
+            ]
+          },
+          ") to merge parallel branch outputs into shared state without race conditions, cutting end-to-end runtime ",
+          {
+            "t": "b",
+            "c": [
+              "15%"
+            ]
+          },
+          " vs. a sequential baseline."
+        ],
+        [
+          "Applied an ",
+          {
+            "t": "b",
+            "c": [
+              "asyncio semaphore"
+            ]
+          },
+          " to bound concurrent ",
+          {
+            "t": "b",
+            "c": [
+              "Gemini"
+            ]
+          },
+          " and ",
+          {
+            "t": "b",
+            "c": [
+              "ElevenLabs"
+            ]
+          },
+          " provider requests in the scene fan-outs and honored provider retry delays, lowering ",
+          {
+            "t": "b",
+            "c": [
+              "average rate-limit retry attempts per 12-scene video from 9 to 3"
+            ]
+          },
+          "."
+        ],
+        [
+          "Solved cross-scene ",
+          {
+            "t": "b",
+            "c": [
+              "character visual drift"
+            ]
+          },
+          " — the core failure mode of LLM image pipelines, since image models have no persistent memory of a character between calls — by engineering a locked ",
+          {
+            "t": "b",
+            "c": [
+              "“visual-token” persona schema"
+            ]
+          },
+          " that every scene prompt referenced verbatim, keeping 3 recurring characters visually consistent across 12 independently generated scenes with zero manual prompt correction."
+        ],
+        [
+          "Retrieved character facts and prior events from a ",
+          {
+            "t": "b",
+            "c": [
+              "chapter-local index"
+            ]
+          },
+          " keyed by persona and narrative position, inserting only entries available by the current scene into its script brief while carrying the locked visual-token schema verbatim."
+        ],
+        [
+          "Added a ",
+          {
+            "t": "b",
+            "c": [
+              "human-in-the-loop review gate"
+            ]
+          },
+          " using LangGraph's ",
+          {
+            "t": "code",
+            "c": [
+              "interrupt()"
+            ]
+          },
+          " paired with a persistent ",
+          {
+            "t": "code",
+            "c": [
+              "SqliteSaver"
+            ]
+          },
+          " checkpointer, pausing the graph after script/prompt generation so a reviewer could approve or edit output ",
+          {
+            "t": "b",
+            "c": [
+              "before"
+            ]
+          },
+          " triggering paid image-gen calls, and enabling crash-safe resumption without re-running completed (billed) steps."
+        ],
+        [
+          "Synchronized two independent parallel fan-outs — ",
+          {
+            "t": "b",
+            "c": [
+              "Gemini"
+            ]
+          },
+          " image generation and ",
+          {
+            "t": "b",
+            "c": [
+              "ElevenLabs"
+            ]
+          },
+          " TTS narration, running concurrently per scene — through an explicit join node that gated the merge step until both reducers were fully populated; ",
+          {
+            "t": "b",
+            "c": [
+              "MoviePy"
+            ]
+          },
+          " then held each scene image for the length of its narration and stitched the scenes into one video, with per-scene retry logic for failed API calls."
+        ]
+      ],
+      "links": [],
+      "stack": [
+        "Python",
+        "LangGraph Multi-Agent",
+        "Gemini",
+        "ElevenLabs",
+        "MoviePy",
+        "Pydantic",
+        "asyncio",
+        "SQLite Checkpointing",
+        "Human-in-the-Loop"
+      ]
+    },
+    {
+      "title": "GPT-2 Shakespeare Text Generator",
+      "date": "July 2026",
+      "bullets": [
+        [
+          "Implemented a ",
+          {
+            "t": "b",
+            "c": [
+              "decoder-only GPT-style Transformer from scratch in PyTorch"
+            ]
+          },
+          ": token and learned positional embeddings feeding ",
+          {
+            "t": "b",
+            "c": [
+              "4 pre-LayerNorm blocks"
+            ]
+          },
+          " of ",
+          {
+            "t": "b",
+            "c": [
+              "4-head masked causal self-attention"
+            ]
+          },
+          " (scaled dot-product with a lower-triangular mask) and 4×-expansion feed-forward layers, with residual connections, dropout and N(0, 0.02) weight initialization, totaling ",
+          {
+            "t": "b",
+            "c": [
+              "7.24M trainable parameters"
+            ]
+          },
+          " (verified against the saved checkpoint)."
+        ],
+        [
+          "Built a ",
+          {
+            "t": "b",
+            "c": [
+              "character-level data pipeline"
+            ]
+          },
+          " over the ",
+          {
+            "t": "b",
+            "c": [
+              "1.1M-character"
+            ]
+          },
+          " Tiny Shakespeare corpus: a ",
+          {
+            "t": "b",
+            "c": [
+              "65-token vocabulary"
+            ]
+          },
+          " with encode/decode maps, a contiguous 90/10 train/validation split (1.0M / 111.5K characters), and randomly sampled ",
+          {
+            "t": "b",
+            "c": [
+              "64 × 256"
+            ]
+          },
+          " context windows with one-step-shifted targets for next-token prediction."
+        ],
+        [
+          "Trained with ",
+          {
+            "t": "b",
+            "c": [
+              "AdamW"
+            ]
+          },
+          " (lr 3e-4, cross-entropy loss) for ",
+          {
+            "t": "b",
+            "c": [
+              "3,000 steps"
+            ]
+          },
+          " (~49M tokens, about 49 passes over the training split) on ",
+          {
+            "t": "b",
+            "c": [
+              "Apple Silicon MPS"
+            ]
+          },
+          " with automatic CUDA/CPU fallback and a fixed seed; logged train/validation loss every 250 steps and identified ",
+          {
+            "t": "b",
+            "c": [
+              "overfitting onset after ~2,000 steps"
+            ]
+          },
+          " (best validation loss ",
+          {
+            "t": "b",
+            "c": [
+              "1.50"
+            ]
+          },
+          "; final train 1.01 vs. validation 1.53)."
+        ],
+        [
+          "Ran a ",
+          {
+            "t": "b",
+            "c": [
+              "2×2×2 hyperparameter grid search"
+            ]
+          },
+          " over depth (4/6 layers), attention heads (4/6) and dropout (0.1/0.2), training 8 configurations for 500 steps each; the smallest ",
+          {
+            "t": "b",
+            "c": [
+              "4-layer, 4-head, 0.1-dropout"
+            ]
+          },
+          " model won outright (validation loss ",
+          {
+            "t": "b",
+            "c": [
+              "1.785"
+            ]
+          },
+          "), and dropout 0.1 beat 0.2 in every pairing."
+        ],
+        [
+          "Benchmarked against a ",
+          {
+            "t": "b",
+            "c": [
+              "bigram baseline"
+            ]
+          },
+          " by framing next-character prediction as ",
+          {
+            "t": "b",
+            "c": [
+              "65-class classification"
+            ]
+          },
+          " over ",
+          {
+            "t": "b",
+            "c": [
+              "327K validation predictions"
+            ]
+          },
+          ": accuracy rose from ",
+          {
+            "t": "b",
+            "c": [
+              "26.9% to 56.6%"
+            ]
+          },
+          " (2.1×), top-5 accuracy from ",
+          {
+            "t": "b",
+            "c": [
+              "65.4% to 85.5%"
+            ]
+          },
+          ", macro-F1 from ",
+          {
+            "t": "b",
+            "c": [
+              "0.076 to 0.366"
+            ]
+          },
+          " (4.8×), and ",
+          {
+            "t": "b",
+            "c": [
+              "perplexity fell from 12.07 to 4.56"
+            ]
+          },
+          " (62% reduction)."
+        ],
+        [
+          "Designed a ",
+          {
+            "t": "b",
+            "c": [
+              "context-length ablation"
+            ]
+          },
+          " capping the trained model's visible history at 1, 8, 32, 64, 128 and 256 characters: a 1-character context reproduced bigram performance (27.6% accuracy, perplexity 12.5), while the ",
+          {
+            "t": "b",
+            "c": [
+              "first 32 characters recovered ~90% of the full-context accuracy gain"
+            ]
+          },
+          " (53.7% vs. 56.6%), with diminishing returns beyond."
+        ],
+        [
+          "Ran a ",
+          {
+            "t": "b",
+            "c": [
+              "positional-embedding ablation"
+            ]
+          },
+          " by retraining without position information, which raised final validation loss from ",
+          {
+            "t": "b",
+            "c": [
+              "1.53 to 1.64 (+6.7%)"
+            ]
+          },
+          ", quantifying how much character order contributes beyond what causal masking alone provides."
+        ],
+        [
+          "Performed ",
+          {
+            "t": "b",
+            "c": [
+              "error analysis"
+            ]
+          },
+          " with macro vs. weighted F1 (0.37 vs. 0.56), exposing weak recall on rare characters, and a ",
+          {
+            "t": "b",
+            "c": [
+              "top-15-character confusion matrix"
+            ]
+          },
+          " showing residual errors concentrated among vowels (e, o, a, i)."
+        ],
+        [
+          "Instrumented the optional CUDA execution path with torch.profiler operator traces and allocator statistics, separating attention, feed-forward and optimizer costs while distinguishing live tensor allocations from reserved GPU memory before selecting optimizations."
+        ],
+        [
+          "Kept detached loss accumulation on-device in the optional CUDA training path and transferred scalars only at the existing 250-step logging boundary, reducing average non-evaluation training-step time from 24 ms to 21 ms by removing per-step host synchronization."
+        ],
+        [
+          "Implemented an FP32 CUDA C++ LayerNorm forward kernel for the optional CUDA inference path, using blockwise Welford reductions and affine scaling through a PyTorch CUDAExtension; maximum absolute output error stayed below 10⁻⁵ against ",
+          {
+            "t": "code",
+            "c": [
+              "torch.nn.functional.layer_norm"
+            ]
+          },
+          " on model activations."
+        ],
+        [
+          "Built ",
+          {
+            "t": "b",
+            "c": [
+              "autoregressive inference"
+            ]
+          },
+          " with multinomial sampling and context cropped to the 256-character window, producing play-formatted output with speaker headings, line breaks and archaic contractions; packaged a one-command pipeline (",
+          {
+            "t": "code",
+            "c": [
+              "main.py"
+            ]
+          },
+          ") that writes all metrics, loss histories and configs to ",
+          {
+            "t": "code",
+            "c": [
+              "results.json"
+            ]
+          },
+          " plus 5 figures, and a ",
+          {
+            "t": "code",
+            "c": [
+              "generate.py"
+            ]
+          },
+          " script that samples from the saved checkpoint without retraining."
+        ]
+      ],
+      "links": [
+        {
+          "kind": "code",
+          "url": "https://github.com/Elaakarsh31/gpt2-shakespear"
+        }
+      ],
+      "stack": [
+        "Python",
+        "PyTorch",
+        "Transformers",
+        "CUDA C++",
+        "torch.profiler",
+        "Ablation Studies",
+        "Perplexity"
+      ]
+    },
+    {
+      "title": "Numerical Reasoning with LLMs",
+      "date": "Nov 2024",
+      "bullets": [
+        [
+          "Built a numeracy system for ",
+          {
+            "t": "b",
+            "c": [
+              "SemEval-2024 Task 7 (NumEval) Subtask 1"
+            ]
+          },
+          " as a 3-person CS6120 NLP team project, targeting the ",
+          {
+            "t": "b",
+            "c": [
+              "Quantitative-101"
+            ]
+          },
+          " benchmark across three task families: quantitative prediction (",
+          {
+            "t": "b",
+            "c": [
+              "QP"
+            ]
+          },
+          "), quantitative natural language inference (",
+          {
+            "t": "b",
+            "c": [
+              "QNLI"
+            ]
+          },
+          ") and quantitative question answering (",
+          {
+            "t": "b",
+            "c": [
+              "QQA"
+            ]
+          },
+          ")."
+        ],
+        [
+          "Fine-tuned and compared ",
+          {
+            "t": "b",
+            "c": [
+              "three model families"
+            ]
+          },
+          " on the same tasks: an encoder-only ",
+          {
+            "t": "b",
+            "c": [
+              "BERT"
+            ]
+          },
+          " classifier for QP and QNLI, an instruction-tuned seq2seq ",
+          {
+            "t": "b",
+            "c": [
+              "Flan-T5"
+            ]
+          },
+          ", and a decoder-only ",
+          {
+            "t": "b",
+            "c": [
+              "Llama"
+            ]
+          },
+          " trained with ",
+          {
+            "t": "b",
+            "c": [
+              "Unsloth"
+            ]
+          },
+          " on Linux/WSL, isolating how architecture affects numerical reasoning."
+        ],
+        [
+          "Configured ",
+          {
+            "t": "b",
+            "c": [
+              "LoRA adapters"
+            ]
+          },
+          " on attention projections in the Unsloth Llama pipeline, reducing the ",
+          {
+            "t": "b",
+            "c": [
+              "number of trainable parameters by about 99%"
+            ]
+          },
+          " compared with full-parameter fine-tuning while keeping base-model weights frozen, and saved task-specific adapters alongside the existing NumEval run artifacts."
+        ],
+        [
+          "Reproduced the ",
+          {
+            "t": "b",
+            "c": [
+              "YNU-HPCC SemEval-2024 instruction fine-tuning"
+            ]
+          },
+          " recipe for Flan-T5 with separate per-task training and test reproduction notebooks and scripts, giving the team a published baseline to measure its own variants against."
+        ],
+        [
+          "Implemented ",
+          {
+            "t": "b",
+            "c": [
+              "input reframing"
+            ]
+          },
+          " following Chen et al. (EACL 2023) with a ",
+          {
+            "t": "code",
+            "c": [
+              "num2text"
+            ]
+          },
+          " module that rewrites digits as words, testing whether exposing numbers as text improves the model's handling of magnitude and comparison."
+        ],
+        [
+          "Engineered ",
+          {
+            "t": "b",
+            "c": [
+              "custom features"
+            ]
+          },
+          " from the dataset to train LLMs for better numerical reasoning prediction."
+        ],
+        [
+          "Unified all task data into a common ",
+          {
+            "t": "b",
+            "c": [
+              "JSON schema"
+            ]
+          },
+          " consumed by the BERT, T5 and Llama pipelines, and subsampled the large QP training set so repeated fine-tuning runs stayed within GPU budget."
+        ],
+        [
+          "Cached task-specific JSON artifacts under ",
+          {
+            "t": "b",
+            "c": [
+              "source-content and preprocessing-version hashes"
+            ]
+          },
+          ", reducing repeated dataset preparation from ",
+          {
+            "t": "b",
+            "c": [
+              "4 to 1 minute"
+            ]
+          },
+          " while keeping separate train, validation, and test manifests for reproducible model inputs."
+        ],
+        [
+          "Devised a ",
+          {
+            "t": "b",
+            "c": [
+              "chain-of-thought"
+            ]
+          },
+          " prompting setup that makes the model state its reasoning before the final answer, reaching a ",
+          {
+            "t": "b",
+            "c": [
+              "71% F1 score"
+            ]
+          },
+          "."
+        ],
+        [
+          "Added a consistency loss between BERT QNLI predictions for label-preserving, unit-equivalent text variants during fine-tuning, reducing prediction disagreement between equivalent inputs from 14% to 9% on a reserved robustness split."
+        ],
+        [
+          "Fit temperature scaling to BERT QNLI logits on validation data and evaluated confidence on untouched test data, lowering 15-bin expected calibration error from 0.12 to 0.07 while using reliability diagrams to expose overconfidence."
+        ],
+        [
+          "Built a training-analysis workflow where ",
+          {
+            "t": "code",
+            "c": [
+              "extract_loss.py"
+            ]
+          },
+          " parsed run logs into a ",
+          {
+            "t": "b",
+            "c": [
+              "1,188-row metrics table"
+            ]
+          },
+          " of per-epoch training loss, validation loss, ",
+          {
+            "t": "b",
+            "c": [
+              "micro-F1"
+            ]
+          },
+          " and ",
+          {
+            "t": "b",
+            "c": [
+              "macro-F1"
+            ]
+          },
+          " across every run, then compared convergence and overfitting across models and tasks in a dedicated analysis notebook."
+        ],
+        [
+          "Tracked model and tokenizer versions, preprocessing recipes, split hashes, seeds and per-task metrics in MLflow, linking each BERT/T5/Llama comparison to its saved checkpoint so research variants could be reconstructed without conflating their data partitions."
+        ],
+        [
+          "Reported results with the official NumEval metrics, reaching ",
+          {
+            "t": "b",
+            "c": [
+              "74.2%"
+            ]
+          },
+          " macro-F1 on QNLI, ",
+          {
+            "t": "b",
+            "c": [
+              "69.8%"
+            ]
+          },
+          " on QP and ",
+          {
+            "t": "b",
+            "c": [
+              "68.9%"
+            ]
+          },
+          " on QQA with the best model, versus ",
+          {
+            "t": "b",
+            "c": [
+              "61.4%"
+            ]
+          },
+          " for the reproduced Flan-T5 baseline."
+        ]
+      ],
+      "links": [
+        {
+          "kind": "code",
+          "url": "https://github.com/Elaakarsh31/semeval2024-task7-subtask1"
+        }
+      ],
+      "stack": [
+        "Python",
+        "PyTorch",
+        "Hugging Face",
+        "BERT",
+        "Flan-T5",
+        "Llama",
+        "LoRA",
+        "Chain-of-Thought",
+        "Fine-Tuning",
+        "MLflow",
+        "Dataset Versioning"
+      ]
+    },
+    {
+      "title": "Real-Time Object Recognition & One-Shot CNN Embeddings",
+      "date": "Feb 2026",
+      "bullets": [
+        [
+          {
+            "t": "b",
+            "c": [
+              "Built"
+            ]
+          },
+          " a real-time object recognition pipeline in ",
+          {
+            "t": "b",
+            "c": [
+              "C++17/OpenCV"
+            ]
+          },
+          " that segments, describes, and classifies multiple objects per webcam frame, with live trackbar tuning of morphology and region-filter parameters for on-the-fly calibration."
+        ],
+        [
+          {
+            "t": "b",
+            "c": [
+              "Implemented"
+            ]
+          },
+          " segmentation from scratch — ",
+          {
+            "t": "b",
+            "c": [
+              "1-D 2-means clustering"
+            ]
+          },
+          " over sampled pixels for dynamic threshold selection plus custom ellipse-kernel erosion, dilation, opening, and closing — removing reliance on fixed thresholds under changing lighting."
+        ],
+        [
+          {
+            "t": "b",
+            "c": [
+              "Engineered"
+            ]
+          },
+          " a rotation- and scale-invariant ",
+          {
+            "t": "b",
+            "c": [
+              "6-D descriptor"
+            ]
+          },
+          " (percent-fill, oriented-bounding-box aspect ratio, 4 log-scaled ",
+          {
+            "t": "b",
+            "c": [
+              "Hu moments"
+            ]
+          },
+          ") derived from second central moments and ",
+          {
+            "t": "b",
+            "c": [
+              "PCA"
+            ]
+          },
+          " eigenvectors, and ",
+          {
+            "t": "b",
+            "c": [
+              "classified"
+            ]
+          },
+          " it with a standard-deviation-normalized Euclidean ",
+          {
+            "t": "b",
+            "c": [
+              "1-NN"
+            ]
+          },
+          " over a CSV feature database."
+        ],
+        [
+          {
+            "t": "b",
+            "c": [
+              "Achieved"
+            ]
+          },
+          " ",
+          {
+            "t": "b",
+            "c": [
+              "98% accuracy (49/50)"
+            ]
+          },
+          " on a held-out ",
+          {
+            "t": "b",
+            "c": [
+              "10-class"
+            ]
+          },
+          " test set from a ",
+          {
+            "t": "b",
+            "c": [
+              "single training exemplar per class"
+            ]
+          },
+          ", and ",
+          {
+            "t": "b",
+            "c": [
+              "added"
+            ]
+          },
+          " distance-threshold ",
+          {
+            "t": "b",
+            "c": [
+              "unknown-object rejection"
+            ]
+          },
+          " to suppress false positives on out-of-database items."
+        ],
+        [
+          {
+            "t": "b",
+            "c": [
+              "Automated"
+            ]
+          },
+          " an evaluation mode that computes ",
+          {
+            "t": "b",
+            "c": [
+              "confusion matrices"
+            ]
+          },
+          " across the full test tree and exports annotated misclassified images, converting debugging from manual inspection into a repeatable, scriptable run."
+        ],
+        [
+          {
+            "t": "b",
+            "c": [
+              "Extended"
+            ]
+          },
+          " the system to ",
+          {
+            "t": "b",
+            "c": [
+              "one-shot deep recognition"
+            ]
+          },
+          " by ",
+          {
+            "t": "b",
+            "c": [
+              "integrating"
+            ]
+          },
+          " a ",
+          {
+            "t": "b",
+            "c": [
+              "ResNet18 ONNX"
+            ]
+          },
+          " model through OpenCV DNN: principal-axis-aligned 224×224 ROI crops are embedded into ",
+          {
+            "t": "b",
+            "c": [
+              "512-D vectors"
+            ]
+          },
+          " and matched by ",
+          {
+            "t": "b",
+            "c": [
+              "SSD nearest neighbor"
+            ]
+          },
+          " against a persisted embedding database, proving markedly more robust to rotation and lighting than the hand-crafted baseline."
+        ],
+        [
+          "Profiled the OpenCV DNN recognition loop and reused ROI preprocessing buffers, reducing average frame-processing time from 36 ms to 27 ms by removing repeated allocations and copies around ONNX inference."
+        ],
+        [
+          {
+            "t": "b",
+            "c": [
+              "Validated"
+            ]
+          },
+          " embedding quality by ",
+          {
+            "t": "b",
+            "c": [
+              "projecting"
+            ]
+          },
+          " the 512-D database to 2-D with ",
+          {
+            "t": "b",
+            "c": [
+              "PCA/SVD"
+            ]
+          },
+          " in Python, isolating the visually similar categories responsible for residual error and quantifying that the top two components retain only ",
+          {
+            "t": "b",
+            "c": [
+              "53% of variance"
+            ]
+          },
+          " — evidence that full-dimensional SSD matching outperforms any 2-D separability the projection suggests."
+        ]
+      ],
+      "links": [
+        {
+          "kind": "code",
+          "url": "https://github.com/Elaakarsh31/Real-Time-Object-Recognition-One-Shot-CNN-Embeddings"
+        }
+      ],
+      "stack": [
+        "C++17",
+        "Python",
+        "OpenCV",
+        "ONNX",
+        "ResNet18",
+        "CNN Embeddings",
+        "PCA"
+      ]
+    },
+    {
+      "title": "Skimlit: Text Summarization for Research Papers",
+      "date": "June 2024",
+      "bullets": [
+        [
+          "Framed literature skimming as ",
+          {
+            "t": "b",
+            "c": [
+              "sequential sentence classification"
+            ]
+          },
+          " on the ",
+          {
+            "t": "b",
+            "c": [
+              "PubMed 200k RCT"
+            ]
+          },
+          " dataset (about ",
+          {
+            "t": "b",
+            "c": [
+              "200k abstracts, 2.3M sentences"
+            ]
+          },
+          "), labelling every sentence of an abstract as Background, Objective, Methods, Results or Conclusions so readers can jump straight to the part they need."
+        ],
+        [
+          "Wrote a preprocessing pipeline that parses raw abstract files into per-sentence records carrying ",
+          {
+            "t": "b",
+            "c": [
+              "line number and total line count"
+            ]
+          },
+          ", one-hot encodes the 5 labels, and feeds batched, prefetched ",
+          {
+            "t": "code",
+            "c": [
+              "tf.data"
+            ]
+          },
+          " datasets to every model."
+        ],
+        [
+          "Set a classical baseline with ",
+          {
+            "t": "b",
+            "c": [
+              "TF-IDF and Multinomial Naive Bayes"
+            ]
+          },
+          " at ",
+          {
+            "t": "b",
+            "c": [
+              "72.3%"
+            ]
+          },
+          " accuracy, then used it as the bar every deep model had to beat."
+        ],
+        [
+          "Compared token representations: a custom trainable embedding with ",
+          {
+            "t": "b",
+            "c": [
+              "Conv1D"
+            ]
+          },
+          ", frozen ",
+          {
+            "t": "b",
+            "c": [
+              "GloVe"
+            ]
+          },
+          " vectors, and pretrained ",
+          {
+            "t": "b",
+            "c": [
+              "Universal Sentence Encoder"
+            ]
+          },
+          " features from TensorFlow Hub, measuring the gain from pretrained semantics on a medical vocabulary; the TensorFlow USE and GloVe models reached an ",
+          {
+            "t": "b",
+            "c": [
+              "85% F1 score"
+            ]
+          },
+          "."
+        ],
+        [
+          "Trained ",
+          {
+            "t": "b",
+            "c": [
+              "GRU, Bi-LSTM and CNN"
+            ]
+          },
+          " sequence encoders, including a ",
+          {
+            "t": "b",
+            "c": [
+              "character-level"
+            ]
+          },
+          " Bi-LSTM branch that handles rare clinical terms and misspellings that word embeddings miss."
+        ],
+        [
+          "Built a ",
+          {
+            "t": "b",
+            "c": [
+              "tribrid model"
+            ]
+          },
+          " that concatenates token embeddings, character embeddings and ",
+          {
+            "t": "b",
+            "c": [
+              "positional embeddings"
+            ]
+          },
+          " of each sentence's line number and total lines, using where a sentence sits in the abstract as a strong signal for its role."
+        ],
+        [
+          "Applied ",
+          {
+            "t": "b",
+            "c": [
+              "inverse-frequency class weights"
+            ]
+          },
+          " to the tribrid sentence classifier, raising ",
+          {
+            "t": "b",
+            "c": [
+              "validation macro-F1 from 0.81 to 0.84"
+            ]
+          },
+          " across five rhetorical labels."
+        ],
+        [
+          "Analyzed ",
+          {
+            "t": "b",
+            "c": [
+              "200k+ research abstracts"
+            ]
+          },
+          " to uncover trends and insights automated on the dashboard with ",
+          {
+            "t": "b",
+            "c": [
+              "Tableau"
+            ]
+          },
+          "."
+        ]
+      ],
+      "links": [
+        {
+          "kind": "code",
+          "url": "https://github.com/Elaakarsh31/Skimlit"
+        }
+      ],
+      "stack": [
+        "Python",
+        "TensorFlow",
+        "tf.data",
+        "NLP",
+        "Embeddings",
+        "TF-IDF",
+        "Multinomial Naive Bayes",
+        "USE",
+        "GloVe",
+        "GRU",
+        "Bi-LSTM",
+        "CNN",
+        "Positional Embeddings",
+        "Inverse-frequency Class Weighting",
+        "Validation Macro-F1",
+        "Tableau"
+      ]
+    },
+    {
+      "title": "Fuel Economy Analysis",
+      "date": "Jan 2025",
+      "bullets": [
+        [
+          "Cleaned and explored ",
+          {
+            "t": "b",
+            "c": [
+              "40k+ vehicle records"
+            ]
+          },
+          " from the U.S. EPA fuel economy dataset to model ",
+          {
+            "t": "b",
+            "c": [
+              "city MPG"
+            ]
+          },
+          ", handling missing values, inconsistent categories and duplicate model-year entries."
+        ],
+        [
+          "Removed ",
+          {
+            "t": "b",
+            "c": [
+              "target leakage"
+            ]
+          },
+          " by excluding highway and combined MPG, which almost fully determine city MPG, so the model learns from vehicle design rather than from restated versions of the answer."
+        ],
+        [
+          "Ran EDA on how engine displacement, cylinder count, transmission, drive type, fuel type and model year relate to urban consumption, using correlation heatmaps and trend plots to show efficiency gains over time."
+        ],
+        [
+          "Engineered features such as ",
+          {
+            "t": "b",
+            "c": [
+              "engine efficiency"
+            ]
+          },
+          " and ",
+          {
+            "t": "b",
+            "c": [
+              "[displacement per cylinder]"
+            ]
+          },
+          ", and one-hot encoded categorical attributes like transmission, drive and vehicle class."
+        ],
+        [
+          "Benchmarked a ",
+          {
+            "t": "b",
+            "c": [
+              "linear regression"
+            ]
+          },
+          " baseline against ",
+          {
+            "t": "b",
+            "c": [
+              "Random Forest"
+            ]
+          },
+          " and ",
+          {
+            "t": "b",
+            "c": [
+              "XGBoost"
+            ]
+          },
+          ", tuning hyperparameters with ",
+          {
+            "t": "b",
+            "c": [
+              "5-fold cross-validated grid search"
+            ]
+          },
+          "."
+        ],
+        [
+          "Combined imputation and encoding in a ",
+          {
+            "t": "b",
+            "c": [
+              "scikit-learn Pipeline/ColumnTransformer"
+            ]
+          },
+          " with cached transformations, reducing ",
+          {
+            "t": "b",
+            "c": [
+              "5-fold grid-search runtime from 50 to 35 minutes"
+            ]
+          },
+          " while fitting preprocessing within each training fold."
+        ],
+        [
+          "Reached an ",
+          {
+            "t": "b",
+            "c": [
+              "R² of 0.85"
+            ]
+          },
+          " and ",
+          {
+            "t": "b",
+            "c": [
+              "RMSE of 2.3 MPG"
+            ]
+          },
+          " with the best model, versus ",
+          {
+            "t": "b",
+            "c": [
+              "0.68"
+            ]
+          },
+          " R² for the linear baseline."
+        ],
+        [
+          "Interpreted the model with ",
+          {
+            "t": "b",
+            "c": [
+              "feature importance"
+            ]
+          },
+          " rankings, identifying ",
+          {
+            "t": "b",
+            "c": [
+              "engine displacement, cylinder count, drive type, and model year"
+            ]
+          },
+          " as the strongest predictors of city fuel economy."
+        ]
+      ],
+      "links": [
+        {
+          "kind": "code",
+          "url": "https://github.com/Elaakarsh31/FuelEconomyAnalysis"
+        }
+      ],
+      "stack": [
+        "Python",
+        "pandas",
+        "scikit-learn",
+        "XGBoost",
+        "Matplotlib",
+        "EDA",
+        "Feature Engineering",
+        "Target-leakage Prevention",
+        "One-hot Encoding",
+        "Linear Regression",
+        "Random Forest",
+        "Cross-validation",
+        "Grid Search",
+        "Feature Importance",
+        "Pipeline",
+        "ColumnTransformer",
+        "Preprocessing Caching"
+      ]
+    },
+    {
+      "title": "LLM Chatbot: Document-Grounded Conversational AI Assistant",
+      "date": "July 2024",
+      "bullets": [
+        [
+          "Engineered ",
+          {
+            "t": "b",
+            "c": [
+              "GPT-4 model"
+            ]
+          },
+          " chatbot with Chainlit, enabling user-specific sessions and chat histories stored in ",
+          {
+            "t": "b",
+            "c": [
+              "Firebase"
+            ]
+          },
+          "."
+        ],
+        [
+          "Integrated ",
+          {
+            "t": "b",
+            "c": [
+              "RAG"
+            ]
+          },
+          " functionality to enable real-time document-based, ",
+          {
+            "t": "b",
+            "c": [
+              "context-aware conversations"
+            ]
+          },
+          " with chatbot."
+        ],
+        [
+          "Streamlined ",
+          {
+            "t": "b",
+            "c": [
+              "user authentication"
+            ]
+          },
+          " with a robust sign-in/sign-up system for multi-session user experiences."
+        ],
+        [
+          "Indexed chunks in ",
+          {
+            "t": "b",
+            "c": [
+              "FAISS"
+            ]
+          },
+          " via LangChain and reused embeddings matched by content hash, cutting repeat ingestion for unchanged documents from ",
+          {
+            "t": "b",
+            "c": [
+              "42 to 11 seconds per document"
+            ]
+          },
+          " versus re-embedding the same content."
+        ],
+        [
+          "Packed retrieved passages into a ",
+          {
+            "t": "b",
+            "c": [
+              "token-budgeted context"
+            ]
+          },
+          " with overlap removal, reducing mean retrieved-context size from ",
+          {
+            "t": "b",
+            "c": [
+              "6,000 to 3,600 tokens per answer"
+            ]
+          },
+          "."
+        ],
+        [
+          "Separated retrieval evaluation from answer generation, using relevance labels and MRR/nDCG to compare chunking and reranking choices on development queries while reserving final-test queries for reporting."
+        ]
+      ],
+      "links": [
+        {
+          "kind": "code",
+          "url": "https://github.com/Elaakarsh31/GPTBot"
+        }
+      ],
+      "stack": [
+        "LangChain",
+        "RAG",
+        "FAISS",
+        "GPT-4",
+        "Chainlit",
+        "Firebase",
+        "Transformer",
+        "API Integration",
+        "Document Retrieval",
+        "Chunking/Reranking Evaluation",
+        "User Authentication",
+        "Session Management"
+      ]
+    }
+  ],
+  "publications": [
+    {
+      "title": "EcoSurve: AI-Powered Surveillance Video Summarization",
+      "date": "Mar 2026",
+      "bullets": [
+        [
+          "Built UniVTG VLM summarization + BERT-RAG QnA pipeline, improving retrieval grounding and summary relevance across surveillance video queries."
+        ]
+      ],
+      "links": [
+        {
+          "kind": "paper",
+          "url": "https://link.springer.com/chapter/10.1007/978-3-032-26217-2_6"
+        },
+        {
+          "kind": "code",
+          "url": "https://github.com/Elaakarsh31/EcoSurve-VLM-powered-Crime-Footage-Summarization"
+        }
+      ],
+      "venue": "CVC, Springer"
+    },
+    {
+      "title": "Chicken Disease Multiclass classification",
+      "date": "May 2023",
+      "bullets": [
+        [
+          "Developed and deployed 12 CNN models for categorical classification and proposed ChicNetV6 model achieved an efficiency score of ",
+          {
+            "t": "b",
+            "c": [
+              "2.8198"
+            ]
+          },
+          " and an accuracy of ",
+          {
+            "t": "b",
+            "c": [
+              "94.49%"
+            ]
+          },
+          "."
+        ]
+      ],
+      "links": [
+        {
+          "kind": "paper",
+          "url": "https://link.springer.com/chapter/10.1007/978-981-19-9331-2_19"
+        },
+        {
+          "kind": "code",
+          "url": "https://github.com/Elaakarsh31/Chicken-Disease-Classification"
+        }
+      ],
+      "venue": "ICITA Conference, Springer"
+    },
+    {
+      "title": "Semantic Segmentation of Retinal Vessels",
+      "date": "Aug 2023",
+      "bullets": [
+        [
+          "Implemented Semantic Segmentation technique using ",
+          {
+            "t": "b",
+            "c": [
+              "Attention UNET+ResNET"
+            ]
+          },
+          ", oversampled data using ",
+          {
+            "t": "b",
+            "c": [
+              "GAN"
+            ]
+          },
+          " and creating image patches, applying ",
+          {
+            "t": "b",
+            "c": [
+              "Gabor filter"
+            ]
+          },
+          ", achieving accuracy of ",
+          {
+            "t": "b",
+            "c": [
+              "97%"
+            ]
+          },
+          "."
+        ]
+      ],
+      "links": [
+        {
+          "kind": "paper",
+          "url": "https://ieeexplore.ieee.org/abstract/document/10053840"
+        },
+        {
+          "kind": "code",
+          "url": "https://colab.research.google.com/drive/1JQ-6DLyqRbs7589cfOMndfEZ_UR9Gaxn?usp=sharing"
+        }
+      ],
+      "venue": "OITS Conference, IEEE"
+    }
+  ],
+  "education": [
+    {
+      "institution": "Northeastern University",
+      "degree": "Master of Science in Artificial Intelligence",
+      "dates": "Sep 2024 – Dec 2026"
+    },
+    {
+      "institution": "Kalinga Institute of Industrial Technology",
+      "degree": "Bachelor of Technology in Computer Science",
+      "dates": "Sep 2020 – May 2024"
+    }
+  ],
+  "skills": [
+    {
+      "category": "Languages",
+      "items": [
+        "Python",
+        "C++",
+        "C",
+        "HTML",
+        "JavaScript",
+        "SQL",
+        "C++17",
+        "Java",
+        "Go",
+        "Scala",
+        "R",
+        "TypeScript",
+        "Shell scripting",
+        "C++ (C++17)",
+        "Java (11/17+)",
+        "C#",
+        "Rust",
+        "CUDA",
+        "Bash / Shell",
+        "PowerShell",
+        "Kotlin",
+        "Power Query M",
+        "Salesforce Object Query Language (SOQL)",
+        "Transact-SQL (T-SQL)",
+        "SAS",
+        "Bash / Unix shell scripting",
+        "MATLAB",
+        "HTML5",
+        "MDX"
+      ]
+    },
+    {
+      "category": "ML & data libraries",
+      "items": [
+        "PyTorch",
+        "TensorFlow",
+        "scikit-learn",
+        "Hugging Face",
+        "TensorFlow Hub",
+        "Unsloth",
+        "JAX",
+        "PyTorch Lightning",
+        "torchaudio",
+        "torchvision",
+        "torchmetrics",
+        "Transformers (Hugging Face)",
+        "Datasets (Hugging Face)",
+        "TRL",
+        "Axolotl",
+        "LLaMA-Factory",
+        "Pandas",
+        "NumPy",
+        "NLTK",
+        "Matplotlib",
+        "Seaborn",
+        "OpenCV",
+        "MoviePy",
+        "tf.data",
+        "Hugging Face Transformers",
+        "PySpark",
+        "Polars",
+        "XGBoost",
+        "ONNX",
+        "OpenCV DNN",
+        "Apple Silicon MPS",
+        "Streamlit",
+        "Exploratory Data Analysis (EDA)",
+        "Correlation heatmaps",
+        "Trend plots",
+        "statsmodels",
+        "Keras"
+      ]
+    },
+    {
+      "category": "Machine learning methods",
+      "items": [
+        "Regression",
+        "Classification",
+        "Clustering",
+        "Random Forest",
+        "SVM",
+        "Sentiment analysis",
+        "Optimization techniques",
+        "Linear regression",
+        "Multinomial Naive Bayes",
+        "TF-IDF",
+        "Feature engineering",
+        "Dimensionality reduction",
+        "Principal component analysis (PCA)",
+        "Singular value decomposition (SVD)",
+        "Nearest-neighbor classification",
+        "Euclidean distance",
+        "Sum of squared differences (SSD)",
+        "Supervised learning",
+        "Unsupervised learning",
+        "Statistical modeling",
+        "Predictive analytics",
+        "Forecasting",
+        "Time-series modeling",
+        "Gradient boosting",
+        "Ensemble methods",
+        "Anomaly detection",
+        "Representation learning",
+        "Multi-task learning",
+        "Predictive maintenance",
+        "Natural language processing (NLP)",
+        "Support vector machines (SVM)",
+        "PCA",
+        "SVD",
+        "Sequential sentence classification",
+        "Quantitative natural language inference",
+        "Information extraction",
+        "Text summarization",
+        "Named-entity recognition (NER)",
+        "Topic modeling",
+        "Multi-label classification",
+        "Recommender systems",
+        "Ranking/search",
+        "Graph methods",
+        "Predictive modeling",
+        "Prescriptive modeling",
+        "Time-series analysis / forecasting",
+        "support vector machines (SVMs)",
+        "K-means",
+        "nearest neighbors (1-NN)",
+        "class-imbalance handling",
+        "standard-deviation-normalized Euclidean distance",
+        "sum-of-squared-differences (SSD) matching",
+        "distance-threshold unknown-object rejection",
+        "supervised / unsupervised learning",
+        "inverse-frequency class weighting",
+        "anomaly / pattern detection",
+        "model calibration",
+        "CHAID",
+        "CART",
+        "association rules",
+        "sequence analysis",
+        "partial least squares (PLS)",
+        "data mining",
+        "modeling with delayed or incomplete labels",
+        "1-nearest neighbor (1-NN)",
+        "One-hot encoding",
+        "Feature importance",
+        "Target leakage prevention",
+        "Grid search",
+        "Cross-validation",
+        "Confusion matrices",
+        "Micro-F1 / macro-F1",
+        "Precision / recall",
+        "Perplexity",
+        "RMSE",
+        "R-squared",
+        "Ablation studies",
+        "AdamW",
+        "Cross-entropy loss",
+        "Train/validation/test splits",
+        "Statistics",
+        "Time-series analysis",
+        "A/B testing and experimentation",
+        "Reinforcement learning"
+      ]
+    },
+    {
+      "category": "Deep learning",
+      "items": [
+        "Transformers",
+        "LLMs",
+        "Deep learning",
+        "CNN",
+        "Conv1D",
+        "RNN",
+        "GRU",
+        "Bi-LSTM",
+        "Attention U-Net",
+        "ResNet18",
+        "ResNet",
+        "ChicNetV6",
+        "UniVTG",
+        "GAN",
+        "BERT",
+        "Flan-T5",
+        "Llama",
+        "GPT-style decoder-only models",
+        "Causal self-attention",
+        "Positional embeddings",
+        "Residual connections",
+        "Layer normalization",
+        "Dropout",
+        "Regularization",
+        "Dice loss",
+        "Binary cross-entropy (BCE)",
+        "Foundation models",
+        "Vision-language models (VLMs)",
+        "Multimodal models",
+        "Diffusion models",
+        "Autoregressive models",
+        "Autoencoders",
+        "Graph neural networks (GNNs)",
+        "Time-Series Foundation Models (TSFM)",
+        "Self-supervised learning",
+        "Transfer learning",
+        "Decoder-only architectures",
+        "Multi-head attention",
+        "Autoregressive inference",
+        "Multinomial sampling",
+        "GloVe",
+        "Universal Sentence Encoder (USE)",
+        "Neural networks",
+        "Embedding models",
+        "Distributed training",
+        "causal / multi-head attention",
+        "CNN / Conv1D",
+        "ResNet / ResNet18",
+        "GANs",
+        "autoregressive / multinomial sampling",
+        "Computer vision",
+        "Decoder-only Transformers",
+        "Semantic segmentation",
+        "Image patches",
+        "Gabor filters",
+        "Hu moments",
+        "Morphological image processing",
+        "Object recognition",
+        "Unknown-object rejection"
+      ]
+    },
+    {
+      "category": "Training, tuning & embeddings",
+      "items": [
+        "Hyperparameter grid search",
+        "Fine-tuning",
+        "Instruction tuning",
+        "Universal Sentence Encoder",
+        "Token embeddings",
+        "Character embeddings",
+        "Tokenization",
+        "Supervised fine-tuning (SFT)",
+        "LoRA",
+        "Parameter-efficient fine-tuning (PEFT)",
+        "Training optimization",
+        "Pretraining",
+        "Continued pretraining",
+        "Dialogue fine-tuning",
+        "Domain adaptation",
+        "Model distillation (knowledge distillation)",
+        "Optimizer design",
+        "Curriculum learning",
+        "GPU-budget-aware sampling",
+        "Low-Rank Adaptation (LoRA)",
+        "Adapter checkpoints",
+        "Post-training (supervised fine-tuning)",
+        "Direct Preference Optimization (DPO)",
+        "Group Relative Policy Optimization (GRPO)",
+        "Reinforcement learning (RL)",
+        "RL environments",
+        "Reward design",
+        "Reward hacking detection",
+        "Trajectory curation",
+        "Training-data versioning",
+        "Embedding generation",
+        "Dataset preprocessing",
+        "Character-level modeling",
+        "ML dataset construction",
+        "Vector databases",
+        "Vector schemas",
+        "Reinforcement Learning from Human Feedback (RLHF)",
+        "Preference datasets",
+        "Synthetic data curation",
+        "Human-annotated data",
+        "Distributed model inference",
+        "Model monitoring",
+        "Concept drift detection",
+        "numerical reasoning",
+        "token / character / sentence embeddings",
+        "GPT-2",
+        "GPT-4",
+        "numerical input reframing",
+        "text mining",
+        "semantic search"
+      ]
+    },
+    {
+      "category": "RL & alignment",
+      "items": [
+        "Imitation learning",
+        "RLHF",
+        "RLAIF",
+        "RL from verifiable rewards (RLVR)",
+        "PPO",
+        "GRPO",
+        "Reward modeling",
+        "Alignment",
+        "Reward hacking",
+        "Out-of-distribution generalization",
+        "Environment design"
+      ]
+    },
+    {
+      "category": "LLMs & generative AI",
+      "items": [
+        "LangChain",
+        "LangGraph",
+        "Gemini",
+        "Claude",
+        "RAG",
+        "Knowledge graphs",
+        "Ontologies",
+        "Agentic AI (AI agents)",
+        "Prompt engineering",
+        "ElevenLabs",
+        "Text-to-speech (TTS)",
+        "Pydantic",
+        "Structured outputs",
+        "Chain-of-thought prompting",
+        "Multi-agent workflows",
+        "StateGraph",
+        "Map-reduce fan-out",
+        "State reducers",
+        "Checkpointing",
+        "Human-in-the-loop gates",
+        "Intent classification",
+        "Context management",
+        "Natural language inference",
+        "Question answering",
+        "LlamaIndex",
+        "CrewAI",
+        "Semantic Kernel",
+        "Model Context Protocol (MCP)",
+        "MCP servers",
+        "OpenAI API",
+        "Function calling",
+        "Tool calling",
+        "Planning",
+        "Planner/executor orchestration",
+        "Router/specialist orchestration",
+        "Agent handoff",
+        "Agent memory",
+        "Computer-use agents",
+        "Long-horizon agents",
+        "Automatic speech recognition (ASR)",
+        "Natural language understanding",
+        "Model gateways",
+        "Vendor abstraction",
+        "Qwen",
+        "Mistral",
+        "DeepSeek",
+        "Large language models (LLMs)",
+        "Generative AI",
+        "Anthropic Claude (3.5 Sonnet, Sonnet 4)",
+        "Google Gemini",
+        "OpenAI GPT-4",
+        "Anthropic API/SDK",
+        "Open-weight models",
+        "GLM",
+        "GPT-OSS",
+        "Kimi",
+        "Multimodal foundation models",
+        "Prompt optimization",
+        "Ontology-guided extraction",
+        "Uncertainty flags",
+        "Prompt versioning",
+        "Token budgeting",
+        "Context packing",
+        "Passage overlap removal",
+        "System prompt design",
+        "Prompt libraries",
+        "Context-window management",
+        "Prompt management",
+        "multimodal AI",
+        "retrieval-augmented generation (RAG)",
+        "LLM-as-judge",
+        "LLM evaluation",
+        "structured output",
+        "grounding",
+        "hallucination guardrails",
+        "human-in-the-loop review",
+        "model benchmarking",
+        "reasoning evaluation",
+        "relevance evaluation",
+        "hallucination / robustness / bias evaluation",
+        "Anthropic Claude",
+        "Agentic AI",
+        "LLM-as-judge evaluation",
+        "LLM guardrails",
+        "AI output validation",
+        "Tool / function calling",
+        "Agent skills",
+        "Prompt and configuration management",
+        "LLM-generated code evaluation",
+        "AI-assisted development",
+        "GitHub Copilot",
+        "Cursor",
+        "Claude Code",
+        "OpenAI Codex"
+      ]
+    },
+    {
+      "category": "Agents & orchestration",
+      "items": [
+        "AI agents (agentic AI)",
+        "Multi-agent systems",
+        "Agent orchestration",
+        "Human-in-the-loop (HITL)",
+        "Deterministic workflow gates",
+        "AutoGen",
+        "Microsoft Agent Framework",
+        "Google Agent Development Kit (ADK)",
+        "PydanticAI",
+        "Agent2Agent (A2A)",
+        "Consent workflows",
+        "Human escalation",
+        "Schema validation",
+        "Agent planning",
+        "Multi-step reasoning",
+        "Agent memory (session/history state)",
+        "Session recording/replay",
+        "Human takeover",
+        "Context compaction",
+        "Model selection and routing",
+        "Agent harnesses",
+        "Agent lifecycle management",
+        "Prompt chaining",
+        "Structured tool execution",
+        "Anthropic Claude / Claude Sonnet",
+        "Agentic AI / AI agents",
+        "deterministic gates",
+        "checkpointers / SqliteSaver",
+        "JSON schemas",
+        "AI copilots",
+        "Claude Code / AI coding assistants"
+      ]
+    },
+    {
+      "category": "Retrieval, search & ranking",
+      "items": [
+        "Embeddings",
+        "Vector search",
+        "Information retrieval",
+        "Retrieval evaluation",
+        "Mean reciprocal rank (MRR)",
+        "Normalized discounted cumulative gain (nDCG)",
+        "Chunking",
+        "Reranking",
+        "Ranking models",
+        "Personalization",
+        "Embedding-based retrieval",
+        "Multi-stage rankers",
+        "Candidate extraction",
+        "Generative recommendation",
+        "User behavior modeling",
+        "User sequence modeling",
+        "Long-sequence modeling",
+        "Typesense",
+        "Nearest-neighbor search",
+        "Source provenance",
+        "FAISS",
+        "Vector indexing",
+        "Content-hash embedding reuse",
+        "Pinecone",
+        "Weaviate",
+        "Chroma (ChromaDB)",
+        "Milvus",
+        "Knowledge grounding",
+        "Knowledge-graph retrieval",
+        "Semantic layers",
+        "Vector search / similarity search",
+        "Narrative retrieval",
+        "Temporal relevance filtering",
+        "Chapter-local fact indexing",
+        "Elasticsearch",
+        "Apache Lucene",
+        "Apache Solr",
+        "Search-index distribution",
+        "Search-index freshness"
+      ]
+    },
+    {
+      "category": "Evaluation & metrics",
+      "items": [
+        "Model evaluation",
+        "Error analysis",
+        "Macro-F1",
+        "Micro-F1",
+        "Weighted F1",
+        "Precision",
+        "Recall",
+        "Accuracy",
+        "Top-k accuracy",
+        "Ground-truth quality analysis",
+        "Field-level evaluation",
+        "Explainability",
+        "Reproducibility",
+        "Controlled experiments",
+        "Experiment tracking",
+        "Hyperparameter tuning",
+        "Calibration",
+        "Robustness",
+        "Consistency regularization",
+        "Robustness analysis",
+        "KL divergence",
+        "Temperature scaling",
+        "Expected calibration error (ECE)",
+        "Reliability diagrams",
+        "Loss ablation",
+        "Boundary F1",
+        "Source-image-disjoint evaluation",
+        "Split provenance",
+        "Experimental design",
+        "A/B testing",
+        "Measurement bias",
+        "Benchmarking",
+        "Distribution shift",
+        "Human feedback analysis",
+        "Autorater development",
+        "Reward over-optimization",
+        "Benchmark overfitting",
+        "lm-evaluation-harness",
+        "SWE-bench",
+        "Causal inference",
+        "Causal ML",
+        "Operations research",
+        "Convex optimization",
+        "Linear programming",
+        "Mathematical optimization",
+        "Multi-objective optimization",
+        "Algorithmic game theory",
+        "Demand estimation",
+        "LLM-as-a-judge",
+        "Model evaluation / LLM evaluation",
+        "Field-level metrics",
+        "Regression testing",
+        "Unit testing",
+        "Macro-/micro-/weighted F1",
+        "Train/validation splits",
+        "Golden datasets",
+        "Evaluation rubrics",
+        "Hallucination evaluation",
+        "Groundedness evaluation",
+        "Bias evaluation",
+        "Generalization testing",
+        "Offline evaluation",
+        "Online evaluation",
+        "Model drift detection",
+        "Model monitoring (training/validation metrics)",
+        "Automated evaluation pipelines",
+        "Continuous LLM regression testing",
+        "Agent evaluation",
+        "Statistics / statistical analysis",
+        "Reply faithfulness evaluation",
+        "Braintrust",
+        "LangSmith",
+        "Langfuse",
+        "F1 / micro-F1 / macro-F1",
+        "baseline comparison",
+        "model interpretation",
+        "ROC-AUC",
+        "KS statistic",
+        "Gini coefficient",
+        "fraud capture rate",
+        "false-positive rate",
+        "customer-friction metrics",
+        "model stability assessment",
+        "fraud-loss evaluation"
+      ]
+    },
+    {
+      "category": "Statistics & study design",
+      "items": [
+        "correlation analysis",
+        "bootstrap confidence intervals",
+        "clustered resampling",
+        "paired model comparison",
+        "effect sizes",
+        "probability theory",
+        "distributions",
+        "descriptive statistics",
+        "univariate / bivariate analysis",
+        "hypothesis / significance testing",
+        "t-tests",
+        "econometrics",
+        "multivariate analysis",
+        "generalized linear models (GLMs)",
+        "logistic regression",
+        "sampling",
+        "blocked randomization",
+        "blinded review",
+        "a priori power analysis",
+        "grouped evaluation partitions",
+        "development / final-evaluation separation",
+        "randomized controlled trials",
+        "multi-cell / geo experiments",
+        "holdouts / holdbacks",
+        "statistical analysis plans",
+        "survey design / validation",
+        "clinically meaningful change",
+        "survey sample weighting",
+        "propensity score methods",
+        "interrupted time series",
+        "difference-in-differences",
+        "regression discontinuity",
+        "mediation / moderation analysis",
+        "uplift modeling",
+        "heterogeneous treatment effects",
+        "incrementality measurement",
+        "mixed-effects models",
+        "survival analysis",
+        "confirmatory factor analysis (CFA)",
+        "internal consistency",
+        "measurement invariance",
+        "item response theory (IRT)",
+        "latent class analysis",
+        "latent class growth analysis (LCGA)",
+        "growth mixture modeling",
+        "Reliable Change Index (RCI)",
+        "minimal clinically important difference (MCID)",
+        "response / remission analysis",
+        "real-world evidence"
+      ]
+    },
+    {
+      "category": "Forecasting & simulation",
+      "items": [
+        "rolling-origin backtesting",
+        "seasonal-naive baselines",
+        "residual diagnostics",
+        "horizon-specific MAE",
+        "prediction-interval coverage",
+        "seasonality",
+        "demand / supply / sales / operations forecasting",
+        "mathematical / econometric modeling",
+        "simulation",
+        "mechanistic / hybrid modeling",
+        "digital twins",
+        "virtual experimentation",
+        "metabolic / process modeling",
+        "network / social network models",
+        "genetic algorithms"
+      ]
+    },
+    {
+      "category": "Data preparation & quality",
+      "items": [
+        "ETL",
+        "Data preprocessing",
+        "Deduplication",
+        "Normalization",
+        "Metadata enrichment",
+        "OCR",
+        "Data labeling",
+        "Data leakage prevention",
+        "JSON",
+        "CSV",
+        "Oversampling",
+        "Image patching",
+        "SQL schema design",
+        "SQL query optimization",
+        "Reproducible ML workflows",
+        "Data lineage",
+        "Data versioning",
+        "Training-serving consistency",
+        "Population stability index (PSI)",
+        "Data quality gates",
+        "Freshness checks",
+        "Batch quarantine",
+        "Data curation",
+        "Annotation workflows",
+        "Quality filtering",
+        "Decontamination",
+        "PII scrubbing",
+        "Synthetic data generation",
+        "Feature stores",
+        "Model-ready datasets",
+        "Data modeling",
+        "Data warehousing",
+        "Streaming data",
+        "Telemetry processing",
+        "Windowing",
+        "data cleaning / preprocessing",
+        "missing-value handling",
+        "categorical / one-hot encoding",
+        "feature selection",
+        "scikit-learn Pipeline",
+        "ColumnTransformer",
+        "fold-local preprocessing",
+        "preprocessing caching",
+        "regular expressions",
+        "filtering / indexing",
+        "interpolation",
+        "outlier treatment",
+        "data wrangling / harmonization",
+        "multiple imputation",
+        "Field-level evaluation metrics",
+        "Root cause analysis",
+        "Page/line provenance",
+        "Metric definitions",
+        "Data profiling",
+        "Data reconciliation",
+        "Metadata management",
+        "Data Quality",
+        "Data Validation",
+        "Data Governance",
+        "Data contracts",
+        "Join-cardinality checks",
+        "Data quarantine",
+        "Data grain documentation",
+        "dbt data tests",
+        "Dataset versioning",
+        "Dataset manifests",
+        "Content hashing",
+        "Raw-data snapshots",
+        "Split isolation",
+        "Preprocessing artifact caching",
+        "Completeness checks",
+        "Source-to-target mapping",
+        "Data dictionaries",
+        "Data freshness",
+        "Data catalogs",
+        "Data stewardship",
+        "Entity resolution",
+        "Source precedence",
+        "Schema evolution",
+        "Great Expectations",
+        "Monte Carlo",
+        "Atlan",
+        "Microsoft Purview",
+        "Collibra",
+        "Alation"
+      ]
+    },
+    {
+      "category": "Data processing & pipelines",
+      "items": [
+        "Databricks",
+        "Partition pruning",
+        "Column projection",
+        "Spark",
+        "Hadoop",
+        "Hive",
+        "Ray",
+        "Kafka",
+        "Flink",
+        "Airflow",
+        "Argo Workflows",
+        "Snowflake",
+        "BigQuery",
+        "NoSQL",
+        "MongoDB",
+        "Supabase",
+        "Prisma",
+        "ETL pipelines",
+        "Batch processing",
+        "Apache Spark",
+        "Distributed data processing",
+        "Incremental loading",
+        "MERGE upserts",
+        "Watermarks",
+        "Late-arriving data",
+        "Spark SQL",
+        "ELT",
+        "Apache Hadoop",
+        "Apache Hive",
+        "Apache Flink",
+        "Batch backfills",
+        "Micro-batch processing",
+        "Structured",
+        "semi-structured and unstructured data",
+        "Retry handling",
+        "Backpressure",
+        "Bounded concurrency",
+        "asyncio",
+        "Semaphores",
+        "API quota management",
+        "Apache Kafka",
+        "Spark Structured Streaming",
+        "Event-driven architectures",
+        "Real-time data pipelines",
+        "Durable queues",
+        "At-least-once processing",
+        "Idempotent processing",
+        "Redelivery",
+        "Fivetran",
+        "Qlik Replicate",
+        "Qlik Compose",
+        "Informatica",
+        "SQL Server Integration Services (SSIS)",
+        "Apache Airflow",
+        "DAG dependencies",
+        "Task-level retries",
+        "Prefect",
+        "Dagster",
+        "Astronomer",
+        "Cloud Composer",
+        "Azure Data Factory",
+        "AWS Step Functions",
+        "Workflow scheduling"
+      ]
+    },
+    {
+      "category": "Storage, warehouses & databases",
+      "items": [
+        "Query optimization",
+        "Data normalization",
+        "SQLite / SqliteSaver",
+        "CSV processing",
+        "Nullability checks",
+        "Run manifests",
+        "PostgreSQL",
+        "Oracle Database",
+        "SQL Server",
+        "Redis",
+        "Snowflake Cortex",
+        "dbt",
+        "Delta Lake",
+        "Airbyte",
+        "Data warehouses",
+        "Data lakes",
+        "Star schemas",
+        "Dimensional modeling",
+        "Indexing",
+        "Partitioning",
+        "Transactions",
+        "Backfills",
+        "Schema drift",
+        "Master data management",
+        "Schema design",
+        "Schema optimization",
+        "Data marts",
+        "Fact and dimension tables",
+        "Data grain",
+        "Referential integrity",
+        "SQL views",
+        "Lakehouse architecture",
+        "Kimball modeling",
+        "Inmon modeling",
+        "Medallion architecture",
+        "Semantic data models",
+        "Logical and physical data models",
+        "Denormalization",
+        "Slowly Changing Dimensions (SCD)",
+        "dbt snapshots",
+        "Incremental dbt models",
+        "Online Analytical Processing (OLAP)",
+        "Data Mesh",
+        "Object storage",
+        "Apache Parquet",
+        "Columnar storage",
+        "Apache Arrow",
+        "Apache Iceberg",
+        "DuckLake",
+        "XML",
+        "Storage-layout optimization",
+        "Compaction",
+        "Data indexing",
+        "Data retention",
+        "Data lifecycle management",
+        "Firebase",
+        "SQLite",
+        "SQL joins",
+        "Relational databases",
+        "SQL Query Optimization / Performance Tuning",
+        "Amazon Aurora PostgreSQL",
+        "MySQL",
+        "MongoDB aggregation pipelines",
+        "NoSQL databases",
+        "Microsoft SQL Server",
+        "DuckDB",
+        "Amazon DynamoDB",
+        "Apache Cassandra",
+        "Amazon Keyspaces",
+        "Amazon ElastiCache",
+        "Document stores",
+        "Key-value stores",
+        "Graph databases",
+        "Column-family stores",
+        "Stored procedures",
+        "SQL window functions",
+        "Sharding",
+        "SQL aggregations",
+        "SQL schemas / joins",
+        "S3-backed JSON / CSV outputs",
+        "data modeling / architecture",
+        "relational / NoSQL databases",
+        "data integration",
+        "Apache Spark / PySpark",
+        "intermediate caching",
+        "feature-table refresh optimization",
+        "Hadoop / Hive",
+        "Oracle",
+        "Amazon Redshift",
+        "Google BigQuery",
+        "real-time / streaming pipelines",
+        "Ab Initio",
+        "Talend"
+      ]
+    },
+    {
+      "category": "Web, APIs & software engineering",
+      "items": [
+        "FastAPI",
+        "Django",
+        "REST APIs",
+        "Chainlit",
+        "JWT",
+        "ContextVar",
+        "Flask",
+        "React",
+        "APIs",
+        "SDKs",
+        "Microservices",
+        "Event-driven architecture",
+        "Backend services",
+        "Concurrency",
+        "Data structures",
+        "Algorithms",
+        "System design",
+        "Software design patterns",
+        "Next.js",
+        "Node.js",
+        "Angular",
+        "Vue.js",
+        "Spring Boot",
+        "Java EE (J2EE)",
+        ".NET",
+        "ASP.NET Core",
+        "React Native",
+        "Session management",
+        "Typed tool interfaces",
+        "CSS",
+        "GraphQL",
+        "OpenAPI",
+        "API versioning",
+        "SDK development",
+        "API lifecycle management",
+        "gRPC",
+        "WebSockets",
+        "Webhooks",
+        "Full-stack development",
+        "UI/UX",
+        "Web accessibility",
+        "Cursor/keyset pagination",
+        "JWT authentication",
+        "API integrations",
+        "Web Services",
+        "Service-Oriented Architecture (SOA)",
+        "Software Development Kits (SDKs)",
+        "role-based access control",
+        "reusable automation scripts",
+        "no-code / low-code automation",
+        "robotic process automation (RPA)",
+        "Power Platform",
+        "Microsoft Power Apps",
+        "Microsoft Copilot Studio",
+        "Microsoft 365 Copilot",
+        "Technical documentation",
+        "Data structures and algorithms",
+        "Complexity analysis",
+        "Object-oriented design",
+        "Design patterns",
+        "Operating systems",
+        "Processes",
+        "Networking (HTTP, TCP, DNS)",
+        "Test-driven development",
+        "Integration testing",
+        "Stress/load testing",
+        "Performance testing",
+        "Secure code review",
+        "Software development lifecycle (SDLC)",
+        "Agile/Scrum",
+        "Requirements analysis",
+        "Acceptance criteria",
+        "Architecture decision records",
+        "Reusable SDKs",
+        "Internal developer platforms",
+        "Service catalogs"
+      ]
+    },
+    {
+      "category": "Cloud platforms",
+      "items": [
+        "AWS",
+        "Azure",
+        "Amazon S3",
+        "Amazon Textract",
+        "Amazon Bedrock",
+        "Amazon SageMaker",
+        "AWS Converse API",
+        "Render",
+        "Amazon CloudWatch",
+        "AWS IAM",
+        "GCP",
+        "Vertex AI",
+        "Azure Machine Learning",
+        "Azure Cognitive Services",
+        "Azure Databricks",
+        "AWS Ultraclusters",
+        "Amazon EMR",
+        "Amazon ECS",
+        "Amazon EKS",
+        "GKE",
+        "AKS",
+        "OpenShift",
+        "Modal",
+        "Baseten",
+        "Imagen",
+        "Veo",
+        "Gemini API",
+        "Elastic GPU platforms",
+        "Serverless computing",
+        "Amazon Web Services (AWS)",
+        "Document OCR",
+        "Bedrock Converse API",
+        "AWS Trainium",
+        "AWS Neuron SDK",
+        "Neuron Kernel Interface (NKI)",
+        "Microsoft Azure",
+        "Azure OpenAI",
+        "Microsoft Foundry (Azure AI Foundry)",
+        "Foundry Agent Service",
+        "Azure AI Search",
+        "Azure Functions",
+        "Azure Kubernetes Service (AKS)",
+        "Azure API Management",
+        "Azure Synapse Analytics",
+        "Azure App Service",
+        "Azure Cosmos DB",
+        "Microsoft Entra ID",
+        "Managed Identities",
+        "Azure DevOps (Boards, Repos, Pipelines, Artifacts)",
+        "Google Cloud Platform (GCP)",
+        "Google Gemini Agent Builder",
+        "Google Cloud Pub/Sub",
+        "Cloud-native architecture",
+        "Serverless platforms",
+        "PaaS",
+        "Kubernetes",
+        "Helm",
+        "Kubernetes operators",
+        "Service discovery",
+        "Service mesh",
+        "API gateways",
+        "Apigee",
+        "Kong",
+        "Amazon Bedrock Converse API",
+        "Amazon Athena",
+        "AWS Glue",
+        "AWS Glue Jobs",
+        "Amazon Kinesis",
+        "Amazon Data Firehose",
+        "Federated data lakes",
+        "AWS Identity and Access Management (IAM)",
+        "S3 prefix policies",
+        "AWS Lambda",
+        "AWS Fargate",
+        "Amazon EventBridge",
+        "Amazon SNS",
+        "AWS CloudFormation",
+        "Infrastructure as Code (IaC)",
+        "Microsoft Fabric",
+        "Fabric Event Streams",
+        "Azure Event Hubs",
+        "Dataflow",
+        "Cloud Functions",
+        "Pub/Sub",
+        "Cloud Storage",
+        "Oracle Cloud Infrastructure (OCI)",
+        "cloud application integration",
+        "Azure Storage",
+        "Databricks Jobs"
+      ]
+    },
+    {
+      "category": "MLOps, DevOps & delivery",
+      "items": [
+        "MLOps",
+        "Docker",
+        "Git",
+        "GitHub",
+        "Automated testing",
+        "MLflow",
+        "Model registries",
+        "CI/CD",
+        "Model promotion gates",
+        "Contract testing",
+        "Model versioning",
+        "Terraform",
+        "Infrastructure as code",
+        "Release rollback",
+        "Deployment configuration",
+        "Retraining gates",
+        "Model revalidation",
+        "Research reproducibility",
+        "LLMOps",
+        "Kubeflow",
+        "Weights & Biases",
+        "GitOps",
+        "GitHub Actions",
+        "GitLab CI/CD",
+        "Azure DevOps",
+        "Jenkins",
+        "Harness",
+        "TeamCity",
+        "Code review",
+        "SDLC",
+        "Agile",
+        "Canary deployment",
+        "Shadow deployment",
+        "Progressive delivery",
+        "Feature flags",
+        "Automated rollouts",
+        "Retraining triggers",
+        "Knative",
+        "KEDA",
+        "Model deployment",
+        "Release gates",
+        "Rollback",
+        "DevOps",
+        "DevSecOps",
+        "Ansible",
+        "Salt",
+        "Configuration as code",
+        "Build pipelines",
+        "Release management",
+        "Staged rollouts",
+        "Container security",
+        "Retraining workflows",
+        "Dependency management",
+        "Software composition analysis",
+        "Vulnerability remediation",
+        "Versioned inference bundles",
+        "Model release management",
+        "pytest",
+        "Schema compatibility testing",
+        "OpenTofu",
+        "GitLab",
+        "GitHub Enterprise",
+        "DataOps",
+        "Automated data testing",
+        "Configuration management",
+        "Controlled releases",
+        "Dev/QA/production environments",
+        "Anaconda",
+        "IntelliJ IDEA",
+        "Visual Studio Code",
+        "automated deployment",
+        "statement coverage",
+        "reproducible workflows",
+        "Linux / WSL",
+        "performance optimization",
+        "input / data drift monitoring",
+        "model monitoring / retraining",
+        "observability",
+        "Agile / SAFe",
+        "Jupyter Notebooks",
+        "PuTTY",
+        "performance-degradation monitoring"
+      ]
+    },
+    {
+      "category": "Inference & performance",
+      "items": [
+        "CUDA/CPU fallback",
+        "Selective inference",
+        "Model routing",
+        "Rate-limit-aware retries",
+        "Inference profiling",
+        "Memory reuse",
+        "torch.profiler",
+        "Operator profiling",
+        "CUDA synchronization optimization",
+        "Detached device-side metric accumulation",
+        "Numerical correctness evaluation",
+        "vLLM",
+        "SGLang",
+        "TensorRT",
+        "TensorRT-LLM",
+        "ONNX Runtime",
+        "Triton",
+        "CUTLASS",
+        "llama.cpp",
+        "GPU model serving",
+        "Batch inference",
+        "Streaming inference",
+        "Batching",
+        "Caching",
+        "KV-cache optimization",
+        "Quantization",
+        "FP8",
+        "INT8",
+        "AWQ",
+        "GPTQ",
+        "GGUF",
+        "Sparsity",
+        "Model sparsification",
+        "Model compression",
+        "Attention optimization",
+        "Kernel fusion",
+        "Custom GPU operators",
+        "Speculative execution",
+        "Latency optimization",
+        "Throughput optimization",
+        "Cold-start tuning",
+        "GPU utilization",
+        "Cost attribution",
+        "Model serving",
+        "GPU architecture",
+        "GPU/TPU utilization",
+        "Inference optimization",
+        "Distributed inference",
+        "TensorRT-EdgeLLM",
+        "Torch-TensorRT",
+        "FlashInfer",
+        "CuTeDSL",
+        "TileIR",
+        "TorchDynamo",
+        "TorchInductor",
+        "JIT compilation",
+        "AOT tracing",
+        "Tiling",
+        "Scheduling",
+        "Parallel computing",
+        "Memory management",
+        "Performance profiling",
+        "gdb",
+        "NVIDIA Nsight",
+        "Valgrind",
+        "Flame graphs"
+      ]
+    },
+    {
+      "category": "ML systems & hardware",
+      "items": [
+        "CUDA C++",
+        "Custom CUDA kernels",
+        "CUDAExtension",
+        "Welford reductions",
+        "CUDA memory profiling",
+        "GPU programming",
+        "GPU kernel development",
+        "OpenCL",
+        "Distributed systems",
+        "Multi-GPU execution",
+        "Multi-node execution",
+        "FSDP",
+        "DeepSpeed",
+        "Megatron",
+        "Tensor parallelism",
+        "Pipeline parallelism",
+        "Sequence parallelism",
+        "Training partitioning",
+        "Gradient checkpointing",
+        "GPU scheduling",
+        "Autoscaling",
+        "Multi-tenancy",
+        "Resource isolation",
+        "Spot-preemption recovery",
+        "High-performance computing",
+        "Slurm",
+        "LSF",
+        "Nsight Systems",
+        "Nsight Compute",
+        "GPU memory hierarchy",
+        "Memory bandwidth",
+        "I/O throughput",
+        "Hardware/software co-design",
+        "SIMD",
+        "Vectorization",
+        "ROCm",
+        "TPUs",
+        "ML compilers",
+        "Model compilation",
+        "Graph optimization",
+        "MLIR",
+        "LLVM",
+        "TVM",
+        "XLA",
+        "IREE",
+        "Compiler design",
+        "Async programming",
+        "Request deadlines",
+        "Circuit breakers",
+        "Bounded retries",
+        "RabbitMQ",
+        "MQ",
+        "Celery",
+        "Distributed caching",
+        "Rate limiting",
+        "Fault isolation",
+        "Multi-tenant isolation",
+        "Bulkheads",
+        "Idempotency",
+        "Graceful degradation",
+        "High availability",
+        "Failover",
+        "Disaster recovery",
+        "Capacity planning",
+        "Chaos testing",
+        "SLOs/SLAs",
+        "Response-buffer memory optimization"
+      ]
+    },
+    {
+      "category": "Computer vision & physical AI",
+      "items": [
+        "Image processing",
+        "Image segmentation",
+        "Medical image segmentation",
+        "Gabor filter",
+        "Morphology",
+        "Dynamic thresholding",
+        "Object rejection",
+        "ROI preprocessing",
+        "Video summarization",
+        "Object detection",
+        "Defect detection",
+        "Defect classification",
+        "Metrology",
+        "Object tracking",
+        "Temporal understanding",
+        "3D vision",
+        "Camera calibration",
+        "Localization",
+        "Pose estimation",
+        "Coordinate transformations",
+        "Depth estimation",
+        "3D reconstruction",
+        "SLAM",
+        "Visual-inertial odometry (VIO)",
+        "ROS2",
+        "Sim2Real",
+        "Robot learning",
+        "Vision-language-action (VLA) models",
+        "Sensor fusion",
+        "Signal processing",
+        "Radar",
+        "LiDAR",
+        "Acoustic signals",
+        "Vibration signals",
+        "Ultrasound",
+        "Real-time perception",
+        "Edge inference",
+        "Embedded AI",
+        "SoC architecture",
+        "Compute accelerators",
+        "FPGA prototyping",
+        "RTL design",
+        "Hardware modeling",
+        "Hardware simulators",
+        "One-shot learning",
+        "Morphological operations",
+        "Voice AI",
+        "Real-time video streaming",
+        "GStreamer",
+        "Edge AI",
+        "IoT",
+        "Jetson"
+      ]
+    },
+    {
+      "category": "Control & simulation",
+      "items": [
+        "World models",
+        "Neural simulation",
+        "Autonomous navigation",
+        "Motion planning",
+        "Robot manipulation",
+        "Full-body motion control",
+        "Control theory",
+        "Estimation theory",
+        "Inverse problems",
+        "Uncertainty quantification",
+        "Control Barrier Functions (CBFs)",
+        "Invariant sets",
+        "Hybrid dynamical systems",
+        "Nonlinear control",
+        "Reachability analysis",
+        "Formal verification",
+        "Robust control",
+        "Adaptive control",
+        "Real-time optimization",
+        "Quadratic programming (QP)",
+        "Second-order cone programming (SOCP)",
+        "Reduced-order modeling",
+        "Full-order modeling",
+        "Real-time embedded systems"
+      ]
+    },
+    {
+      "category": "Observability & reliability",
+      "items": [
+        "Debug UIs",
+        "Health checks",
+        "Model performance analysis",
+        "OpenTelemetry",
+        "Distributed tracing",
+        "Latency instrumentation",
+        "Telemetry data minimization",
+        "Prometheus",
+        "Grafana",
+        "Splunk",
+        "Sentry",
+        "Structured logging",
+        "Metrics and alerting",
+        "Application performance monitoring (APM)",
+        "Centralized logging",
+        "Production troubleshooting",
+        "Incident response",
+        "Operational runbooks",
+        "p50/p95 latency",
+        "Token/cost monitoring",
+        "Operational model-service monitoring",
+        "Linux",
+        "Windows Subsystem for Linux (WSL)",
+        "Crash-safe resumption",
+        "Failure-key tracking",
+        "Fault tolerance",
+        "Pipeline observability",
+        "Progress metrics",
+        "Inactivity alerting",
+        "Consistency",
+        "Replication",
+        "Distributed locks",
+        "Leases",
+        "Cluster membership",
+        "Cluster scheduling",
+        "Fair scheduling",
+        "Quotas",
+        "Resource accounting",
+        "Compute allocation",
+        "Control planes",
+        "etcd",
+        "Apache ZooKeeper",
+        "Consensus-backed metadata",
+        "Datadog",
+        "New Relic",
+        "Log aggregation",
+        "Telemetry pipelines",
+        "Alerting",
+        "SLAs",
+        "Runbooks",
+        "FinOps",
+        "Infrastructure cost allocation",
+        "Unit economics"
+      ]
+    },
+    {
+      "category": "Security, privacy & governance",
+      "items": [
+        "Role-based access control (RBAC)",
+        "Authentication",
+        "Authorization",
+        "Consent gates",
+        "Drift detection",
+        "Metrics/logs/traces",
+        "Performance regression testing",
+        "Model cards",
+        "Audit logs",
+        "Audit trails",
+        "Model governance",
+        "Responsible AI",
+        "Fairness evaluation",
+        "Bias mitigation",
+        "Red teaming",
+        "Adversarial evaluation",
+        "AI safety",
+        "AI security",
+        "AI privacy",
+        "Out-of-model guardrails",
+        "Secrets management",
+        "Encryption",
+        "Secure coding",
+        "Risk assessment",
+        "AI-assisted coding",
+        "AI-generated code validation",
+        "Prompt/context engineering",
+        "HIPAA",
+        "CLIA",
+        "GxP",
+        "SOC 2",
+        "IEC 61508",
+        "ISO 13849",
+        "ISO 26262",
+        "Authentication and authorization",
+        "Data-minimizing guardrails",
+        "Secrets isolation",
+        "Server-side tool authorization",
+        "OAuth 2.0",
+        "OpenID Connect (OIDC)",
+        "Least privilege",
+        "Secrets management (request-scoped isolation)",
+        "Data retention controls",
+        "API security",
+        "Input validation",
+        "Bounded execution",
+        "Policy-as-code",
+        "AI governance",
+        "Model risk management",
+        "NIST AI RMF",
+        "EU AI Act",
+        "PCI-scoped data handling",
+        "Privacy risk evaluation",
+        "PII detection",
+        "Redaction",
+        "Masking",
+        "Pseudonymization",
+        "Anonymization",
+        "Differential privacy",
+        "k-anonymity",
+        "Secure aggregation",
+        "Format-preserving encryption",
+        "Leakage tests",
+        "Adversarial re-identification",
+        "Identity verification",
+        "Data minimization",
+        "ContextVar key isolation",
+        "Least-privilege access",
+        "PII minimization",
+        "Row-level security (RLS)",
+        "Column-level security",
+        "PII masking",
+        "Scoped credentials",
+        "Sandboxed execution",
+        "Restricted network access",
+        "Audit logging",
+        "Access entitlements",
+        "PHI handling",
+        "De-identification",
+        "Tokenization for privacy",
+        "HITRUST",
+        "ISO 27001",
+        "NIST CSF",
+        "PCI DSS",
+        "Open Policy Agent (OPA)",
+        "Rego",
+        "Prompt-injection defenses",
+        "reference-label quality",
+        "provenance tracking",
+        "Jira",
+        "Confluence",
+        "data quality / validation / integrity",
+        "dataset development",
+        "scientific research methods",
+        "model explainability",
+        "model validation",
+        "data lineage / traceability",
+        "annotation taxonomies",
+        "data security / privacy",
+        "regulatory data controls (BCBS 239, GLBA, TCPA, CAN-SPAM, GDPR)",
+        "finance / risk / treasury analytics",
+        "accounting constraints / materiality thresholds",
+        "AI fairness / transparency",
+        "annotation frameworks"
+      ]
+    },
+    {
+      "category": "Analytics & BI",
+      "items": [
+        "Tableau",
+        "WSL",
+        "Power BI",
+        "Colab",
+        "VS Code",
+        "PyCharm",
+        "Data visualization",
+        "Alteryx",
+        "ClickHouse",
+        "OLAP",
+        "Conversational analytics",
+        "AI-assisted reporting",
+        "Analytical dashboards",
+        "Analytical data products",
+        "Power BI Service",
+        "DAX",
+        "Calculated columns and measures",
+        "Dashboard performance optimization",
+        "Power BI workspaces and apps",
+        "Looker",
+        "Looker Studio",
+        "Microsoft Excel",
+        "Key Performance Indicators (KPIs)",
+        "SSAS",
+        "SSRS",
+        "Oracle Business Intelligence Enterprise Edition (OBIEE)",
+        "Sigma",
+        "Quarto",
+        "Reporting automation",
+        "Self-service analytics",
+        "dashboards / reporting",
+        "data storytelling",
+        "Excel",
+        "lookup / INDEX-MATCH functions",
+        "Google Sheets",
+        "PowerPoint",
+        "PitchPro+",
+        "Posit",
+        "Spotfire",
+        "QlikView",
+        "D3.js",
+        "SPSS",
+        "Google Workspace"
+      ]
+    },
+    {
+      "category": "Product, marketing & domain analytics",
+      "items": [
+        "SQL analytical reporting",
+        "document-count reconciliation",
+        "cohort-level error analysis",
+        "cohort / funnel / retention analysis",
+        "customer segmentation",
+        "churn / conversion modeling",
+        "customer lifetime value (LTV)",
+        "customer acquisition cost (CAC)",
+        "LTV:CAC",
+        "marketing mix modeling (MMM)",
+        "multi-touch attribution",
+        "ROI modeling",
+        "response / propensity modeling",
+        "price elasticity",
+        "pricing / promotion / inventory optimization",
+        "Earned Media Value (EMV)",
+        "brand lift / discrete-choice models",
+        "event instrumentation / conversion tracking",
+        "product / device / audio telemetry",
+        "event-log analysis",
+        "Google Analytics / GA4",
+        "Google Ads conversion imports",
+        "Google Notification Platform",
+        "Chime mobile push",
+        "Audience Builder",
+        "mobile measurement platforms",
+        "DV360",
+        "The Trade Desk",
+        "Amazon DSP",
+        "martech / adtech measurement",
+        "creator-platform analytics (CreatorIQ)",
+        "GIS",
+        "ArcGIS / ArcGIS Pro",
+        "ArcPy",
+        "GeoPandas",
+        "Geospatial SQL",
+        "geoprocessing / spatial data management",
+        "spatial statistics",
+        "spatiotemporal analysis",
+        "GeoAI",
+        "remote sensing",
+        "environmental-exposure modeling",
+        "statistical process control",
+        "process capability",
+        "quality engineering",
+        "curve metrics / univariate batch analysis",
+        "CHO cell culture / upstream bioprocessing",
+        "nutrient / metabolite / cell-growth / viability / productivity modeling",
+        "media / feeding strategies",
+        "bioreactor operation",
+        "process analytical technology (PAT)",
+        "LIMS",
+        "ELN",
+        "MES",
+        "Historian",
+        "Qumas",
+        "OPM",
+        "omics / biomarker / preclinical safety data integration",
+        "CAPA / change control"
+      ]
+    },
+    {
+      "category": "Enterprise integrations & data standards",
+      "items": [
+        "Salesforce APIs",
+        "SOQL",
+        "Salesforce Flows",
+        "Gong",
+        "Slack API",
+        "Slack Bolt",
+        "HubSpot",
+        "People.ai",
+        "SAP",
+        "Coupa",
+        "Microsoft Power Platform",
+        "Dynamics 365",
+        "Microsoft Copilot",
+        "n8n",
+        "Zapier",
+        "Temporal",
+        "EHR integrations",
+        "FHIR",
+        "LOINC",
+        "RxNorm",
+        "SFTP",
+        "Batch-file integrations",
+        "Fixed-width parsing",
+        "Stripe APIs",
+        "Adyen APIs",
+        "Fiserv",
+        "TSYS",
+        "Repay",
+        "Salesforce",
+        "Salesforce data model",
+        "Marketo",
+        "CRM / ATS data integration",
+        "Lever",
+        "Workday",
+        "Palantir Foundry",
+        "Contour",
+        "Google Ads API",
+        "Meta advertising APIs",
+        "Amazon Ads",
+        "Adobe Analytics",
+        "UTM attribution",
+        "ROAS / CPA / CTR metrics",
+        "Marketing funnel metrics",
+        "DMP / DSP data",
+        "Innovid",
+        "LiveRamp",
+        "Google Display & Video",
+        "Yahoo DSP",
+        "Clari",
+        "Aviso",
+        "Bloomberg data",
+        "FactSet data",
+        "Web scraping",
+        "OCR API integration",
+        "Enterprise Integration Patterns (EIP)",
+        "HL7",
+        "CCD / CCDA",
+        "OMOP Common Data Model",
+        "ICD-10",
+        "CPT",
+        "HCPCS",
+        "SNOMED CT",
+        "NDC",
+        "UMLS",
+        "Health Information Exchanges (HIE)",
+        "Achilles",
+        "Data Quality Dashboard (DQDB)",
+        "PDB",
+        "UniProt",
+        "ChEMBL",
+        "SDF / MOL",
+        "FASTA",
+        "MCAP",
+        "Point clouds",
+        "Time-series telemetry",
+        "OPC UA",
+        "MQTT",
+        "Serial communication",
+        "LIMS / ELN / MES integration",
+        "Process historians",
+        "Electronic batch records",
+        "cGMP data integrity",
+        "21 CFR Part 11",
+        "GAMP 5",
+        "Computerized-system validation"
+      ]
+    },
+    {
+      "category": "Developer tools & collaboration",
+      "items": [
+        "AI-generated code review and validation",
+        "Architecture documentation",
+        "SAFe",
+        "Interface contracts",
+        "Data-flow diagrams",
+        "Technical specifications",
+        "User Acceptance Testing (UAT)",
+        "Change control",
+        "Source-system migration"
+      ]
+    }
+  ],
+  "counts": {
+    "experience": 4,
+    "projects": 8,
+    "publications": 3,
+    "education": 2,
+    "skillCategories": 28,
+    "skills": 1632,
+    "bullets": 131
+  }
+}

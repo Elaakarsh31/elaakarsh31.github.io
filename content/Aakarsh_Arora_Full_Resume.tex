@@ -1,0 +1,529 @@
+% =====================================================================
+% Aakarsh Arora: full master resume
+% Merged on 15 Nov 2026 from four domain masters: machine learning engineer,
+% AI/agentic engineer, data engineering and data scientist. Nothing was dropped:
+% identical bullets appear once, overlapping variants were merged into one bullet
+% that keeps every fact, metric and tool, and the Technical Skills section is the
+% union of all four skill lists.
+% Lines starting with % are notes for the reader, not resume content.
+% Lines marked "NOTE FOR AAKARSH" flag points to confirm before an interview.
+% =====================================================================
+\documentclass[letterpaper,11pt]{article}
+
+\usepackage{latexsym}
+\usepackage[empty]{fullpage}
+\usepackage{titlesec}
+\usepackage{marvosym}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{verbatim}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage{fontawesome}
+\usepackage[english]{babel}
+\usepackage{tabularx}
+\usepackage{array}
+\input{glyphtounicode}
+
+\hypersetup{
+    colorlinks = true,
+    linkcolor = cyan,
+    urlcolor = blue}
+
+% Adjust margins
+\addtolength{\oddsidemargin}{-0.8in}    % Left
+\addtolength{\evensidemargin}{-0.8in}   % Right
+\addtolength{\textwidth}{1.6in}         % Width
+\addtolength{\topmargin}{-0.8in}        % Top
+\addtolength{\textheight}{1.7in}        % Height
+
+\urlstyle{same}
+
+\raggedbottom
+\raggedright
+\setlength{\tabcolsep}{0in}
+
+% Sections formatting
+\titleformat{\section}{
+  \vspace{-13pt}\scshape\raggedright\large\bfseries
+}{}{0em}{}[\color{black}\titlerule \vspace{-10pt}]
+
+% Ensure that generate pdf is machine readable/ATS parsable
+\pdfgentounicode=1
+
+%-------------------------
+% Custom commands
+\newcommand{\resumeItem}[1]{
+  \item\small{
+    {#1 \vspace{-2pt}}
+  }
+}
+
+\newcommand{\resumeSubheading}[4]{
+  \vspace{0pt}\item
+    \begin{tabular*}{0.97\textwidth}[t]{l@{\extracolsep{\fill}}r}
+      \textbf{#1} & #2 \\
+      \textit{\small#3} & \textit{\small #4} \\
+    \end{tabular*}\vspace{-8pt}
+}
+
+\newcommand{\resumeProjectHeading}[2]{
+    \item
+    \begin{tabular*}{0.97\textwidth}{l@{\extracolsep{\fill}}r}
+      \small#1 & #2 \\
+    \end{tabular*}\vspace{-9pt}
+}
+\newcommand{\resumeEduLine}[3]{
+  \item
+    \begin{tabular*}{0.97\textwidth}[t]{l@{\extracolsep{\fill}}r}
+      \textbf{#1} $|$ \small #2 & \textbf{#3} \\
+    \end{tabular*}\vspace{-5pt}
+}
+\newcommand{\resumeSubItem}[1]{\resumeItem{#1}\vspace{-4pt}}
+
+\renewcommand\labelitemii{$\vcenter{\hbox{\tiny$\bullet$}}$}
+
+\newcommand{\resumeSubHeadingListStart}{\begin{itemize}[leftmargin=0.15in, label={}]} 
+\newcommand{\resumeSubHeadingListEnd}{\end{itemize}\vspace{-7pt}}
+\newcommand{\resumeItemListStart}{\begin{itemize}}
+\newcommand{\resumeItemListEnd}{\end{itemize}\vspace{-10pt}}
+
+%-------------------------------------------
+%%%%%%  RESUME STARTS HERE  %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{document}
+
+%----------HEADING----------
+% \begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}r}
+%   \textbf{\href{http://sourabhbajaj.com/}{\Large Sourabh Bajaj}} & Email : \href{mailto:sourabh@sourabhbajaj.com}{sourabh@sourabhbajaj.com}\\
+%   \href{http://sourabhbajaj.com/}{http://www.sourabhbajaj.com} & Mobile : +1-123-456-7890 \\
+% \end{tabular*}
+
+\begin{center}
+    \textbf{\Huge \scshape Aakarsh Arora} \\ \vspace{1pt}
+    \hypersetup{urlcolor=black} % Change hyperlink color to black temporarily
+    \small \textbf{\faEnvelope} \href{mailto:aakarshverma330@gmail.com}{\underline{aakarshverma330@gmail.com}} $|$ 
+    \textbf{\faLinkedinSquare} \href{https://www.linkedin.com/in/aakarsharora/}{\underline{linkedin}} $|$
+    \textbf{\faGithub} \href{https://github.com/elaakarsh31}{\underline{github}} $|$
+    \textbf{\faGraduationCap} \href{https://scholar.google.com/citations?user=zabMms8AAAAJ&hl=en}{\underline{googlescholars}}
+    \hypersetup{urlcolor=blue} % Revert hyperlink color to default
+\end{center}
+
+
+
+%-----------Objective-----------
+% \section{Summary}
+% \vspace{2pt}
+% \begin{itemize}[leftmargin=*, itemsep=-5pt]
+%     \item {\small \textbf{Machine Learning Engineer} with experience building LLM-based document validation systems on AWS.}
+%     \item {\small Proficient in \textbf{Python, TensorFlow, PyTorch, and GenAI}, with a strong background in feature engineering.}
+%     \item {\small Specialized in weakly \textbf{supervised evaluation, prompt optimization}, and \textbf{ontology} guided reasoning.}
+%     % \item {\small Adept at presenting complex technical concepts clearly to diverse technical and non-technical audiences.}
+% \end{itemize}
+% {\small Machine Learning engineer specializing in deep learning, computer vision, and generative AI. Expertise in developing and deploying predictive models and scalable algorithms for large-scale data problems. Skilled in Python, PyTorch, and TensorFlow, with hands-on experience in CV algorithms, image and video data processing, and end-to-end production solutions. Passionate about leveraging advanced AI/ML techniques to transform digital experiences.}
+
+%-----------EXPERIENCE-----------
+\section{Experience}
+\newcommand{\resumeNeedspace}[1]{
+  \par\begingroup
+  \dimen0=\pagegoal\advance\dimen0 by -\pagetotal
+  \ifdim\dimen0<#1\newpage\fi
+  \endgroup
+}
+
+\vspace{0.2em}
+  \resumeSubHeadingListStart
+    \resumeNeedspace{6\baselineskip}
+    \resumeSubheading
+      {Data Scientist}{\textbf{July 2025 -- Dec 2025}}
+      {\parbox[t]{0.75\textwidth}{\raggedright Fidelity Investments - Python, SQL, AWS (S3, Textract, Athena, CloudWatch, IAM), Claude, LLM Pipelines, LLM-as-Judge, LLM Evaluation, Prompt Engineering, Parquet, Data Contracts, Bootstrap CIs, Error Analysis\strut}}{Boston, USA}
+        % ===== NOTE FOR THE TAILORING AGENT: Fidelity student-debt project (comment, never printed) =====
+      % BOLD = the data a participant types into the submission form when uploading proof of a student
+      %   loan (enrollment) or of a loan payment. It is the participant's claim, not a font style and not
+      %   an acronym to expand. The LLM output was scored against it, but it is participant-entered and
+      %   has entry errors of its own (see the MOHELA / Sallie Mae bullet).
+      % Workitem = one participant submission; it can carry several attached documents. A document ID ties
+      %   a BOLD record to one specific document (missing on multi-attachment payment workitems).
+      % Qualified = the document backs the participant's BOLD entries on every key field. Two tracks:
+      %   Enrollment (850 docs, Claude 3.5 Sonnet): fields are extracted from the document and compared with
+      %     BOLD through the custom fuzzy field-level metrics; qualification rate = share of documents that
+      %     pass (76.7% extraction, 76.1% original judge, 77.8% optimized judge; the ontology-prompt rates
+      %     69.3 / 76.4 / 76.6% are enrollment numbers too).
+      %   Payments (Textract + all-in-one prompt): "BOLD qualification rate" 90.3% = share of workitems where
+      %     the LLM confirmed the BOLD values for the key fields appear in the document; "key-field pass
+      %     rate" 85.2% = share where the extracted values matched BOLD on all four key fields.
+      % Key fields: four per track, and they are not the same four.
+      %   Enrollment: borrower name, loan account number, loan balance, LSP name.
+      %   Payments: loan account number, LSP name, payment amount, payment date. Borrower name was only a
+      %     backup field for payments (64.1%), never a key field.
+      % LSP = loan service provider (the loan servicer), e.g. MOHELA, Sallie Mae, Aidvantage.
+      % NOTE FOR AAKARSH: the Athena reporting bullet combines two different time savings
+      % (2 hours to 30 minutes from the data scientist master, 18 to 6 minutes from the data
+      % engineering master). Confirm which number is accurate before an interview.
+      \resumeItemListStart
+        \resumeItem{\textbf{Architected} an end-to-end LLM document-validation pipeline (documents in S3, \textbf{Amazon Textract} OCR, Claude 3.5 Sonnet extraction, JSON persisted back to S3, and automated scoring against BOLD reference data) covering \textbf{$\sim$1,300+} student-debt documents.}
+        \resumeItem{Automated verification of \textbf{BOLD} data, the loan details participants enter when submitting student-loan proof, against the uploaded document; a document \textbf{qualified} only if it backed those entries on all four key fields: loan account number and loan servicer (LSP) name, plus borrower name and loan balance (enrollment) or payment amount and date (payments).}
+        \resumeItem{Engineered the ingestion layer for \textbf{$\sim$1,300+} documents across \textbf{1,000+} unlabeled workitems: generated document metadata, ran \textbf{batched} Textract jobs with explicit failure-key tracking to avoid mid-run data loss, and joined the BOLD reference CSV to \textbf{850} documents on workitem and document ID.}
+        \resumeItem{Introduced \textbf{data contracts} for document metadata and extraction JSON, checking required identifiers, field types, and reference-join cardinality before scoring; quarantined nonconforming records with reason codes while retaining their S3 source paths for remediation.}
+        \resumeItem{Built \textbf{custom field-level metrics} beyond exact string matching and used them to scale evaluation from a 113-document pilot to \textbf{850} documents, showing the pilot overstated field accuracy (borrower name fell from 99\% to 87.6\% at scale) while reporting \textbf{98.7\%} loan balance, \textbf{91.3\%} loan account number, \textbf{90.5\%} LSP name, and \textbf{87.6\%} borrower name accuracy at scale.}
+        \resumeItem{Built an automated \textbf{LLM-as-judge} on Claude Sonnet 3.5 that emitted structured \textbf{pass/fail, confidence score, and written reasoning} per field, replacing brittle exact-match scoring with contextual adjudication.}
+        \resumeItem{Routed normalized extractor/reference disagreements and extraction uncertainty flags to the LLM judge, reducing judge API calls for an 850-document scoring pass from 850 to 595 by bypassing adjudication on unflagged agreements.}
+        \resumeItem{Designed a \textbf{prompt feedback loop} in which a second LLM audited \textbf{568} judgment errors and iteratively rewrote the judge prompt, lifting the judge's document qualification rate from \textbf{76.1\% to 77.8\%} and field accuracy by \textbf{1--2 points} across 3 of 4 fields.}
+        \resumeItem{Defined subsequent \textbf{workitem-grouped prompt comparisons} with \textbf{bootstrap confidence intervals} for paired accuracy differences, keeping prompt development separate from final evaluation.}
+        \resumeItem{\textbf{Root-caused} the \textbf{27} documents where judge and extractor disagreed, labelling \textbf{108} field-level decisions into a taxonomy --- false negatives (\textbf{76.9\%}), true negatives (15.7\%), false positives (1.9\%), true positives (5.6\%) --- isolating formatting variance, LSP name aliasing, and middle-initial drift as the dominant error drivers.}
+        \resumeItem{\textbf{Demonstrated} that a large share of apparent model failures were \textbf{errors in the BOLD ground truth itself}, evidencing documents that named MOHELA and Olympic SLT where reference data recorded Sallie Mae and Firstmark --- reframing how qualification rate was interpreted by the business.}
+        \resumeItem{Designed and benchmarked \textbf{3 ontology-guided extraction prompts} (base, v3, v4): adding detailed extraction rules, page/line provenance tracking and uncertainty flags lifted qualification from \textbf{69.3\% to 76.4\%}, and moving document and ontology context mid-prompt reached \textbf{76.6\%}, on par with the original extraction prompt (76.7\%).}
+        \resumeItem{Built student-payment verification as \textbf{Textract OCR plus a single all-in-one prompt} performing extraction, BOLD matching, and presence validation, reaching \textbf{90.3\%} BOLD qualification and an \textbf{85.2\%} pass rate on all four key fields.}
+        \resumeItem{Reached \textbf{97.6\%} LSP name, \textbf{93.5\%} payment date, and \textbf{92.2\%} loan account number match against BOLD on payment workitems, with only \textbf{7.1\%} of workitems mismatching on more than one field.}
+        \resumeItem{\textbf{Diagnosed} systematic failure modes with document-level evidence --- OCR digit confusion ('6' read as '8' in account numbers), payment-count and \$1-tolerance mismatches, and historical-vs-scheduled payment misalignment --- converting anecdotal errors into a prioritized remediation backlog.}
+        \resumeItem{\textbf{Quantified} an upstream data gap where BOLD records lacked document IDs on multi-attachment workitems, scoping the \textbf{$<$50\% addressable volume} and aligning remediation to the Q1 Snowflake load.}
+        \resumeItem{Versioned extraction prompts and prompt hashes, model identifiers, BOLD snapshot references and scoring-code revisions in \textbf{S3 run manifests}, linking each extraction and judge output to its input document and configuration so scoring changes could be traced to the exact pipeline revision.}
+        \resumeItem{Instrumented ingestion and scoring with \textbf{Amazon CloudWatch} progress metrics, changing the \textbf{configured inactivity-alarm threshold from 25 to 5 minutes} so stalled stages trigger an alert under the configured monitoring policy.}
+        \resumeItem{Published field-level scoring outputs as \textbf{Parquet} tables behind \textbf{SQL reporting views in Amazon Athena}, reconciling document counts and slicing field errors by lender and document type; replacing repeated JSON preparation cut recurring active analyst effort per 850-document evaluation report from \textbf{18 to 6 minutes}, excluding initial Parquet publication.}
+        \resumeItem{Separated raw-document and derived-metric access with \textbf{AWS IAM} policies scoped to S3 prefixes, and removed borrower identifiers from analytical exports so reporting consumers could inspect scoring trends without receiving document text or direct personal identifiers.}
+        \resumeItem{Documented pipeline architecture, \textbf{metric definitions}, and comparative evaluation results across \textbf{7 Confluence pages} tied to Jira delivery tickets, giving business stakeholders a reproducible audit trail.}
+      \resumeItemListEnd
+      \resumeNeedspace{6\baselineskip}
+    \resumeSubheading
+      {Machine Learning Engineer}{\textbf{Jan 2024 -- Aug 2024}}
+      {\parbox[t]{0.75\textwidth}{\raggedright Zingroll - Python, SQL, pandas, AWS SageMaker, HuggingFace, LLMs, Apache Airflow, MLflow, Docker, Terraform, CloudWatch, CI/CD, REST APIs, Guardrails, A/B Testing, Power Analysis, PSI Drift Monitoring\strut}}{New Delhi, India}
+      \resumeItemListStart
+        \resumeItem{Built a scalable preprocessing pipeline for 1M+ noisy tweets and social media posts, improving LLM training quality through deduplication, normalization, and metadata enrichment.}
+        \resumeItem{Orchestrated ingestion, preprocessing, and training-data export with \textbf{Apache Airflow} dependencies and task-level retries, reducing manual setup per successful data refresh from \textbf{35 to 10 minutes} and retaining raw input snapshots for reruns.}
+        \resumeItem{Fine-tuned HuggingFace models on Amazon SageMaker for humorous meme generation, reducing inference latency by 30\% while improving content relevance through prompt optimization.}
+        \resumeItem{Designed a \textbf{topic-blocked A/B evaluation} of meme prompts using random assignment, blinded relevance scoring and \textbf{a priori power analysis}, keeping final evaluation separate from prompt tuning.}
+        \resumeItem{Developed RESTful APIs to serve LLM-generated content and integrated automated moderation, reducing invalid generations before deployment.}
+        \resumeItem{Set a \textbf{deadline covering all generation-provider retries} and a circuit breaker, reducing the \textbf{configured maximum wait for an unavailable provider from 60 to 15 seconds}.}
+        \resumeItem{Added CI/CD release gates that checked candidate content-generation configurations against the incumbent for moderation violations and task relevance, blocking promotion when either acceptance threshold failed.}
+        \resumeItem{Automated model training and deployment workflows using Docker and SageMaker, accelerating experimentation and shortening release cycles.}
+        \resumeItem{Codified SageMaker endpoint, execution-role and scaling configuration in Terraform with CI plan checks, reducing manual environment setup from 45 minutes to 18 minutes through reusable, versioned deployment definitions.}
+        \resumeItem{Versioned content-generation artifacts in MLflow, packaging HuggingFace model references, prompts and moderation settings into \textbf{versioned inference bundles} tied to their Docker image digests and linking each SageMaker release to a prior approved version; restoring API rollback-and-health-check time from \textbf{18 to 5 minutes}.}
+        \resumeItem{Monitored input drift with Pandas \textbf{population stability index} checks on tweet-length and language distributions, moving them from \textbf{weekly to daily} to shorten the schedule-derived maximum alert delay from \textbf{7 days to 24 hours} for persistent, threshold-crossing shifts, and published input-length PSI, moderation rejection rate and serving 5xx rate as CloudWatch metrics; drift alerts queued data curation and candidate revalidation, while service-error alerts paused release promotion and triggered endpoint health checks.}
+        \resumeItem{Configured \textbf{CloudWatch alarms} on provider failures and moderation-rejection rates by model/prompt release, reducing average detection delay for threshold-breaching releases from \textbf{30 to 8 minutes}.}
+      \resumeItemListEnd
+    \resumeNeedspace{6\baselineskip}
+    \resumeSubheading
+      {Software Engineer}{\textbf{Feb 2023 -- Aug 2023}}
+      {\parbox[t]{0.75\textwidth}{\raggedright Hexbit - Python, SQL, PySpark, Databricks, Delta Lake, dbt, ETL, Feature Tables, Django, REST APIs, Docker, CI/CD, GitHub Actions, Data Quality Checks\strut}}{New Delhi, India}
+      \resumeItemListStart
+        \resumeItem{Designed \textbf{Databricks ETL pipelines using Python and SQL} to normalize and transform millions of seller-catalog, price, availability and listing-update records into structured datasets consumed by downstream ML services; standardized seller-item and source identifiers and replayed missed updates, increasing eligible seller-item records published with required attributes by the scheduled cutoff from \textbf{75\% to 90\%, a 20\% relative improvement}.}
+        \resumeItem{Built \textbf{seller-item feature tables} containing price, listing availability, title length, required-attribute missingness, and update recency, documenting feature definitions and null handling at one row per seller, item, and snapshot date.}
+        \resumeItem{Profiled missing values, duplicate identifiers, price distributions, and category frequencies by source and ingestion batch, producing exception summaries to identify inconsistent mappings and malformed updates before feature publication.}
+        \resumeItem{Added \textbf{SQL schema and nullability checks} for required seller-item identifiers, price and other numeric fields, and source timestamps before ETL publication; quarantined malformed records with batch identifiers and reproducible rejection reasons, reducing \textbf{downstream batch failures from 8\% to 3\%} across comparable scheduled runs while tracking validation rejects separately.}
+        \resumeItem{Gated \textbf{Databricks feature-batch publication on schema, null-rate, and freshness checks}, quarantining failed batches and retaining the last approved snapshot with its timestamp; downstream training refreshes required valid inputs and model revalidation before release eligibility.}
+        \resumeItem{Implemented incremental \textbf{PySpark loads into Delta Lake} using source-key merges, an update-time watermark, and a bounded lookback for late changes; reduced a routine catalog-table refresh from \textbf{50 to 20 minutes} compared with rebuilding the full downstream table.}
+        \resumeItem{Used \textbf{PySpark partition pruning and early column projection in Databricks} to avoid irrelevant input partitions and unused fields, reducing the existing million-record \textbf{training-data preparation batch from 42 to 29 minutes} while preserving the required output.}
+        \resumeItem{Cached reused \textbf{PySpark intermediates} after catalog normalization and seller-item joins in Databricks, reducing \textbf{feature-table refresh time from 40 to 28 minutes} by avoiding repeated execution of transformations shared across feature outputs.}
+        \resumeItem{Modeled \textbf{pipeline-execution facts and source-dataset dimensions in a dimensional data mart}, using \textbf{dbt SQL transformations} at a documented run/source/attempt grain; added \textbf{not-null, uniqueness, and relationship tests} to support consistent reporting of received records, published records, rejects, and refresh duration.}
+        \resumeItem{Centralized \textbf{feature transformations shared by batch preparation and Django inference endpoints}, adding \textbf{schema and null-handling contract tests} that compared representative records across both paths to detect \textbf{training-serving skew} before backend releases.}
+        \resumeItem{Developed secure \textbf{REST APIs with Django and JWT authentication} for catalog lookup, approved datasets, feature tables and feature snapshots, and batch and pipeline-run status, enforcing server-side role-based permissions, restricting administrative operations, returning consistent errors for unauthorized requests, and protecting internal ML endpoints.}
+        \resumeItem{Optimized \textbf{SQL schemas and query execution} behind Django ML-data APIs for catalog and seller-item lookups and feature-snapshot reads, using composite seller-item indexes, narrower result projections and removal of redundant joins and columns; reduced \textbf{median API response time from 240 to 205 ms, approximately 15\%}, under the same dataset, authenticated request mix, result sizes, concurrent load and database configuration.}
+        \resumeItem{Added \textbf{cursor-paginated reads to Django ML APIs} using stable indexed ordering and bounded database queries, applying limits before ORM materialization and response serialization; reduced \textbf{peak per-request response-buffer memory from 180 to 70 MB} for the same catalog export workload, with tests covering cursor progression, page boundaries, empty pages, and traversal without skipped or duplicated records.}
+        \resumeItem{Added \textbf{GitHub Actions CI/CD checks} for ETL and API changes, running \textbf{pytest unit and integration tests} for transformation rules, schema compatibility, duplicate-safe reloads, and JWT access boundaries before allowing deployment.}
+        \resumeItem{\textbf{Dockerized backend services and automated deployment workflows}, maintaining consistent development and production environments and dependencies, running pre-release smoke checks for endpoint health, JWT authentication and permissions, dataset access, validation errors, pagination, and feature- and response-schema compatibility, and retaining versioned container images to support rollback after unsuccessful releases.}
+      \resumeItemListEnd
+
+ \resumeNeedspace{6\baselineskip}
+    \resumeSubheading
+      {Research Assistant}{\textbf{Mar 2022 -- Jan 2023}}
+      {\parbox[t]{0.75\textwidth}{\raggedright KIIT University - Python, PyTorch, Attention U-Net, Medical Image Segmentation, Computer Vision, Transformers, NLP, Forecasting, Backtesting, statsmodels\strut}}{Bhubaneswar, India}
+      \resumeItemListStart
+        \resumeItem{Implemented \textbf{Attention UNET} for \textbf{medical image segmentation}, achieving \textbf{97\%} F1-Score.}
+        \resumeItem{Compared binary cross-entropy with Dice+BCE for Attention U-Net using source-image-disjoint splits, improving boundary F1 from 0.81 to 0.85 with the combined loss at the same foreground threshold while reporting foreground precision-recall separately.}
+        \resumeItem{Built \textbf{Transformer sequence models} for biomedical text analysis, increasing disease prediction accuracy by \textbf{20\%}.}
+        \resumeItem{Developed \textbf{forecasting models for Distributed Energy Resource} integration, improving prediction accuracy by 18\%, and validated them with \textbf{rolling-origin backtesting} against seasonal-naive baselines and \textbf{statsmodels} residual diagnostics, reporting horizon-specific MAE and prediction-interval coverage.}
+        \resumeItem{Applied \textbf{dimensionality reduction techniques (PCA)} to optimize large-scale datasets for predictive modeling.}
+      \resumeItemListEnd
+    % VRAcademi was commented out in all four masters and stays commented here.
+    % \resumeSubheading
+    %   {Artificial Intelligence Developer}{\textbf{Oct 2021 -- Feb 2022}}
+    %   {VRAcademi - Dynamic Programming, Algorithms, C++, UE4}{Dubai, UAE}
+    %   \resumeItemListStart
+    %     \resumeItem{Created AI-driven dynamic enemies in Unreal Engine 4, improving gameplay engagement for \textbf{50+ players}.}
+    %     \resumeItem{\textbf{Directed} the development of a multiplayer game with C++, featuring ammunition tracking and voice chat.}
+    %     % \resumeItem{Contributed 50K+ lines of code to an established codebase via Git}
+    %     % \resumeItem{Conducted  a human subject study to determine which video game dungeon generation technique is enjoyable}
+    %     % \resumeItem{Wrote an 8-page paper and gave multiple presentations on-campus}
+    %     % \resumeItem{Presented virtually to the World Conference on Computational Intelligence}
+    %   \resumeItemListEnd
+  \resumeSubHeadingListEnd
+
+%-----------PROJECTS-----------
+\resumeNeedspace{8\baselineskip}
+\section{Projects}
+    \resumeSubHeadingListStart
+      \resumeNeedspace{6\baselineskip}
+\resumeProjectHeading
+  {\parbox[t]{0.79\textwidth}{\raggedright\textbf{SOP-Guided Insurance Claims Agent} $|$ \emph{Python, LangGraph, Gemini, Pydantic, FastAPI, MCP, Guardrails, REST APIs, Docker, Unit Testing}\strut}}{\textbf{Sept 2026}}
+  \resumeItemListStart
+        \resumeItem{Architected a \textbf{deterministic agentic workflow} as a 6-node \textbf{LangGraph} \texttt{StateGraph} enforcing a fixed 4-phase SOP (\texttt{VERIFY\_ID}, \texttt{RESOLVE\_INTENT}, \texttt{PROCESS\_CASE}, \texttt{POST\_PROCESS}), where \textbf{Python owns control flow}, phase gates and allowed actions, and the LLM is confined to three narrow jobs: structured extraction, intent classification, and phrasing a reply from a per-turn brief; conditional-edge fall-through lets multiple phases complete in a single turn without repeating steps.}
+        \resumeItem{Replaced multi-call parsing with a \textbf{single structured-output Gemini call} into a nested \textbf{Pydantic} schema (identity, caller, request, mood, closing), using \texttt{Field} descriptions as the extraction spec to normalize messy speech (spoken dates to ISO, ``at \ldots\ dot com'' to email, digits-only phones, leading-zero ID digits), classify a \textbf{7-class intent taxonomy}, and capture claim type, status and period hints stated mid-verification so the right claim is resolved later without re-asking.}
+        \resumeItem{Enforced \textbf{data-minimizing guardrails} where gates are enforced by what the model is given, not what it is told: claim records never enter the LLM context before verification, and a single \texttt{briefs.py} module is the only \textbf{leak surface}, so no prompt pressure or jailbreak can surface an unverified fact.}
+        \resumeItem{Built an \textbf{identity-verification gate} requiring 3 of 5 factors that must all belong to \textbf{one policyholder}: the first match pins a party so details borrowed from different records cannot combine, matched fields are \textbf{locked} so verification cannot be flipped back, policy numbers are excluded as a factor, and names, emails and phones are normalized and matched against record aliases.}
+        \resumeItem{Separated \textbf{identity from authorization}: third-party callers must appear on the representative list and the policyholder must approve through a \textbf{polled consent check}, with approve, deny and timeout-to-human-escalation paths configurable via environment variable for scenario testing.}
+        \resumeItem{Made answers \textbf{retrieved, not generated}: approved guidance is routed from a JSON guideline table by intent and keyword, templated with the claim id and required documents, and passed to the model to rephrase only; grounding is \textbf{scoped by intent} (amounts only on money questions, deadlines only on appeal questions), and state hints disambiguate near-duplicate claims.}
+        \resumeItem{Added a read-only \textbf{Model Context Protocol (MCP)} adapter with typed arguments for the existing guidance lookup, validating each call against server-held phase and intent state before returning approved text to external clients.}
+        \resumeItem{Designed \textbf{emotion-aware escalation}: per-turn mood and refusal detection prepends a tone note that changes wording but \textbf{never the gate}, a refused detail triggers an alternative instead of insisting, and friction and off-topic counters escalate to a human after repeated difficult turns; explicit transfer requests short-circuit routing from any phase, and calls close with a recap plus an optional emailed summary.}
+        \resumeItem{Validated the deterministic gates with a \textbf{31-case unit test suite} (identity, claim resolution, consent) at \textbf{100\% pass rate} and \textbf{97.8\% statement coverage}, covering adversarial cases such as identity details borrowed from \textbf{three different policyholders}, a pinned party rejecting another person's correct detail, representatives of the wrong policyholder, misremembered claim periods, and consent timeouts that must never approve; the full suite runs offline with \textbf{no LLM calls} in under 5 ms.}
+        \resumeItem{Wired the existing offline gate tests into \textbf{GitHub Actions} and Docker image checks, blocking demo releases on authorization regressions and retaining the previous image for rollback.}
+        \resumeItem{Built an out-of-band \textbf{LLM-as-judge reply evaluator} for grounding in the approved brief, intent relevance, and handoff wording, keeping response-quality findings separate from the existing deterministic, no-LLM gate tests.}
+        \resumeItem{Instrumented FastAPI requests and LangGraph nodes with \textbf{OpenTelemetry traces} carrying phase, provider latency, and HTTP status while excluding raw caller inputs and credentials, separating model delays from workflow errors.}
+        \resumeItem{Shipped as a \textbf{FastAPI} service with REST endpoints (\texttt{/api/start}, \texttt{/api/chat}, \texttt{/api/state}, \texttt{/healthz}), mapping each session to a LangGraph thread persisted by a \textbf{checkpointer}, per-request bring-your-own-key via \texttt{ContextVar} (never stored), model failures surfaced as HTTP 503, a live debug UI showing phase and state transitions, and a terminal client; \textbf{containerized with Docker} and deployed on \textbf{Render}. \href{https://sop-guided-agent.onrender.com/}{[Live Demo]}\href{https://github.com/Elaakarsh31/SOP-Guided-Agent}{[Code]}}
+  \resumeItemListEnd
+      \resumeNeedspace{6\baselineskip}
+\resumeProjectHeading
+  {\parbox[t]{0.79\textwidth}{\raggedright\textbf{StoryWeaver AI} $|$ \emph{Python, LangGraph Multi-Agent, Gemini, ElevenLabs, MoviePy, Pydantic, asyncio, SQLite Checkpointing, Human-in-the-Loop}\strut}}{\textbf{July 2026}}
+  % The StoryWeaver repo is not public yet, so this entry has no code link.
+  \resumeItemListStart
+        \resumeItem{Architected a \textbf{multi-agent LangGraph pipeline} converting unstructured book text into narrated scene videos, using \texttt{Send()} map-reduce fan-out to parallelize prompt and image generation across 12 scenes and \textbf{LangGraph state reducers} (\texttt{Annotated[list, operator.add]}) to merge parallel branch outputs into shared state without race conditions, cutting end-to-end runtime \textbf{15\%} vs. a sequential baseline.}
+        \resumeItem{Applied an \textbf{asyncio semaphore} to bound concurrent \textbf{Gemini} and \textbf{ElevenLabs} provider requests in the scene fan-outs and honored provider retry delays, lowering \textbf{average rate-limit retry attempts per 12-scene video from 9 to 3}.}
+        \resumeItem{Solved cross-scene \textbf{character visual drift} --- the core failure mode of LLM image pipelines, since image models have no persistent memory of a character between calls --- by engineering a locked \textbf{``visual-token'' persona schema} that every scene prompt referenced verbatim, keeping 3 recurring characters visually consistent across 12 independently generated scenes with zero manual prompt correction.}
+        \resumeItem{Retrieved character facts and prior events from a \textbf{chapter-local index} keyed by persona and narrative position, inserting only entries available by the current scene into its script brief while carrying the locked visual-token schema verbatim.}
+        \resumeItem{Added a \textbf{human-in-the-loop review gate} using LangGraph's \texttt{interrupt()} paired with a persistent \texttt{SqliteSaver} checkpointer, pausing the graph after script/prompt generation so a reviewer could approve or edit output \textbf{before} triggering paid image-gen calls, and enabling crash-safe resumption without re-running completed (billed) steps.}
+        \resumeItem{Synchronized two independent parallel fan-outs --- \textbf{Gemini} image generation and \textbf{ElevenLabs} TTS narration, running concurrently per scene --- through an explicit join node that gated the merge step until both reducers were fully populated; \textbf{MoviePy} then held each scene image for the length of its narration and stitched the scenes into one video, with per-scene retry logic for failed API calls.}
+  \resumeItemListEnd
+      \resumeNeedspace{6\baselineskip}
+\resumeProjectHeading
+  {\parbox[t]{0.79\textwidth}{\raggedright\textbf{GPT-2 Shakespeare Text Generator} $|$ \emph{Python, PyTorch, Transformers, CUDA C++, torch.profiler, Ablation Studies, Perplexity}\strut}}{\textbf{July 2026}}
+  \resumeItemListStart
+        \resumeItem{Implemented a \textbf{decoder-only GPT-style Transformer from scratch in PyTorch}: token and learned positional embeddings feeding \textbf{4 pre-LayerNorm blocks} of \textbf{4-head masked causal self-attention} (scaled dot-product with a lower-triangular mask) and 4$\times$-expansion feed-forward layers, with residual connections, dropout and $\mathcal{N}(0,\,0.02)$ weight initialization, totaling \textbf{7.24M trainable parameters} (verified against the saved checkpoint).}
+        \resumeItem{Built a \textbf{character-level data pipeline} over the \textbf{1.1M-character} Tiny Shakespeare corpus: a \textbf{65-token vocabulary} with encode/decode maps, a contiguous 90/10 train/validation split (1.0M / 111.5K characters), and randomly sampled \textbf{64 $\times$ 256} context windows with one-step-shifted targets for next-token prediction.}
+        \resumeItem{Trained with \textbf{AdamW} (lr 3e-4, cross-entropy loss) for \textbf{3,000 steps} ($\sim$49M tokens, about 49 passes over the training split) on \textbf{Apple Silicon MPS} with automatic CUDA/CPU fallback and a fixed seed; logged train/validation loss every 250 steps and identified \textbf{overfitting onset after $\sim$2,000 steps} (best validation loss \textbf{1.50}; final train 1.01 vs.\ validation 1.53).}
+        \resumeItem{Ran a \textbf{2$\times$2$\times$2 hyperparameter grid search} over depth (4/6 layers), attention heads (4/6) and dropout (0.1/0.2), training 8 configurations for 500 steps each; the smallest \textbf{4-layer, 4-head, 0.1-dropout} model won outright (validation loss \textbf{1.785}), and dropout 0.1 beat 0.2 in every pairing.}
+        \resumeItem{Benchmarked against a \textbf{bigram baseline} by framing next-character prediction as \textbf{65-class classification} over \textbf{327K validation predictions}: accuracy rose from \textbf{26.9\% to 56.6\%} (2.1$\times$), top-5 accuracy from \textbf{65.4\% to 85.5\%}, macro-F1 from \textbf{0.076 to 0.366} (4.8$\times$), and \textbf{perplexity fell from 12.07 to 4.56} (62\% reduction).}
+        \resumeItem{Designed a \textbf{context-length ablation} capping the trained model's visible history at 1, 8, 32, 64, 128 and 256 characters: a 1-character context reproduced bigram performance (27.6\% accuracy, perplexity 12.5), while the \textbf{first 32 characters recovered $\sim$90\% of the full-context accuracy gain} (53.7\% vs.\ 56.6\%), with diminishing returns beyond.}
+        \resumeItem{Ran a \textbf{positional-embedding ablation} by retraining without position information, which raised final validation loss from \textbf{1.53 to 1.64 (+6.7\%)}, quantifying how much character order contributes beyond what causal masking alone provides.}
+        \resumeItem{Performed \textbf{error analysis} with macro vs.\ weighted F1 (0.37 vs.\ 0.56), exposing weak recall on rare characters, and a \textbf{top-15-character confusion matrix} showing residual errors concentrated among vowels (e, o, a, i).}
+        \resumeItem{Instrumented the optional CUDA execution path with torch.profiler operator traces and allocator statistics, separating attention, feed-forward and optimizer costs while distinguishing live tensor allocations from reserved GPU memory before selecting optimizations.}
+        \resumeItem{Kept detached loss accumulation on-device in the optional CUDA training path and transferred scalars only at the existing 250-step logging boundary, reducing average non-evaluation training-step time from 24 ms to 21 ms by removing per-step host synchronization.}
+        \resumeItem{Implemented an FP32 CUDA C++ LayerNorm forward kernel for the optional CUDA inference path, using blockwise Welford reductions and affine scaling through a PyTorch CUDAExtension; maximum absolute output error stayed below $10^{-5}$ against \texttt{torch.nn.functional.layer\_norm} on model activations.}
+        \resumeItem{Built \textbf{autoregressive inference} with multinomial sampling and context cropped to the 256-character window, producing play-formatted output with speaker headings, line breaks and archaic contractions; packaged a one-command pipeline (\texttt{main.py}) that writes all metrics, loss histories and configs to \texttt{results.json} plus 5 figures, and a \texttt{generate.py} script that samples from the saved checkpoint without retraining. \href{https://github.com/Elaakarsh31/gpt2-shakespear}{[Code]}}
+  \resumeItemListEnd
+      \resumeNeedspace{6\baselineskip}
+\resumeProjectHeading
+  {\parbox[t]{0.79\textwidth}{\raggedright\textbf{Numerical Reasoning with LLMs} $|$ \emph{Python, PyTorch, Hugging Face, BERT, Flan-T5, Llama, LoRA, Chain-of-Thought, Fine-Tuning, MLflow, Dataset Versioning}\strut}}{\textbf{Nov 2024}}
+  \resumeItemListStart
+        \resumeItem{Built a numeracy system for \textbf{SemEval-2024 Task 7 (NumEval) Subtask 1} as a 3-person CS6120 NLP team project, targeting the \textbf{Quantitative-101} benchmark across three task families: quantitative prediction (\textbf{QP}), quantitative natural language inference (\textbf{QNLI}) and quantitative question answering (\textbf{QQA}).}
+        \resumeItem{Fine-tuned and compared \textbf{three model families} on the same tasks: an encoder-only \textbf{BERT} classifier for QP and QNLI, an instruction-tuned seq2seq \textbf{Flan-T5}, and a decoder-only \textbf{Llama} trained with \textbf{Unsloth} on Linux/WSL, isolating how architecture affects numerical reasoning.}
+        \resumeItem{Configured \textbf{LoRA adapters} on attention projections in the Unsloth Llama pipeline, reducing the \textbf{number of trainable parameters by about 99\%} compared with full-parameter fine-tuning while keeping base-model weights frozen, and saved task-specific adapters alongside the existing NumEval run artifacts.}
+        \resumeItem{Reproduced the \textbf{YNU-HPCC SemEval-2024 instruction fine-tuning} recipe for Flan-T5 with separate per-task training and test reproduction notebooks and scripts, giving the team a published baseline to measure its own variants against.}
+        \resumeItem{Implemented \textbf{input reframing} following Chen et al. (EACL 2023) with a \texttt{num2text} module that rewrites digits as words, testing whether exposing numbers as text improves the model's handling of magnitude and comparison.}
+        \resumeItem{Engineered \textbf{custom features} from the dataset to train LLMs for better numerical reasoning prediction.}
+        \resumeItem{Unified all task data into a common \textbf{JSON schema} consumed by the BERT, T5 and Llama pipelines, and subsampled the large QP training set so repeated fine-tuning runs stayed within GPU budget.}
+        \resumeItem{Cached task-specific JSON artifacts under \textbf{source-content and preprocessing-version hashes}, reducing repeated dataset preparation from \textbf{4 to 1 minute} while keeping separate train, validation, and test manifests for reproducible model inputs.}
+        \resumeItem{Devised a \textbf{chain-of-thought} prompting setup that makes the model state its reasoning before the final answer, reaching a \textbf{71\% F1 score}.}
+        \resumeItem{Added a consistency loss between BERT QNLI predictions for label-preserving, unit-equivalent text variants during fine-tuning, reducing prediction disagreement between equivalent inputs from 14\% to 9\% on a reserved robustness split.}
+        \resumeItem{Fit temperature scaling to BERT QNLI logits on validation data and evaluated confidence on untouched test data, lowering 15-bin expected calibration error from 0.12 to 0.07 while using reliability diagrams to expose overconfidence.}
+        \resumeItem{Built a training-analysis workflow where \texttt{extract\_loss.py} parsed run logs into a \textbf{1,188-row metrics table} of per-epoch training loss, validation loss, \textbf{micro-F1} and \textbf{macro-F1} across every run, then compared convergence and overfitting across models and tasks in a dedicated analysis notebook.}
+        \resumeItem{Tracked model and tokenizer versions, preprocessing recipes, split hashes, seeds and per-task metrics in MLflow, linking each BERT/T5/Llama comparison to its saved checkpoint so research variants could be reconstructed without conflating their data partitions.}
+        \resumeItem{Reported results with the official NumEval metrics, reaching \textbf{74.2\%} macro-F1 on QNLI, \textbf{69.8\%} on QP and \textbf{68.9\%} on QQA with the best model, versus \textbf{61.4\%} for the reproduced Flan-T5 baseline. \href{https://github.com/Elaakarsh31/semeval2024-task7-subtask1}{[Code]}}
+  \resumeItemListEnd
+      \resumeNeedspace{6\baselineskip}
+\resumeProjectHeading
+  {\parbox[t]{0.79\textwidth}{\raggedright\textbf{Real-Time Object Recognition \& One-Shot CNN Embeddings} $|$ \emph{C++17, Python, OpenCV, ONNX, ResNet18, CNN Embeddings, PCA}\strut}}{\textbf{Feb 2026}}
+  \resumeItemListStart
+        \resumeItem{\textbf{Built} a real-time object recognition pipeline in \textbf{C++17/OpenCV} that segments, describes, and classifies multiple objects per webcam frame, with live trackbar tuning of morphology and region-filter parameters for on-the-fly calibration.}
+        \resumeItem{\textbf{Implemented} segmentation from scratch — \textbf{1-D 2-means clustering} over sampled pixels for dynamic threshold selection plus custom ellipse-kernel erosion, dilation, opening, and closing — removing reliance on fixed thresholds under changing lighting.}
+        \resumeItem{\textbf{Engineered} a rotation- and scale-invariant \textbf{6-D descriptor} (percent-fill, oriented-bounding-box aspect ratio, 4 log-scaled \textbf{Hu moments}) derived from second central moments and \textbf{PCA} eigenvectors, and \textbf{classified} it with a standard-deviation-normalized Euclidean \textbf{1-NN} over a CSV feature database.}
+        \resumeItem{\textbf{Achieved} \textbf{98\% accuracy (49/50)} on a held-out \textbf{10-class} test set from a \textbf{single training exemplar per class}, and \textbf{added} distance-threshold \textbf{unknown-object rejection} to suppress false positives on out-of-database items.}
+        \resumeItem{\textbf{Automated} an evaluation mode that computes \textbf{confusion matrices} across the full test tree and exports annotated misclassified images, converting debugging from manual inspection into a repeatable, scriptable run.}
+        \resumeItem{\textbf{Extended} the system to \textbf{one-shot deep recognition} by \textbf{integrating} a \textbf{ResNet18 ONNX} model through OpenCV DNN: principal-axis-aligned $224{\times}224$ ROI crops are embedded into \textbf{512-D vectors} and matched by \textbf{SSD nearest neighbor} against a persisted embedding database, proving markedly more robust to rotation and lighting than the hand-crafted baseline.}
+        \resumeItem{Profiled the OpenCV DNN recognition loop and reused ROI preprocessing buffers, reducing average frame-processing time from 36 ms to 27 ms by removing repeated allocations and copies around ONNX inference.}
+        \resumeItem{\textbf{Validated} embedding quality by \textbf{projecting} the 512-D database to 2-D with \textbf{PCA/SVD} in Python, isolating the visually similar categories responsible for residual error and quantifying that the top two components retain only \textbf{53\% of variance} --- evidence that full-dimensional SSD matching outperforms any 2-D separability the projection suggests. \href{https://github.com/Elaakarsh31/Real-Time-Object-Recognition-One-Shot-CNN-Embeddings}{[Code]}}
+  \resumeItemListEnd
+      \resumeNeedspace{6\baselineskip}
+\resumeProjectHeading
+  {\parbox[t]{0.79\textwidth}{\raggedright\textbf{Skimlit: Text Summarization for Research Papers} $|$ \emph{Python, TensorFlow, tf.data, NLP, Embeddings, TF-IDF, Multinomial Naive Bayes, USE, GloVe, GRU, Bi-LSTM, CNN, Positional Embeddings, Inverse-frequency Class Weighting, Validation Macro-F1, Tableau}\strut}}{\textbf{June 2024}}
+  \resumeItemListStart
+        \resumeItem{Framed literature skimming as \textbf{sequential sentence classification} on the \textbf{PubMed 200k RCT} dataset (about \textbf{200k abstracts, 2.3M sentences}), labelling every sentence of an abstract as Background, Objective, Methods, Results or Conclusions so readers can jump straight to the part they need.}
+        \resumeItem{Wrote a preprocessing pipeline that parses raw abstract files into per-sentence records carrying \textbf{line number and total line count}, one-hot encodes the 5 labels, and feeds batched, prefetched \texttt{tf.data} datasets to every model.}
+        \resumeItem{Set a classical baseline with \textbf{TF-IDF and Multinomial Naive Bayes} at \textbf{72.3\%} accuracy, then used it as the bar every deep model had to beat.}
+        \resumeItem{Compared token representations: a custom trainable embedding with \textbf{Conv1D}, frozen \textbf{GloVe} vectors, and pretrained \textbf{Universal Sentence Encoder} features from TensorFlow Hub, measuring the gain from pretrained semantics on a medical vocabulary; the TensorFlow USE and GloVe models reached an \textbf{85\% F1 score}.}
+        \resumeItem{Trained \textbf{GRU, Bi-LSTM and CNN} sequence encoders, including a \textbf{character-level} Bi-LSTM branch that handles rare clinical terms and misspellings that word embeddings miss.}
+        \resumeItem{Built a \textbf{tribrid model} that concatenates token embeddings, character embeddings and \textbf{positional embeddings} of each sentence's line number and total lines, using where a sentence sits in the abstract as a strong signal for its role.}
+        \resumeItem{Applied \textbf{inverse-frequency class weights} to the tribrid sentence classifier, raising \textbf{validation macro-F1 from 0.81 to 0.84} across five rhetorical labels.}
+        \resumeItem{Analyzed \textbf{200k+ research abstracts} to uncover trends and insights automated on the dashboard with \textbf{Tableau}. \href{https://github.com/Elaakarsh31/Skimlit}{[Code]}}
+  \resumeItemListEnd
+      \resumeNeedspace{6\baselineskip}
+\resumeProjectHeading
+  {\parbox[t]{0.79\textwidth}{\raggedright\textbf{Fuel Economy Analysis} $|$ \emph{Python, pandas, scikit-learn, XGBoost, Matplotlib, EDA, Feature Engineering, Target-leakage Prevention, One-hot Encoding, Linear Regression, Random Forest, Cross-validation, Grid Search, Feature Importance, Pipeline, ColumnTransformer, Preprocessing Caching}\strut}}{\textbf{Jan 2025}}
+  \resumeItemListStart
+        \resumeItem{Cleaned and explored \textbf{40k+ vehicle records} from the U.S. EPA fuel economy dataset to model \textbf{city MPG}, handling missing values, inconsistent categories and duplicate model-year entries.}
+        \resumeItem{Removed \textbf{target leakage} by excluding highway and combined MPG, which almost fully determine city MPG, so the model learns from vehicle design rather than from restated versions of the answer.}
+        \resumeItem{Ran EDA on how engine displacement, cylinder count, transmission, drive type, fuel type and model year relate to urban consumption, using correlation heatmaps and trend plots to show efficiency gains over time.}
+        \resumeItem{Engineered features such as \textbf{engine efficiency} and \textbf{[displacement per cylinder]}, and one-hot encoded categorical attributes like transmission, drive and vehicle class.}
+        \resumeItem{Benchmarked a \textbf{linear regression} baseline against \textbf{Random Forest} and \textbf{XGBoost}, tuning hyperparameters with \textbf{5-fold cross-validated grid search}.}
+        \resumeItem{Combined imputation and encoding in a \textbf{scikit-learn Pipeline/ColumnTransformer} with cached transformations, reducing \textbf{5-fold grid-search runtime from 50 to 35 minutes} while fitting preprocessing within each training fold.}
+        \resumeItem{Reached an \textbf{R\textsuperscript{2} of 0.85} and \textbf{RMSE of 2.3 MPG} with the best model, versus \textbf{0.68} R\textsuperscript{2} for the linear baseline.}
+        \resumeItem{Interpreted the model with \textbf{feature importance} rankings, identifying \textbf{engine displacement, cylinder count, drive type, and model year} as the strongest predictors of city fuel economy. \href{https://github.com/Elaakarsh31/FuelEconomyAnalysis}{[Code]}}
+  \resumeItemListEnd
+      \resumeNeedspace{6\baselineskip}
+\resumeProjectHeading
+  {\parbox[t]{0.79\textwidth}{\raggedright\textbf{LLM Chatbot: Document-Grounded Conversational AI Assistant} $|$ \emph{LangChain, RAG, FAISS, GPT-4, Chainlit, Firebase, Transformer, API Integration, Document Retrieval, Chunking/Reranking Evaluation, User Authentication, Session Management}\strut}}{\textbf{July 2024}}
+  % Titled "LLM Chatbot" in three masters and "Document-Grounded Conversational AI Assistant" in the AI/agentic master.
+  \resumeItemListStart
+        \resumeItem{Engineered \textbf{GPT-4 model} chatbot with Chainlit, enabling user-specific sessions and chat histories stored in \textbf{Firebase}.}
+        \resumeItem{Integrated \textbf{RAG} functionality to enable real-time document-based, \textbf{context-aware conversations} with chatbot.}
+        \resumeItem{Streamlined \textbf{user authentication} with a robust sign-in/sign-up system for multi-session user experiences.}
+        \resumeItem{Indexed chunks in \textbf{FAISS} via LangChain and reused embeddings matched by content hash, cutting repeat ingestion for unchanged documents from \textbf{42 to 11 seconds per document} versus re-embedding the same content.}
+        \resumeItem{Packed retrieved passages into a \textbf{token-budgeted context} with overlap removal, reducing mean retrieved-context size from \textbf{6,000 to 3,600 tokens per answer}.}
+        \resumeItem{Separated retrieval evaluation from answer generation, using relevance labels and MRR/nDCG to compare chunking and reranking choices on development queries while reserving final-test queries for reporting. \href{https://github.com/Elaakarsh31/GPTBot}{[Code]}}
+  \resumeItemListEnd
+    \resumeSubHeadingListEnd
+
+%-----------PUBLICATIONS-----------
+\section{Publications}
+    % \vspace{-0.5em}
+    \resumeSubHeadingListStart
+      \resumeProjectHeading
+          {\textbf{EcoSurve: AI-Powered Surveillance Video Summarization} $|$ \emph{CVC, Springer}}{\textbf{Mar 2026}}
+          \resumeItemListStart
+            \resumeItem{Built UniVTG VLM summarization + BERT-RAG QnA pipeline, improving retrieval grounding and summary relevance across surveillance video queries.\href{https://link.springer.com/chapter/10.1007/978-3-032-26217-2_6}{[Paper]}\href{https://github.com/Elaakarsh31/EcoSurve-VLM-powered-Crime-Footage-Summarization}{[Code]}}
+          \resumeItemListEnd
+        % \vspace{-0.5em}
+
+      % The masters said IEEE; the paper link is a Springer chapter (DOI prefix 10.1007), so Springer is used here.
+      \resumeProjectHeading
+          {\textbf{Chicken Disease Multiclass classification} $|$ \emph{ICITA Conference, Springer}}{\textbf{May 2023}}
+          \resumeItemListStart
+            \resumeItem{Developed and deployed 12 CNN models for categorical classification and proposed ChicNetV6 model achieved an efficiency score of \textbf{2.8198} and an accuracy of \textbf{94.49\%}.\href{https://link.springer.com/chapter/10.1007/978-981-19-9331-2_19}{[Paper]}\href{https://github.com/Elaakarsh31/Chicken-Disease-Classification}{[Code]}}
+          \resumeItemListEnd
+                \resumeProjectHeading
+          {\textbf{Semantic Segmentation of Retinal Vessels} $|$ \emph{OITS Conference, IEEE}}{\textbf{Aug 2023}}
+          \resumeItemListStart
+            \resumeItem{Implemented Semantic Segmentation technique using \textbf{Attention UNET+ResNET}, oversampled data using \textbf{GAN} and creating image patches, applying \textbf{Gabor filter}, achieving accuracy of \textbf{97\%}.\href{https://ieeexplore.ieee.org/abstract/document/10053840}{[Paper]}\href{https://colab.research.google.com/drive/1JQ-6DLyqRbs7589cfOMndfEZ_UR9Gaxn?usp=sharing}{[Code]}}
+          \resumeItemListEnd
+        
+    \resumeSubHeadingListEnd
+
+%-----------EDUCATION-----------
+\section{Education}
+  \resumeSubHeadingListStart
+    \resumeEduLine
+      {Northeastern University}{Master of Science in Artificial Intelligence}{Sep 2024 -- Dec 2026}
+    \resumeEduLine
+      {Kalinga Institute of Industrial Technology}{Bachelor of Technology in Computer Science}{Sep 2020 -- May 2024}
+  \resumeSubHeadingListEnd
+
+
+%
+%-----------TECHNICAL SKILLS-----------
+% Union of the four masters skill lists. Exact duplicates (same words, ignoring case,
+% spaces and hyphens) appear once; every other skill from every master is kept.
+\section{Technical Skills}
+
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{1.8in}X@{}}
+\textbf{Languages:} & \footnotesize{Python, C++, C, HTML, JavaScript, SQL, C++17, Java, Go, Scala, R, TypeScript, Shell scripting, C++ (C++17), Java (11/17+), C\#, Rust, CUDA, Bash / Shell, PowerShell, Kotlin, Power Query M, Salesforce Object Query Language (SOQL), Transact-SQL (T-SQL), SAS, Bash / Unix shell scripting, MATLAB, HTML5, MDX}\\
+\end{tabularx}
+\par\vspace{2pt}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{1.8in}X@{}}
+\textbf{ML \& data libraries:} & \footnotesize{PyTorch, TensorFlow, scikit-learn, Hugging Face, TensorFlow Hub, Unsloth, JAX, PyTorch Lightning, torchaudio, torchvision, torchmetrics, Transformers (Hugging Face), Datasets (Hugging Face), TRL, Axolotl, LLaMA-Factory, Pandas, NumPy, NLTK, Matplotlib, Seaborn, OpenCV, MoviePy, tf.data, Hugging Face Transformers, PySpark, Polars, XGBoost, ONNX, OpenCV DNN, Apple Silicon MPS, Streamlit, Exploratory Data Analysis (EDA), Correlation heatmaps, Trend plots, statsmodels, Keras}\\
+\end{tabularx}
+\par\vspace{2pt}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{1.8in}X@{}}
+\textbf{Machine learning methods:} & \footnotesize{Regression, Classification, Clustering, Random Forest, SVM, Sentiment analysis, Optimization techniques, Linear regression, Multinomial Naive Bayes, TF-IDF, Feature engineering, Dimensionality reduction, Principal component analysis (PCA), Singular value decomposition (SVD), Nearest-neighbor classification, Euclidean distance, Sum of squared differences (SSD), Supervised learning, Unsupervised learning, Statistical modeling, Predictive analytics, Forecasting, Time-series modeling, Gradient boosting, Ensemble methods, Anomaly detection, Representation learning, Multi-task learning, Predictive maintenance, Natural language processing (NLP), Support vector machines (SVM), PCA, SVD, Sequential sentence classification, Quantitative natural language inference, Information extraction, Text summarization, Named-entity recognition (NER), Topic modeling, Multi-label classification, Recommender systems, Ranking/search, Graph methods, Predictive modeling, Prescriptive modeling, Time-series analysis / forecasting, support vector machines (SVMs), K-means, nearest neighbors (1-NN), class-imbalance handling, standard-deviation-normalized Euclidean distance, sum-of-squared-differences (SSD) matching, distance-threshold unknown-object rejection, supervised / unsupervised learning, inverse-frequency class weighting, anomaly / pattern detection, model calibration, CHAID, CART, association rules, sequence analysis, partial least squares (PLS), data mining, modeling with delayed or incomplete labels, 1-nearest neighbor (1-NN), One-hot encoding, Feature importance, Target leakage prevention, Grid search, Cross-validation, Confusion matrices, Micro-F1 / macro-F1, Precision / recall, Perplexity, RMSE, R-squared, Ablation studies, AdamW, Cross-entropy loss, Train/validation/test splits, Statistics, Time-series analysis, A/B testing and experimentation, Reinforcement learning}\\
+\end{tabularx}
+\par\vspace{2pt}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{1.8in}X@{}}
+\textbf{Deep learning:} & \footnotesize{Transformers, LLMs, Deep learning, CNN, Conv1D, RNN, GRU, Bi-LSTM, Attention U-Net, ResNet18, ResNet, ChicNetV6, UniVTG, GAN, BERT, Flan-T5, Llama, GPT-style decoder-only models, Causal self-attention, Positional embeddings, Residual connections, Layer normalization, Dropout, Regularization, Dice loss, Binary cross-entropy (BCE), Foundation models, Vision-language models (VLMs), Multimodal models, Diffusion models, Autoregressive models, Autoencoders, Graph neural networks (GNNs), Time-Series Foundation Models (TSFM), Self-supervised learning, Transfer learning, Decoder-only architectures, Multi-head attention, Autoregressive inference, Multinomial sampling, GloVe, Universal Sentence Encoder (USE), Neural networks, Embedding models, Distributed training, causal / multi-head attention, CNN / Conv1D, ResNet / ResNet18, GANs, autoregressive / multinomial sampling, Computer vision, Decoder-only Transformers, Semantic segmentation, Image patches, Gabor filters, Hu moments, Morphological image processing, Object recognition, Unknown-object rejection}\\
+\end{tabularx}
+\par\vspace{2pt}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{1.8in}X@{}}
+\textbf{Training, tuning \& embeddings:} & \footnotesize{Hyperparameter grid search, Fine-tuning, Instruction tuning, Universal Sentence Encoder, Token embeddings, Character embeddings, Tokenization, Supervised fine-tuning (SFT), LoRA, Parameter-efficient fine-tuning (PEFT), Training optimization, Pretraining, Continued pretraining, Dialogue fine-tuning, Domain adaptation, Model distillation (knowledge distillation), Optimizer design, Curriculum learning, GPU-budget-aware sampling, Low-Rank Adaptation (LoRA), Adapter checkpoints, Post-training (supervised fine-tuning), Direct Preference Optimization (DPO), Group Relative Policy Optimization (GRPO), Reinforcement learning (RL), RL environments, Reward design, Reward hacking detection, Trajectory curation, Training-data versioning, Embedding generation, Dataset preprocessing, Character-level modeling, ML dataset construction, Vector databases, Vector schemas, Reinforcement Learning from Human Feedback (RLHF), Preference datasets, Synthetic data curation, Human-annotated data, Distributed model inference, Model monitoring, Concept drift detection, numerical reasoning, token / character / sentence embeddings, GPT-2, GPT-4, numerical input reframing, text mining, semantic search}\\
+\end{tabularx}
+\par\vspace{2pt}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{1.8in}X@{}}
+\textbf{RL \& alignment:} & \footnotesize{Imitation learning, RLHF, RLAIF, RL from verifiable rewards (RLVR), PPO, GRPO, Reward modeling, Alignment, Reward hacking, Out-of-distribution generalization, Environment design}\\
+\end{tabularx}
+\par\vspace{2pt}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{1.8in}X@{}}
+\textbf{LLMs \& generative AI:} & \footnotesize{LangChain, LangGraph, Gemini, Claude, RAG, Knowledge graphs, Ontologies, Agentic AI (AI agents), Prompt engineering, ElevenLabs, Text-to-speech (TTS), Pydantic, Structured outputs, Chain-of-thought prompting, Multi-agent workflows, StateGraph, Map-reduce fan-out, State reducers, Checkpointing, Human-in-the-loop gates, Intent classification, Context management, Natural language inference, Question answering, LlamaIndex, CrewAI, Semantic Kernel, Model Context Protocol (MCP), MCP servers, OpenAI API, Function calling, Tool calling, Planning, Planner/executor orchestration, Router/specialist orchestration, Agent handoff, Agent memory, Computer-use agents, Long-horizon agents, Automatic speech recognition (ASR), Natural language understanding, Model gateways, Vendor abstraction, Qwen, Mistral, DeepSeek, Large language models (LLMs), Generative AI, Anthropic Claude (3.5 Sonnet, Sonnet 4), Google Gemini, OpenAI GPT-4, Anthropic API/SDK, Open-weight models, GLM, GPT-OSS, Kimi, Multimodal foundation models, Prompt optimization, Ontology-guided extraction, Uncertainty flags, Prompt versioning, Token budgeting, Context packing, Passage overlap removal, System prompt design, Prompt libraries, Context-window management, Prompt management, multimodal AI, retrieval-augmented generation (RAG), LLM-as-judge, LLM evaluation, structured output, grounding, hallucination guardrails, human-in-the-loop review, model benchmarking, reasoning evaluation, relevance evaluation, hallucination / robustness / bias evaluation, Anthropic Claude, Agentic AI, LLM-as-judge evaluation, LLM guardrails, AI output validation, Tool / function calling, Agent skills, Prompt and configuration management, LLM-generated code evaluation, AI-assisted development, GitHub Copilot, Cursor, Claude Code, OpenAI Codex}\\
+\end{tabularx}
+\par\vspace{2pt}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{1.8in}X@{}}
+\textbf{Agents \& orchestration:} & \footnotesize{AI agents (agentic AI), Multi-agent systems, Agent orchestration, Human-in-the-loop (HITL), Deterministic workflow gates, AutoGen, Microsoft Agent Framework, Google Agent Development Kit (ADK), PydanticAI, Agent2Agent (A2A), Consent workflows, Human escalation, Schema validation, Agent planning, Multi-step reasoning, Agent memory (session/history state), Session recording/replay, Human takeover, Context compaction, Model selection and routing, Agent harnesses, Agent lifecycle management, Prompt chaining, Structured tool execution, Anthropic Claude / Claude Sonnet, Agentic AI / AI agents, deterministic gates, checkpointers / SqliteSaver, JSON schemas, AI copilots, Claude Code / AI coding assistants}\\
+\end{tabularx}
+\par\vspace{2pt}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{1.8in}X@{}}
+\textbf{Retrieval, search \& ranking:} & \footnotesize{Embeddings, Vector search, Information retrieval, Retrieval evaluation, Mean reciprocal rank (MRR), Normalized discounted cumulative gain (nDCG), Chunking, Reranking, Ranking models, Personalization, Embedding-based retrieval, Multi-stage rankers, Candidate extraction, Generative recommendation, User behavior modeling, User sequence modeling, Long-sequence modeling, Typesense, Nearest-neighbor search, Source provenance, FAISS, Vector indexing, Content-hash embedding reuse, Pinecone, Weaviate, Chroma (ChromaDB), Milvus, Knowledge grounding, Knowledge-graph retrieval, Semantic layers, Vector search / similarity search, Narrative retrieval, Temporal relevance filtering, Chapter-local fact indexing, Elasticsearch, Apache Lucene, Apache Solr, Search-index distribution, Search-index freshness}\\
+\end{tabularx}
+\par\vspace{2pt}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{1.8in}X@{}}
+\textbf{Evaluation \& metrics:} & \footnotesize{Model evaluation, Error analysis, Macro-F1, Micro-F1, Weighted F1, Precision, Recall, Accuracy, Top-k accuracy, Ground-truth quality analysis, Field-level evaluation, Explainability, Reproducibility, Controlled experiments, Experiment tracking, Hyperparameter tuning, Calibration, Robustness, Consistency regularization, Robustness analysis, KL divergence, Temperature scaling, Expected calibration error (ECE), Reliability diagrams, Loss ablation, Boundary F1, Source-image-disjoint evaluation, Split provenance, Experimental design, A/B testing, Measurement bias, Benchmarking, Distribution shift, Human feedback analysis, Autorater development, Reward over-optimization, Benchmark overfitting, lm-evaluation-harness, SWE-bench, Causal inference, Causal ML, Operations research, Convex optimization, Linear programming, Mathematical optimization, Multi-objective optimization, Algorithmic game theory, Demand estimation, LLM-as-a-judge, Model evaluation / LLM evaluation, Field-level metrics, Regression testing, Unit testing, Macro-/micro-/weighted F1, Train/validation splits, Golden datasets, Evaluation rubrics, Hallucination evaluation, Groundedness evaluation, Bias evaluation, Generalization testing, Offline evaluation, Online evaluation, Model drift detection, Model monitoring (training/validation metrics), Automated evaluation pipelines, Continuous LLM regression testing, Agent evaluation, Statistics / statistical analysis, Reply faithfulness evaluation, Braintrust, LangSmith, Langfuse, F1 / micro-F1 / macro-F1, baseline comparison, model interpretation, ROC-AUC, KS statistic, Gini coefficient, fraud capture rate, false-positive rate, customer-friction metrics, model stability assessment, fraud-loss evaluation}\\
+\end{tabularx}
+\par\vspace{2pt}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{1.8in}X@{}}
+\textbf{Statistics \& study design:} & \footnotesize{correlation analysis, bootstrap confidence intervals, clustered resampling, paired model comparison, effect sizes, probability theory, distributions, descriptive statistics, univariate / bivariate analysis, hypothesis / significance testing, t-tests, econometrics, multivariate analysis, generalized linear models (GLMs), logistic regression, sampling, blocked randomization, blinded review, a priori power analysis, grouped evaluation partitions, development / final-evaluation separation, randomized controlled trials, multi-cell / geo experiments, holdouts / holdbacks, statistical analysis plans, survey design / validation, clinically meaningful change, survey sample weighting, propensity score methods, interrupted time series, difference-in-differences, regression discontinuity, mediation / moderation analysis, uplift modeling, heterogeneous treatment effects, incrementality measurement, mixed-effects models, survival analysis, confirmatory factor analysis (CFA), internal consistency, measurement invariance, item response theory (IRT), latent class analysis, latent class growth analysis (LCGA), growth mixture modeling, Reliable Change Index (RCI), minimal clinically important difference (MCID), response / remission analysis, real-world evidence}\\
+\end{tabularx}
+\par\vspace{2pt}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{1.8in}X@{}}
+\textbf{Forecasting \& simulation:} & \footnotesize{rolling-origin backtesting, seasonal-naive baselines, residual diagnostics, horizon-specific MAE, prediction-interval coverage, seasonality, demand / supply / sales / operations forecasting, mathematical / econometric modeling, simulation, mechanistic / hybrid modeling, digital twins, virtual experimentation, metabolic / process modeling, network / social network models, genetic algorithms}\\
+\end{tabularx}
+\par\vspace{2pt}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{1.8in}X@{}}
+\textbf{Data preparation \& quality:} & \footnotesize{ETL, Data preprocessing, Deduplication, Normalization, Metadata enrichment, OCR, Data labeling, Data leakage prevention, JSON, CSV, Oversampling, Image patching, SQL schema design, SQL query optimization, Reproducible ML workflows, Data lineage, Data versioning, Training-serving consistency, Population stability index (PSI), Data quality gates, Freshness checks, Batch quarantine, Data curation, Annotation workflows, Quality filtering, Decontamination, PII scrubbing, Synthetic data generation, Feature stores, Model-ready datasets, Data modeling, Data warehousing, Streaming data, Telemetry processing, Windowing, data cleaning / preprocessing, missing-value handling, categorical / one-hot encoding, feature selection, scikit-learn Pipeline, ColumnTransformer, fold-local preprocessing, preprocessing caching, regular expressions, filtering / indexing, interpolation, outlier treatment, data wrangling / harmonization, multiple imputation, Field-level evaluation metrics, Root cause analysis, Page/line provenance, Metric definitions, Data profiling, Data reconciliation, Metadata management, Data Quality, Data Validation, Data Governance, Data contracts, Join-cardinality checks, Data quarantine, Data grain documentation, dbt data tests, Dataset versioning, Dataset manifests, Content hashing, Raw-data snapshots, Split isolation, Preprocessing artifact caching, Completeness checks, Source-to-target mapping, Data dictionaries, Data freshness, Data catalogs, Data stewardship, Entity resolution, Source precedence, Schema evolution, Great Expectations, Monte Carlo, Atlan, Microsoft Purview, Collibra, Alation}\\
+\end{tabularx}
+\par\vspace{2pt}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{1.8in}X@{}}
+\textbf{Data processing \& pipelines:} & \footnotesize{Databricks, Partition pruning, Column projection, Spark, Hadoop, Hive, Ray, Kafka, Flink, Airflow, Argo Workflows, Snowflake, BigQuery, NoSQL, MongoDB, Supabase, Prisma, ETL pipelines, Batch processing, Apache Spark, Distributed data processing, Incremental loading, MERGE upserts, Watermarks, Late-arriving data, Spark SQL, ELT, Apache Hadoop, Apache Hive, Apache Flink, Batch backfills, Micro-batch processing, Structured, semi-structured and unstructured data, Retry handling, Backpressure, Bounded concurrency, asyncio, Semaphores, API quota management, Apache Kafka, Spark Structured Streaming, Event-driven architectures, Real-time data pipelines, Durable queues, At-least-once processing, Idempotent processing, Redelivery, Fivetran, Qlik Replicate, Qlik Compose, Informatica, SQL Server Integration Services (SSIS), Apache Airflow, DAG dependencies, Task-level retries, Prefect, Dagster, Astronomer, Cloud Composer, Azure Data Factory, AWS Step Functions, Workflow scheduling}\\
+\end{tabularx}
+\par\vspace{2pt}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{1.8in}X@{}}
+\textbf{Storage, warehouses \& databases:} & \footnotesize{Query optimization, Data normalization, SQLite / SqliteSaver, CSV processing, Nullability checks, Run manifests, PostgreSQL, Oracle Database, SQL Server, Redis, Snowflake Cortex, dbt, Delta Lake, Airbyte, Data warehouses, Data lakes, Star schemas, Dimensional modeling, Indexing, Partitioning, Transactions, Backfills, Schema drift, Master data management, Schema design, Schema optimization, Data marts, Fact and dimension tables, Data grain, Referential integrity, SQL views, Lakehouse architecture, Kimball modeling, Inmon modeling, Medallion architecture, Semantic data models, Logical and physical data models, Denormalization, Slowly Changing Dimensions (SCD), dbt snapshots, Incremental dbt models, Online Analytical Processing (OLAP), Data Mesh, Object storage, Apache Parquet, Columnar storage, Apache Arrow, Apache Iceberg, DuckLake, XML, Storage-layout optimization, Compaction, Data indexing, Data retention, Data lifecycle management, Firebase, SQLite, SQL joins, Relational databases, SQL Query Optimization / Performance Tuning, Amazon Aurora PostgreSQL, MySQL, MongoDB aggregation pipelines, NoSQL databases, Microsoft SQL Server, DuckDB, Amazon DynamoDB, Apache Cassandra, Amazon Keyspaces, Amazon ElastiCache, Document stores, Key-value stores, Graph databases, Column-family stores, Stored procedures, SQL window functions, Sharding, SQL aggregations, SQL schemas / joins, S3-backed JSON / CSV outputs, data modeling / architecture, relational / NoSQL databases, data integration, Apache Spark / PySpark, intermediate caching, feature-table refresh optimization, Hadoop / Hive, Oracle, Amazon Redshift, Google BigQuery, real-time / streaming pipelines, Ab Initio, Talend}\\
+\end{tabularx}
+\par\vspace{2pt}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{1.8in}X@{}}
+\textbf{Web, APIs \& software engineering:} & \footnotesize{FastAPI, Django, REST APIs, Chainlit, JWT, ContextVar, Flask, React, APIs, SDKs, Microservices, Event-driven architecture, Backend services, Concurrency, Data structures, Algorithms, System design, Software design patterns, Next.js, Node.js, Angular, Vue.js, Spring Boot, Java EE (J2EE), .NET, ASP.NET Core, React Native, Session management, Typed tool interfaces, CSS, GraphQL, OpenAPI, API versioning, SDK development, API lifecycle management, gRPC, WebSockets, Webhooks, Full-stack development, UI/UX, Web accessibility, Cursor/keyset pagination, JWT authentication, API integrations, Web Services, Service-Oriented Architecture (SOA), Software Development Kits (SDKs), role-based access control, reusable automation scripts, no-code / low-code automation, robotic process automation (RPA), Power Platform, Microsoft Power Apps, Microsoft Copilot Studio, Microsoft 365 Copilot, Technical documentation, Data structures and algorithms, Complexity analysis, Object-oriented design, Design patterns, Operating systems, Processes, Networking (HTTP, TCP, DNS), Test-driven development, Integration testing, Stress/load testing, Performance testing, Secure code review, Software development lifecycle (SDLC), Agile/Scrum, Requirements analysis, Acceptance criteria, Architecture decision records, Reusable SDKs, Internal developer platforms, Service catalogs}\\
+\end{tabularx}
+\par\vspace{2pt}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{1.8in}X@{}}
+\textbf{Cloud platforms:} & \footnotesize{AWS, Azure, Amazon S3, Amazon Textract, Amazon Bedrock, Amazon SageMaker, AWS Converse API, Render, Amazon CloudWatch, AWS IAM, GCP, Vertex AI, Azure Machine Learning, Azure Cognitive Services, Azure Databricks, AWS Ultraclusters, Amazon EMR, Amazon ECS, Amazon EKS, GKE, AKS, OpenShift, Modal, Baseten, Imagen, Veo, Gemini API, Elastic GPU platforms, Serverless computing, Amazon Web Services (AWS), Document OCR, Bedrock Converse API, AWS Trainium, AWS Neuron SDK, Neuron Kernel Interface (NKI), Microsoft Azure, Azure OpenAI, Microsoft Foundry (Azure AI Foundry), Foundry Agent Service, Azure AI Search, Azure Functions, Azure Kubernetes Service (AKS), Azure API Management, Azure Synapse Analytics, Azure App Service, Azure Cosmos DB, Microsoft Entra ID, Managed Identities, Azure DevOps (Boards, Repos, Pipelines, Artifacts), Google Cloud Platform (GCP), Google Gemini Agent Builder, Google Cloud Pub/Sub, Cloud-native architecture, Serverless platforms, PaaS, Kubernetes, Helm, Kubernetes operators, Service discovery, Service mesh, API gateways, Apigee, Kong, Amazon Bedrock Converse API, Amazon Athena, AWS Glue, AWS Glue Jobs, Amazon Kinesis, Amazon Data Firehose, Federated data lakes, AWS Identity and Access Management (IAM), S3 prefix policies, AWS Lambda, AWS Fargate, Amazon EventBridge, Amazon SNS, AWS CloudFormation, Infrastructure as Code (IaC), Microsoft Fabric, Fabric Event Streams, Azure Event Hubs, Dataflow, Cloud Functions, Pub/Sub, Cloud Storage, Oracle Cloud Infrastructure (OCI), cloud application integration, Azure Storage, Databricks Jobs}\\
+\end{tabularx}
+\par\vspace{2pt}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{1.8in}X@{}}
+\textbf{MLOps, DevOps \& delivery:} & \footnotesize{MLOps, Docker, Git, GitHub, Automated testing, MLflow, Model registries, CI/CD, Model promotion gates, Contract testing, Model versioning, Terraform, Infrastructure as code, Release rollback, Deployment configuration, Retraining gates, Model revalidation, Research reproducibility, LLMOps, Kubeflow, Weights \& Biases, GitOps, GitHub Actions, GitLab CI/CD, Azure DevOps, Jenkins, Harness, TeamCity, Code review, SDLC, Agile, Canary deployment, Shadow deployment, Progressive delivery, Feature flags, Automated rollouts, Retraining triggers, Knative, KEDA, Model deployment, Release gates, Rollback, DevOps, DevSecOps, Ansible, Salt, Configuration as code, Build pipelines, Release management, Staged rollouts, Container security, Retraining workflows, Dependency management, Software composition analysis, Vulnerability remediation, Versioned inference bundles, Model release management, pytest, Schema compatibility testing, OpenTofu, GitLab, GitHub Enterprise, DataOps, Automated data testing, Configuration management, Controlled releases, Dev/QA/production environments, Anaconda, IntelliJ IDEA, Visual Studio Code, automated deployment, statement coverage, reproducible workflows, Linux / WSL, performance optimization, input / data drift monitoring, model monitoring / retraining, observability, Agile / SAFe, Jupyter Notebooks, PuTTY, performance-degradation monitoring}\\
+\end{tabularx}
+\par\vspace{2pt}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{1.8in}X@{}}
+\textbf{Inference \& performance:} & \footnotesize{CUDA/CPU fallback, Selective inference, Model routing, Rate-limit-aware retries, Inference profiling, Memory reuse, torch.profiler, Operator profiling, CUDA synchronization optimization, Detached device-side metric accumulation, Numerical correctness evaluation, vLLM, SGLang, TensorRT, TensorRT-LLM, ONNX Runtime, Triton, CUTLASS, llama.cpp, GPU model serving, Batch inference, Streaming inference, Batching, Caching, KV-cache optimization, Quantization, FP8, INT8, AWQ, GPTQ, GGUF, Sparsity, Model sparsification, Model compression, Attention optimization, Kernel fusion, Custom GPU operators, Speculative execution, Latency optimization, Throughput optimization, Cold-start tuning, GPU utilization, Cost attribution, Model serving, GPU architecture, GPU/TPU utilization, Inference optimization, Distributed inference, TensorRT-EdgeLLM, Torch-TensorRT, FlashInfer, CuTeDSL, TileIR, TorchDynamo, TorchInductor, JIT compilation, AOT tracing, Tiling, Scheduling, Parallel computing, Memory management, Performance profiling, gdb, NVIDIA Nsight, Valgrind, Flame graphs}\\
+\end{tabularx}
+\par\vspace{2pt}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{1.8in}X@{}}
+\textbf{ML systems \& hardware:} & \footnotesize{CUDA C++, Custom CUDA kernels, CUDAExtension, Welford reductions, CUDA memory profiling, GPU programming, GPU kernel development, OpenCL, Distributed systems, Multi-GPU execution, Multi-node execution, FSDP, DeepSpeed, Megatron, Tensor parallelism, Pipeline parallelism, Sequence parallelism, Training partitioning, Gradient checkpointing, GPU scheduling, Autoscaling, Multi-tenancy, Resource isolation, Spot-preemption recovery, High-performance computing, Slurm, LSF, Nsight Systems, Nsight Compute, GPU memory hierarchy, Memory bandwidth, I/O throughput, Hardware/software co-design, SIMD, Vectorization, ROCm, TPUs, ML compilers, Model compilation, Graph optimization, MLIR, LLVM, TVM, XLA, IREE, Compiler design, Async programming, Request deadlines, Circuit breakers, Bounded retries, RabbitMQ, MQ, Celery, Distributed caching, Rate limiting, Fault isolation, Multi-tenant isolation, Bulkheads, Idempotency, Graceful degradation, High availability, Failover, Disaster recovery, Capacity planning, Chaos testing, SLOs/SLAs, Response-buffer memory optimization}\\
+\end{tabularx}
+\par\vspace{2pt}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{1.8in}X@{}}
+\textbf{Computer vision \& physical AI:} & \footnotesize{Image processing, Image segmentation, Medical image segmentation, Gabor filter, Morphology, Dynamic thresholding, Object rejection, ROI preprocessing, Video summarization, Object detection, Defect detection, Defect classification, Metrology, Object tracking, Temporal understanding, 3D vision, Camera calibration, Localization, Pose estimation, Coordinate transformations, Depth estimation, 3D reconstruction, SLAM, Visual-inertial odometry (VIO), ROS2, Sim2Real, Robot learning, Vision-language-action (VLA) models, Sensor fusion, Signal processing, Radar, LiDAR, Acoustic signals, Vibration signals, Ultrasound, Real-time perception, Edge inference, Embedded AI, SoC architecture, Compute accelerators, FPGA prototyping, RTL design, Hardware modeling, Hardware simulators, One-shot learning, Morphological operations, Voice AI, Real-time video streaming, GStreamer, Edge AI, IoT, Jetson}\\
+\end{tabularx}
+\par\vspace{2pt}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{1.8in}X@{}}
+\textbf{Control \& simulation:} & \footnotesize{World models, Neural simulation, Autonomous navigation, Motion planning, Robot manipulation, Full-body motion control, Control theory, Estimation theory, Inverse problems, Uncertainty quantification, Control Barrier Functions (CBFs), Invariant sets, Hybrid dynamical systems, Nonlinear control, Reachability analysis, Formal verification, Robust control, Adaptive control, Real-time optimization, Quadratic programming (QP), Second-order cone programming (SOCP), Reduced-order modeling, Full-order modeling, Real-time embedded systems}\\
+\end{tabularx}
+\par\vspace{2pt}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{1.8in}X@{}}
+\textbf{Observability \& reliability:} & \footnotesize{Debug UIs, Health checks, Model performance analysis, OpenTelemetry, Distributed tracing, Latency instrumentation, Telemetry data minimization, Prometheus, Grafana, Splunk, Sentry, Structured logging, Metrics and alerting, Application performance monitoring (APM), Centralized logging, Production troubleshooting, Incident response, Operational runbooks, p50/p95 latency, Token/cost monitoring, Operational model-service monitoring, Linux, Windows Subsystem for Linux (WSL), Crash-safe resumption, Failure-key tracking, Fault tolerance, Pipeline observability, Progress metrics, Inactivity alerting, Consistency, Replication, Distributed locks, Leases, Cluster membership, Cluster scheduling, Fair scheduling, Quotas, Resource accounting, Compute allocation, Control planes, etcd, Apache ZooKeeper, Consensus-backed metadata, Datadog, New Relic, Log aggregation, Telemetry pipelines, Alerting, SLAs, Runbooks, FinOps, Infrastructure cost allocation, Unit economics}\\
+\end{tabularx}
+\par\vspace{2pt}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{1.8in}X@{}}
+\textbf{Security, privacy \& governance:} & \footnotesize{Role-based access control (RBAC), Authentication, Authorization, Consent gates, Drift detection, Metrics/logs/traces, Performance regression testing, Model cards, Audit logs, Audit trails, Model governance, Responsible AI, Fairness evaluation, Bias mitigation, Red teaming, Adversarial evaluation, AI safety, AI security, AI privacy, Out-of-model guardrails, Secrets management, Encryption, Secure coding, Risk assessment, AI-assisted coding, AI-generated code validation, Prompt/context engineering, HIPAA, CLIA, GxP, SOC 2, IEC 61508, ISO 13849, ISO 26262, Authentication and authorization, Data-minimizing guardrails, Secrets isolation, Server-side tool authorization, OAuth 2.0, OpenID Connect (OIDC), Least privilege, Secrets management (request-scoped isolation), Data retention controls, API security, Input validation, Bounded execution, Policy-as-code, AI governance, Model risk management, NIST AI RMF, EU AI Act, PCI-scoped data handling, Privacy risk evaluation, PII detection, Redaction, Masking, Pseudonymization, Anonymization, Differential privacy, k-anonymity, Secure aggregation, Format-preserving encryption, Leakage tests, Adversarial re-identification, Identity verification, Data minimization, ContextVar key isolation, Least-privilege access, PII minimization, Row-level security (RLS), Column-level security, PII masking, Scoped credentials, Sandboxed execution, Restricted network access, Audit logging, Access entitlements, PHI handling, De-identification, Tokenization for privacy, HITRUST, ISO 27001, NIST CSF, PCI DSS, Open Policy Agent (OPA), Rego, Prompt-injection defenses, reference-label quality, provenance tracking, Jira, Confluence, data quality / validation / integrity, dataset development, scientific research methods, model explainability, model validation, data lineage / traceability, annotation taxonomies, data security / privacy, regulatory data controls (BCBS 239, GLBA, TCPA, CAN-SPAM, GDPR), finance / risk / treasury analytics, accounting constraints / materiality thresholds, AI fairness / transparency, annotation frameworks}\\
+\end{tabularx}
+\par\vspace{2pt}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{1.8in}X@{}}
+\textbf{Analytics \& BI:} & \footnotesize{Tableau, WSL, Power BI, Colab, VS Code, PyCharm, Data visualization, Alteryx, ClickHouse, OLAP, Conversational analytics, AI-assisted reporting, Analytical dashboards, Analytical data products, Power BI Service, DAX, Calculated columns and measures, Dashboard performance optimization, Power BI workspaces and apps, Looker, Looker Studio, Microsoft Excel, Key Performance Indicators (KPIs), SSAS, SSRS, Oracle Business Intelligence Enterprise Edition (OBIEE), Sigma, Quarto, Reporting automation, Self-service analytics, dashboards / reporting, data storytelling, Excel, lookup / INDEX-MATCH functions, Google Sheets, PowerPoint, PitchPro+, Posit, Spotfire, QlikView, D3.js, SPSS, Google Workspace}\\
+\end{tabularx}
+\par\vspace{2pt}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{1.8in}X@{}}
+\textbf{Product, marketing \& domain analytics:} & \footnotesize{SQL analytical reporting, document-count reconciliation, cohort-level error analysis, cohort / funnel / retention analysis, customer segmentation, churn / conversion modeling, customer lifetime value (LTV), customer acquisition cost (CAC), LTV:CAC, marketing mix modeling (MMM), multi-touch attribution, ROI modeling, response / propensity modeling, price elasticity, pricing / promotion / inventory optimization, Earned Media Value (EMV), brand lift / discrete-choice models, event instrumentation / conversion tracking, product / device / audio telemetry, event-log analysis, Google Analytics / GA4, Google Ads conversion imports, Google Notification Platform, Chime mobile push, Audience Builder, mobile measurement platforms, DV360, The Trade Desk, Amazon DSP, martech / adtech measurement, creator-platform analytics (CreatorIQ), GIS, ArcGIS / ArcGIS Pro, ArcPy, GeoPandas, Geospatial SQL, geoprocessing / spatial data management, spatial statistics, spatiotemporal analysis, GeoAI, remote sensing, environmental-exposure modeling, statistical process control, process capability, quality engineering, curve metrics / univariate batch analysis, CHO cell culture / upstream bioprocessing, nutrient / metabolite / cell-growth / viability / productivity modeling, media / feeding strategies, bioreactor operation, process analytical technology (PAT), LIMS, ELN, MES, Historian, Qumas, OPM, omics / biomarker / preclinical safety data integration, CAPA / change control}\\
+\end{tabularx}
+\par\vspace{2pt}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{1.8in}X@{}}
+\textbf{Enterprise integrations \& data standards:} & \footnotesize{Salesforce APIs, SOQL, Salesforce Flows, Gong, Slack API, Slack Bolt, HubSpot, People.ai, SAP, Coupa, Microsoft Power Platform, Dynamics 365, Microsoft Copilot, n8n, Zapier, Temporal, EHR integrations, FHIR, LOINC, RxNorm, SFTP, Batch-file integrations, Fixed-width parsing, Stripe APIs, Adyen APIs, Fiserv, TSYS, Repay, Salesforce, Salesforce data model, Marketo, CRM / ATS data integration, Lever, Workday, Palantir Foundry, Contour, Google Ads API, Meta advertising APIs, Amazon Ads, Adobe Analytics, UTM attribution, ROAS / CPA / CTR metrics, Marketing funnel metrics, DMP / DSP data, Innovid, LiveRamp, Google Display \& Video, Yahoo DSP, Clari, Aviso, Bloomberg data, FactSet data, Web scraping, OCR API integration, Enterprise Integration Patterns (EIP), HL7, CCD / CCDA, OMOP Common Data Model, ICD-10, CPT, HCPCS, SNOMED CT, NDC, UMLS, Health Information Exchanges (HIE), Achilles, Data Quality Dashboard (DQDB), PDB, UniProt, ChEMBL, SDF / MOL, FASTA, MCAP, Point clouds, Time-series telemetry, OPC UA, MQTT, Serial communication, LIMS / ELN / MES integration, Process historians, Electronic batch records, cGMP data integrity, 21 CFR Part 11, GAMP 5, Computerized-system validation}\\
+\end{tabularx}
+\par\vspace{2pt}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{1.8in}X@{}}
+\textbf{Developer tools \& collaboration:} & \footnotesize{AI-generated code review and validation, Architecture documentation, SAFe, Interface contracts, Data-flow diagrams, Technical specifications, User Acceptance Testing (UAT), Change control, Source-system migration}\\
+\end{tabularx}
+\par\vspace{2pt}
+
+\end{document}

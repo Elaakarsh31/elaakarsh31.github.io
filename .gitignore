@@ -1,0 +1,15 @@
+node_modules
+dist
+.venv
+screenshots
+test-results
+*.log
+.DS_Store
+content/*.pdf
+# LaTeX build artifacts
+content/*.aux
+content/*.fdb_latexmk
+content/*.fls
+content/*.out
+content/*.log
+content/*.synctex.gz
