@@ -553,6 +553,10 @@ html[data-cursor-on] .cur-spot {
   .nav-list {
     display: none;
   }
+}
+
+/* Touch screens and phones: "Menu" instead of keyboard keys. */
+@media (max-width: 767px), (hover: none) {
   .nav-k-keys {
     display: none;
   }
@@ -562,6 +566,47 @@ html[data-cursor-on] .cur-spot {
   .nav-k {
     padding: 8px 14px;
   }
+}
+
+.nav-end {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nav-resume {
+  display: none;
+}
+
+/* Compact screens (phones, portrait tablets, small windows): nothing floats over the content.
+   The dock and the rail go, and the resume button joins the nav bar. Social links stay in Contact
+   and the Menu. */
+html[data-size='compact'] .dock,
+html[data-size='compact'] .resume-fab,
+html[data-size='compact'] .rail {
+  display: none;
+}
+
+html[data-size='compact'] .nav-resume {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--holo-line);
+  border-radius: 999px;
+  background: rgba(111, 211, 255, 0.06);
+  box-shadow: 0 0 14px -4px rgba(111, 211, 255, 0.5);
+  color: var(--holo);
+  font-family: var(--font-display);
+  font-weight: 650;
+  font-size: 13px;
+  text-decoration: none;
+}
+
+html[data-size='compact'] .nav-resume svg {
+  width: 15px;
+  height: 15px;
 }
 
 /* WebGL canvas: fixed behind the page */

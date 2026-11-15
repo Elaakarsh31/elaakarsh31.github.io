@@ -4,30 +4,32 @@ import { PerspectiveCamera, Vector3 } from 'three';
 import { easeInOut, seg } from './choreo';
 import { BENCH } from './toolbench/layout';
 import { CONTACT_CAM } from './afterBuild';
+import { fitFov } from './lens';
 
 type Shot = { pos: [number, number, number]; target: [number, number, number]; shift: number; lift?: number; fov?: number };
 
 // Camera framings. `shift` moves the scene right (fraction of the viewport width) so the copy on
-// the left never sits over the machine; `lift` moves it down (phones).
+// the left never sits over the machine; `lift` moves it down.
 export const SHOTS: Record<string, Shot> = {
   hero: { pos: [0.55, 1.8, 8.0], target: [0.12, 1.06, 0], shift: 0.19 },
   data: { pos: [-1.95, 1.85, 7.1], target: [-2.25, 0.64, 0.3], shift: 0.14 },
   model: { pos: [0.95, 1.9, 6.7], target: [0.12, 1.1, 0], shift: 0.15 },
   system: { pos: [0.75, 1.75, 7.4], target: [0.1, 1.06, 0], shift: 0.15 },
   projects: { pos: [0.1, 1.7, 9.6], target: [0.08, 1.08, 0], shift: 0.31 },
-  // Career: the bot on its own, close and large on the right, beside the timeline.
-  career: { pos: [-1.95, 1.64, 5.75], target: [-2.0, 1.54, 3.35], shift: 0.27 },
-  toolbench: { pos: [BENCH.x, 3.15, BENCH.z + 3.55], target: [BENCH.x, 0, BENCH.z + 0.12], shift: 0.06, lift: 0.07 },
+  // Career: the bot on its own, close and large on the right, beside the timeline. It sits in the
+  // open floor between the machine and the bench, so no later move sweeps across the machine.
+  career: { pos: [5.05, 1.64, 5.75], target: [5.0, 1.54, 3.35], shift: 0.27 },
+  // Toolbench: centred and a touch further back, so all three trays fit at any window shape.
+  toolbench: { pos: [BENCH.x, 3.75, BENCH.z + 4.15], target: [BENCH.x, 0, BENCH.z + 0.02], shift: 0, lift: 0.12 },
   // Contact: straight on, in the gap between the machine and the bench; the bot stands beside the
   // title (afterBuild.contactBotPoint places it from the title's position on screen).
   contact: { pos: [CONTACT_CAM.x, CONTACT_CAM.y, CONTACT_CAM.z], target: [CONTACT_CAM.x, CONTACT_CAM.y, CONTACT_CAM.z - 3], shift: 0, lift: 0 },
-  // Still frames: centred, for the phone, reduced-motion and no-WebGL layouts.
+  // Still frames: centred, for the compact, reduced-motion and no-WebGL layouts.
   frameHero: { pos: [0.4, 1.75, 7.4], target: [0.12, 1.02, 0], shift: 0 },
   frameData: { pos: [-1.75, 1.5, 5.0], target: [-2.05, 0.6, 0.25], shift: 0 },
   frameModel: { pos: [0.95, 1.9, 6.3], target: [0.12, 1.1, 0], shift: 0 },
   frameSystem: { pos: [0.55, 1.75, 6.9], target: [-0.1, 1.06, 0], shift: 0 },
   frameOg: { pos: [0.7, 1.68, 6.9], target: [0.02, 1.08, 0], shift: 0.16 },
-  heroPhone: { pos: [0.35, 1.7, 11.2], target: [0.15, 1.0, 0], shift: 0, lift: 0.36, fov: 34 },
 };
 
 /** Camera keyframes along the build: [p, shot]. */
@@ -101,11 +103,10 @@ export function CameraRig({ resolve, immediate }: { resolve: (out: ShotState) =>
     cur.fov += (want.fov - cur.fov) * k;
     camera.position.copy(cur.pos);
     camera.lookAt(cur.target);
-    if (Math.abs(camera.fov - cur.fov) > 1e-3) {
-      camera.fov = cur.fov;
-    }
     const w = size.width;
     const h = size.height;
+    const fov = fitFov(cur.fov, w / h);
+    if (Math.abs(camera.fov - fov) > 1e-3) camera.fov = fov;
     camera.setViewOffset(w, h, -cur.shift * w, -cur.lift * h, w, h);
     camera.updateProjectionMatrix();
   }, -2);

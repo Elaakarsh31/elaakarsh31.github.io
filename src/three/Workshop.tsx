@@ -22,11 +22,6 @@ const camRight = new Vector3();
 const camUp = new Vector3();
 const local = new Vector3();
 
-/** The scene is off screen (below the hero on phones, where the acts use still frames). */
-function sceneHidden() {
-  return document.documentElement.dataset.mode === 'phone' && currentSection() !== 'top';
-}
-
 /** Shows the hovered machine part's name in the HUD and lights its plate label. */
 function showPart(part: { anchor: string; label: string; kind: string } | null) {
   const html = document.documentElement;
@@ -158,13 +153,6 @@ export function Workshop({ motion, sparks: sparksOn, capture }: { motion: boolea
   }, [sparks, dpr, size.height]);
 
   useFrame((state, dt) => {
-    // Nothing on screen to point at: let go of any hover.
-    if (sceneHidden() && (hoverPart.current || document.documentElement.dataset.botHover)) {
-      hoverPart.current = '';
-      machine.setHover(null);
-      showPart(null);
-      delete document.documentElement.dataset.botHover;
-    }
     const p = stage.p;
     const t = state.clock.elapsedTime;
     machine.update(p, t, dt, motion, stage.highlight);
@@ -231,13 +219,12 @@ export function Workshop({ motion, sparks: sparksOn, capture }: { motion: boolea
   }, -1);
 
   const onClick = (e: ThreeEvent<MouseEvent>) => {
-    if (sceneHidden()) return;
     e.stopPropagation();
     pokeBot();
   };
 
   const onMachineMove = (e: ThreeEvent<PointerEvent>) => {
-    if (capture || sceneHidden()) return;
+    if (capture) return;
     // The bot is in front: it takes the hover, the machine lets go.
     if (document.documentElement.dataset.botHover) {
       if (hoverPart.current) onMachineOut();
@@ -257,7 +244,7 @@ export function Workshop({ motion, sparks: sparksOn, capture }: { motion: boolea
     showPart(null);
   };
   const onMachineClick = (e: ThreeEvent<MouseEvent>) => {
-    if (capture || e.delta > 6 || document.documentElement.dataset.botHover || sceneHidden()) return;
+    if (capture || e.delta > 6 || document.documentElement.dataset.botHover) return;
     machine.ping();
     brain.react(clock.elapsedTime);
   };
@@ -271,7 +258,7 @@ export function Workshop({ motion, sparks: sparksOn, capture }: { motion: boolea
         object={bot.root}
         onClick={onClick}
         onPointerOver={() => {
-          if (!sceneHidden()) document.documentElement.dataset.botHover = '1';
+          document.documentElement.dataset.botHover = '1';
         }}
         onPointerOut={() => delete document.documentElement.dataset.botHover}
         name={botName() || 'bot'}

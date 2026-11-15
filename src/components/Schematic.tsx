@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, type ReactNode } from 'react';
+import { hasFinePointer } from '../lib/env';
 import { Hint, PointerIcon } from './Hint';
 
 // Exploded mini-diagrams for the spec sheets, drawn in code like a technical drawing. Every label
@@ -13,7 +14,10 @@ const H = 300;
 type Active = { id: string; group?: string; caption: string } | null;
 const Ctx = createContext<{ active: Active; set: (a: Active) => void }>({ active: null, set: () => {} });
 
-/** A hoverable part of a drawing. Parts in the same group light up together. */
+/**
+ * A hoverable part of a drawing; parts in the same group light up together. On touch screens a
+ * tap selects the part and it stays selected until another part is tapped.
+ */
 function Part({ id, group, caption, children }: { id: string; group?: string; caption: string; children: ReactNode }) {
   const { active, set } = useContext(Ctx);
   const on = !!active && (active.id === id || (!!group && active.group === group));
@@ -21,7 +25,9 @@ function Part({ id, group, caption, children }: { id: string; group?: string; ca
     <g
       className={on ? 'sch-part is-on' : 'sch-part'}
       onPointerEnter={() => set({ id, group, caption })}
-      onPointerLeave={() => set(null)}
+      onPointerLeave={(e) => {
+        if (e.pointerType === 'mouse' || e.pointerType === 'pen') set(null);
+      }}
     >
       {children}
     </g>
@@ -278,7 +284,7 @@ const DIAGRAMS: Record<string, { body: () => ReactNode; label: string }> = {
   gpt2: { body: Gpt2, label: 'An exploded decoder-only Transformer: character tokens, embeddings, a stack of decoder blocks, and a next-character output, dimensioned at 7.24M parameters.' },
 };
 
-const HINT = 'Point at any part of the drawing.';
+const HINT = hasFinePointer() ? 'Point at any part of the drawing.' : 'Tap any part of the drawing.';
 
 /** Exploded mini-diagram drawn in code for a project's spec sheet. */
 export function Schematic({ id }: { id: string }) {

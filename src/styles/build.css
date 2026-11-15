@@ -81,6 +81,14 @@
   background: var(--gunmetal);
 }
 
+/* On short screens (a phone held sideways) a still frame never takes more than most of a screen. */
+@media (max-height: 559px) {
+  .frame img {
+    max-height: 72svh;
+    object-fit: cover;
+  }
+}
+
 /* Acts in flow */
 .act {
   max-width: var(--maxw);

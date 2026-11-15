@@ -10,6 +10,7 @@ import './styles/chrome.css';
 import './styles/build.css';
 import './styles/stage.css';
 import './styles/sections.css';
+import './styles/large.css';
 import { App } from './App';
 
 createRoot(document.getElementById('root')!).render(

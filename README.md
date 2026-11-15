@@ -25,7 +25,7 @@ npm run resume    # only regenerate src/content/resume.generated.json
 
 `npm run shots` serves `dist/` and checks the following. It fails on any console error, page error or request to another origin.
 - The power-on gate holds the page, fills, focuses Power on, lifts on Enter or a tap, and starts audio.
-- Screenshots at 1440×900 and 390×844: the hero; the start, middle and end of each act; projects; career; the toolbench before and after sorting; contact.
+- Screenshots at 1440×900 and 390×844 (plus a portrait tablet and a phone held sideways, which must use the compact layout with nothing floating over the content): the hero; the start, middle and end of each act; projects; career; the toolbench before and after sorting; contact.
 - No HUD panel overlaps the act copy.
 - Readouts show live values.
 - Rendering pauses offscreen and in a hidden tab.
@@ -66,9 +66,10 @@ Callouts carry:
 ## How the page works
 
 - **Modes** (`src/lib/env.ts`) are set on `<html data-mode>`:
-  - `live`: desktop or tablet with WebGL and motion allowed. The pinned build, the HUD and the physics bench run here.
-  - `phone`: under 768px. The hero is live; the acts use still frames with callouts as lists, and the toolbench shows tags as chips.
-  - `static`: reduced motion, no WebGL, or a lost context. Every section sits in normal flow beside its still frame.
+  - `live`: a wide, landscape window (at least 1000×560 and wider than 1.15:1) with WebGL and motion allowed. The pinned build, the HUD, the physics bench, the power-on gate and sound run here.
+  - `static`: everything else: phones, portrait tablets, phones held sideways, small windows, reduced motion, no WebGL or a lost context. Every section sits in normal flow beside its still frame, with native scrolling and no WebGL.
+  - `<html data-size>` is `compact` on the small and squarish screens: the dock, rail and floating resume button are hidden so nothing covers the content, and Resume moves into the nav.
+  - On narrower live windows the camera holds its horizontal view (`src/three/lens.ts`), and from 1800px up the type and text columns grow (`src/styles/large.css`).
 - **The build** (`src/components/Build.tsx`, `src/lib/timeline.ts`):
   - `#build` is 500vh tall with a sticky 100vh stage.
   - One GSAP timeline, scrubbed by ScrollTrigger and driven by Lenis, tweens `stage.p` from 0 to 400 (vh of scroll). It also handles the act copy.

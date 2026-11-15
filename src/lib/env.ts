@@ -1,14 +1,17 @@
 // Render mode for the whole page, re-evaluated when the media queries change.
-//   live:   desktop or tablet with WebGL and motion allowed (pinned stage, physics, cursor)
-//   phone:  narrow screens: live hero canvas, still frames for the acts, tag chips
-//   static: reduced motion, no WebGL, or a lost WebGL context: still frames everywhere
+//   live:   a wide, landscape window with WebGL and motion allowed: the pinned stage, the 3D
+//           scene, physics, the cursor and sound.
+//   static: everything else: phones, portrait tablets, short or narrow windows, reduced motion,
+//           no WebGL or a lost WebGL context. Still frames, normal flow, native scrolling.
+// html[data-size] is 'compact' on the small or squarish screens, for layout (no floating dock).
 import { useSyncExternalStore } from 'react';
 
-export type Mode = 'live' | 'phone' | 'static';
+export type Mode = 'live' | 'static';
 
 const mq = (q: string) => window.matchMedia(q);
 const reducedMq = mq('(prefers-reduced-motion: reduce)');
-const phoneMq = mq('(max-width: 767px)');
+/** Too small or too square for the scroll-driven scene beside the copy. */
+const compactMq = mq('(max-width: 999px), (max-height: 559px), (max-aspect-ratio: 23/20)');
 const finePointerMq = mq('(hover: hover) and (pointer: fine)');
 
 let webgl: boolean | null = null;
@@ -39,8 +42,8 @@ const emit = () => {
 };
 
 function compute(): Mode {
-  if (forceStatic || reducedMq.matches || contextLost || !hasWebGL()) return 'static';
-  return phoneMq.matches ? 'phone' : 'live';
+  if (forceStatic || reducedMq.matches || contextLost || compactMq.matches || !hasWebGL()) return 'static';
+  return 'live';
 }
 
 let current: Mode = compute();
@@ -49,11 +52,12 @@ function apply() {
   const html = document.documentElement;
   html.dataset.mode = current;
   html.dataset.motion = reducedMq.matches ? 'reduce' : 'ok';
+  html.dataset.size = compactMq.matches ? 'compact' : 'wide';
 }
 apply();
 
 reducedMq.addEventListener('change', emit);
-phoneMq.addEventListener('change', emit);
+compactMq.addEventListener('change', emit);
 
 export function getMode() {
   return current;

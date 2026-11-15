@@ -31,7 +31,7 @@ function CaptureApp({ frame }: { frame: string }) {
   return (
     <div className="capture" data-frame={frame}>
       <Suspense fallback={null}>
-        <WorkshopCanvas mode="live" />
+        <WorkshopCanvas />
       </Suspense>
       {frame === 'og' && (
         <div className="og-copy">
@@ -53,10 +53,10 @@ function Site() {
   const mode = useMode();
   const [finePointer] = useState(hasFinePointer);
 
-  // Smooth scrolling everywhere except with reduced motion (static mode covers that case,
-  // plus no-WebGL, where smooth scrolling is still welcome).
+  // Smooth scrolling drives the scroll-built scene; phones, tablets and reduced motion keep the
+  // browser's own scrolling.
   useEffect(() => {
-    if (document.documentElement.dataset.motion === 'reduce') return;
+    if (mode !== 'live') return;
     return startSmoothScroll();
   }, [mode]);
 
@@ -77,7 +77,7 @@ function Site() {
     <>
       {mode !== 'static' && (
         <Suspense fallback={null}>
-          <WorkshopCanvas mode={mode} />
+          <WorkshopCanvas />
         </Suspense>
       )}
       <a className="skip" href="#projects">

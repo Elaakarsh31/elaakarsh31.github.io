@@ -31,6 +31,8 @@ function unlock() {
 GESTURES.forEach((g) => window.addEventListener(g, unlock, true));
 
 export const isSoundOn = () => enabled;
+/** Audio has already been started by a click, tap or key press. */
+export const isAudioRunning = () => !!ctx && ctx.state === 'running';
 
 export function onSoundChange(fn: (on: boolean) => void) {
   listeners.add(fn);

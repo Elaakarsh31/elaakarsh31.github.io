@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Captures still frames of the real scene for the phone, reduced-motion and no-WebGL layouts,
+// Captures still frames of the real scene for the compact, reduced-motion and no-WebGL layouts,
 // plus the Open Graph image. Serves the production build with `vite preview`.
 //
 //   npm run build && npm run frames     # public/frames/{hero,data,model,system}.png and public/og.png

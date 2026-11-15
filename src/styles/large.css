@@ -1,0 +1,199 @@
+/* Large screens (1800px and wider): type and text columns grow with the window, so the copy keeps
+   its weight beside the scene instead of shrinking into a corner of a 27-inch monitor. Sizes are
+   the base sizes times --type. */
+@media (min-width: 1800px) {
+  :root {
+    --type: 1.14;
+    --maxw: 1400px;
+  }
+}
+
+@media (min-width: 2300px) {
+  :root {
+    --type: 1.3;
+    --maxw: 1600px;
+  }
+}
+
+@media (min-width: 1800px) {
+  body {
+    font-size: calc(17px * var(--type));
+  }
+
+  /* Nav and fixed controls */
+  .nav-mark {
+    font-size: calc(18px * var(--type));
+  }
+  .nav-list {
+    font-size: calc(15px * var(--type));
+  }
+  .resume-fab {
+    font-size: calc(13px * var(--type));
+  }
+  .btn {
+    font-size: calc(15px * var(--type));
+    min-height: calc(44px * var(--type));
+  }
+  .details summary {
+    font-size: calc(13px * var(--type));
+  }
+  .hint-chip {
+    font-size: calc(12.5px * var(--type));
+  }
+
+  /* Hero */
+  html[data-mode='live'] .hero-name {
+    font-size: clamp(56px, 7.2vw, calc(108px * var(--type)));
+  }
+  .hero-tagline {
+    font-size: calc(32px * var(--type));
+  }
+  .hero-intro {
+    font-size: calc(18px * var(--type));
+    max-width: calc(30rem * var(--type));
+  }
+  .hero-edu,
+  .hero-fact {
+    font-size: calc(13px * var(--type));
+  }
+  html[data-mode='live'] .hero-copy {
+    width: min(40vw, calc(600px * var(--type)));
+  }
+
+  /* Acts and HUD */
+  .act-kicker {
+    font-size: calc(13px * var(--type));
+  }
+  html[data-mode='live'] .act-title {
+    font-size: clamp(36px, 3.9vw, calc(60px * var(--type)));
+  }
+  .act-line {
+    font-size: calc(18px * var(--type));
+    max-width: calc(28rem * var(--type));
+  }
+  .act-link {
+    font-size: calc(15px * var(--type));
+  }
+  html[data-mode='live'] .act-copy {
+    width: min(36vw, calc(520px * var(--type)));
+  }
+  html[data-mode='live'] .act .callouts {
+    width: clamp(240px, 20vw, calc(290px * var(--type)));
+  }
+  .callout-face {
+    font-size: calc(13.5px * var(--type));
+  }
+  .callout-detail {
+    font-size: calc(15px * var(--type));
+  }
+  .callout-bullet,
+  .callout-links {
+    font-size: calc(14px * var(--type));
+  }
+  .ro-act {
+    font-size: calc(12.5px * var(--type));
+  }
+  .ro-metric {
+    font-size: calc(12px * var(--type));
+  }
+
+  /* Projects and publications */
+  .section-title {
+    font-size: clamp(34px, 4.6vw, calc(60px * var(--type)));
+  }
+  html[data-mode='live'] .projects > .sheets,
+  html[data-mode='live'] .projects > .more-github,
+  html[data-mode='live'] .projects > .papers {
+    width: min(calc(880px * var(--type)), 62vw);
+  }
+  .sheet-title {
+    font-size: calc(32px * var(--type));
+  }
+  .sheet-meta,
+  .paper-meta {
+    font-size: calc(13px * var(--type));
+  }
+  .sheet-result {
+    font-size: calc(14px * var(--type));
+  }
+  .stack {
+    font-size: calc(12.5px * var(--type));
+  }
+  .chip {
+    font-size: calc(12px * var(--type));
+  }
+  .more-github {
+    font-size: calc(16px * var(--type));
+  }
+  .papers-title {
+    font-size: calc(22px * var(--type));
+  }
+  .papers-note {
+    font-size: calc(15px * var(--type));
+  }
+  .sch-explain {
+    font-size: calc(13px * var(--type));
+  }
+  .schematic-wrap {
+    max-width: calc(620px * var(--type));
+  }
+
+  /* Career */
+  .log-about {
+    font-size: calc(18px * var(--type));
+    max-width: calc(44rem * var(--type));
+  }
+  .log-head {
+    font-size: calc(13px * var(--type));
+  }
+  .log-title {
+    font-size: calc(20px * var(--type));
+  }
+  .log-org {
+    font-size: calc(16px * var(--type));
+  }
+  .log-notes {
+    font-size: calc(15px * var(--type));
+    max-width: calc(44rem * var(--type));
+  }
+  .log-tag {
+    font-size: calc(12px * var(--type));
+  }
+  .log-more-list {
+    font-size: calc(14.5px * var(--type));
+  }
+  .log-merge-text {
+    font-size: calc(12.5px * var(--type));
+  }
+  .career-holo-role {
+    font-size: calc(18px * var(--type));
+  }
+  .career-holo-head,
+  .career-holo-org {
+    font-size: calc(12.5px * var(--type));
+  }
+
+  /* Resume band, toolbench, contact */
+  .resume-band-line {
+    font-size: clamp(22px, 2.6vw, calc(32px * var(--type)));
+  }
+  .band-download {
+    font-size: calc(15px * var(--type));
+  }
+  html[data-mode='live'] .bench-head {
+    width: min(44vw, calc(560px * var(--type)));
+  }
+  .tray-title,
+  .tag {
+    font-size: calc(13px * var(--type));
+  }
+  .contact-title {
+    font-size: clamp(38px, 6vw, calc(84px * var(--type)));
+  }
+  .contact-email {
+    font-size: clamp(20px, 3.2vw, calc(40px * var(--type)));
+  }
+  .footer {
+    font-size: calc(14px * var(--type));
+  }
+}

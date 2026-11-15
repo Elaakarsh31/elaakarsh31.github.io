@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { BOOT_STEPS, bootReady, isBooted, onBoot, setPowered, type BootStep } from '../lib/boot';
 import { getLenis } from '../lib/scroll';
-import { powerOn } from '../lib/sound';
+import { isAudioRunning, powerOn } from '../lib/sound';
 import { stage } from '../lib/stage';
 
 /** How far along the bar each finished step takes it. */
@@ -31,7 +31,8 @@ function flicker(ms: number) {
  * click is what lets the browser play sound, so every visitor hears the workshop.
  */
 export function PowerGate() {
-  const [phase, setPhase] = useState<'boot' | 'ready' | 'leaving' | 'gone'>('boot');
+  // Already clicked earlier (say the window was widened from a phone-sized layout): no gate.
+  const [phase, setPhase] = useState<'boot' | 'ready' | 'leaving' | 'gone'>(() => (isAudioRunning() ? 'gone' : 'boot'));
   const [pct, setPct] = useState(0);
   const [, setTick] = useState(0);
   const button = useRef<HTMLButtonElement>(null);
@@ -63,9 +64,17 @@ export function PowerGate() {
     };
   }, [up]);
 
+  useEffect(() => {
+    if (phase !== 'gone' || stage.power > 0) return;
+    stage.power = 1;
+    setPowered();
+  }, [phase]);
+
   // Progress: eases toward the last finished step and creeps toward the next, never faster than
   // MIN_FILL_MS overall; ready once every step has reported (or after FALLBACK_MS).
+  const skipped = useRef(phase === 'gone');
   useEffect(() => {
+    if (skipped.current) return;
     const t0 = performance.now();
     let lastStepAt = t0;
     let shown = 0;

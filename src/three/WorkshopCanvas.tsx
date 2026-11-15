@@ -3,7 +3,7 @@ import { Bloom, EffectComposer, ToneMapping } from '@react-three/postprocessing'
 import { ToneMappingMode } from 'postprocessing';
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { bootStep, setPowered } from '../lib/boot';
-import { markContextLost, type Mode } from '../lib/env';
+import { markContextLost } from '../lib/env';
 import { currentSection } from '../lib/spy';
 import { BUILD_LENGTH, stage } from '../lib/stage';
 import { blendAt, type Spot } from './afterBuild';
@@ -60,50 +60,34 @@ function CaptureReady() {
   return null;
 }
 
-/**
- * Pauses rendering when the tab is hidden (or below the hero on phones), and falls back
- * to still frames if the WebGL context is lost.
- */
-function Lifecycle({ phone }: { phone: boolean }) {
+/** Pauses rendering while the tab is hidden, and falls back to still frames if the WebGL context is lost. */
+function Lifecycle() {
   const gl = useThree((s) => s.gl);
   const setFrameloop = useThree((s) => s.setFrameloop);
   useEffect(() => {
     const canvas = gl.domElement;
-    let pauseTimer = 0;
     const lost = (e: Event) => {
       e.preventDefault();
       markContextLost();
     };
     canvas.addEventListener('webglcontextlost', lost);
     const apply = () => {
-      clearTimeout(pauseTimer);
-      const section = currentSection();
-      // On phones only the hero is live; the acts below use still frames.
-      const offstage = phone && section !== 'top';
-      const run = (on: boolean) => {
-        setFrameloop(on ? 'always' : 'never');
-        canvas.dataset.running = on ? '1' : '0';
-      };
-      if (document.hidden) run(false);
-      else if (offstage) pauseTimer = window.setTimeout(() => run(false), 650); // after the fade
-      else run(true);
+      const on = !document.hidden;
+      setFrameloop(on ? 'always' : 'never');
+      canvas.dataset.running = on ? '1' : '0';
     };
     document.addEventListener('visibilitychange', apply);
-    window.addEventListener('section', apply);
     apply();
     return () => {
-      clearTimeout(pauseTimer);
       canvas.removeEventListener('webglcontextlost', lost);
       document.removeEventListener('visibilitychange', apply);
-      window.removeEventListener('section', apply);
     };
-  }, [gl, setFrameloop, phone]);
+  }, [gl, setFrameloop]);
   return null;
 }
 
 /** The fixed WebGL canvas behind the page: studio, machine, bot, HUD anchors. */
-export default function WorkshopCanvas({ mode }: { mode: Mode }) {
-  const phone = mode === 'phone';
+export default function WorkshopCanvas() {
   const motion = !isCapture;
   useEffect(() => {
     startInput();
@@ -138,8 +122,8 @@ export default function WorkshopCanvas({ mode }: { mode: Mode }) {
         out.fov = debugCam[6] ?? 30;
         return out;
       }
-      if (isCapture || phone) {
-        const s = isCapture ? SHOTS[`frame${captureFrame![0].toUpperCase()}${captureFrame!.slice(1)}`] : SHOTS.heroPhone;
+      if (isCapture) {
+        const s = SHOTS[`frame${captureFrame![0].toUpperCase()}${captureFrame!.slice(1)}`];
         out.pos.fromArray(s.pos);
         out.target.fromArray(s.target);
         out.shift = s.shift;
@@ -168,13 +152,13 @@ export default function WorkshopCanvas({ mode }: { mode: Mode }) {
       out.fov = tmp.fov;
       return out;
     };
-  }, [phone]);
+  }, []);
 
   return (
     <div className="webgl" aria-hidden="true">
       <Canvas
-        dpr={[1, phone ? 1.25 : 1.75]}
-        shadows={!phone}
+        dpr={[1, 1.75]}
+        shadows
         gl={{ antialias: false, alpha: false, stencil: false, powerPreference: 'high-performance', preserveDrawingBuffer: isCapture }}
         camera={{ fov: 30, near: 0.1, far: 60, position: [0.35, 1.7, 6.6] }}
         eventSource={document.getElementById('root')!}
@@ -184,15 +168,15 @@ export default function WorkshopCanvas({ mode }: { mode: Mode }) {
           bootStep('scene');
         }}
       >
-        {isCapture ? <CaptureReady /> : <Lifecycle phone={phone} />}
+        {isCapture ? <CaptureReady /> : <Lifecycle />}
         <BootProbe />
-        <Studio reflect={!phone} shadows={!phone} />
+        <Studio reflect shadows />
         <Workshop motion={motion} sparks={motion || isCapture} capture={isCapture} />
-        {!phone && !isCapture && <BenchLoader />}
+        {!isCapture && <BenchLoader />}
         <CameraRig resolve={resolve} immediate={isCapture} />
         <HudSync />
         {!noPost && (
-          <EffectComposer multisampling={phone ? 0 : 4}>
+          <EffectComposer multisampling={4}>
             <Bloom mipmapBlur intensity={0.75} luminanceThreshold={1.4} luminanceSmoothing={0.2} radius={0.62} />
             <ToneMapping mode={ToneMappingMode.ACES_FILMIC} />
           </EffectComposer>

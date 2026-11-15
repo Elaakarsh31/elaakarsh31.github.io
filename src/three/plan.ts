@@ -151,7 +151,7 @@ export function planBot(p: number, m: MachineHandles, d: DataHandles, out: BotPl
   return out;
 }
 
-export const BOT_CAREER = new Vector3(-2.0, 1.42, 3.35);
+export const BOT_CAREER = new Vector3(5.0, 1.42, 3.35);
 /** Leaving Career: risen out of the top of the frame, as if scrolled away with the timeline. */
 export const BOT_CAREER_UP = BOT_CAREER.clone().add(new Vector3(0, 1.05, 0));
 /** Out of sight above the Contact framing while the toolbench is on screen; it drops in from here. */

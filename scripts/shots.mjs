@@ -31,6 +31,11 @@ const SWIFTSHADER = ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '
 const LAUNCH = forceSw || process.platform !== 'darwin' ? SWIFTSHADER : GPU;
 const DESKTOP = { width: 1440, height: 900 };
 const MOBILE = { width: 390, height: 844 };
+// Other compact shapes: a portrait tablet and a phone held sideways.
+const COMPACT = [
+  ['tablet', { width: 768, height: 1024 }],
+  ['landscape-phone', { width: 844, height: 390 }],
+];
 
 const resumeData = JSON.parse(readFileSync(resolve(root, 'src/content/resume.generated.json'), 'utf8'));
 const portfolioSrc = readFileSync(resolve(root, 'src/content/portfolio.ts'), 'utf8');
@@ -237,26 +242,54 @@ async function desktop(browser) {
 async function mobile(browser) {
   if (!want('mobile')) return;
   const page = await newPage(browser, 'mobile', { viewport: MOBILE, mobile: true });
-  const mode = await page.evaluate(() => document.documentElement.dataset.mode);
-  if (mode !== 'phone') errors.push(`[mobile] expected phone mode, got ${mode}`);
+  await compactChecks(page, 'mobile');
   await shot(page, 'mobile-hero');
   for (const id of ['data', 'model', 'system', 'projects', 'career', 'toolbench', 'contact']) {
     await scrollToId(page, id, 60);
     await shot(page, `mobile-${id}`);
   }
-  const r = await page.evaluate(() => ({
-    frames: document.querySelectorAll('.act .frame img').length,
-    rail: getComputedStyle(document.querySelector('.rail')).display,
-    cursor: !!document.querySelector('.cur-ring'),
-    overflow: document.documentElement.scrollWidth > innerWidth + 1,
-  }));
-  if (r.frames !== 3) errors.push(`[mobile] ${r.frames} act frames shown, expected 3`);
-  if (r.rail !== 'none') errors.push('[mobile] pipeline rail is visible');
-  if (r.cursor) errors.push('[mobile] custom cursor is mounted');
-  if (r.overflow) errors.push('[mobile] page scrolls horizontally');
-  const phoneRunning = await page.evaluate(() => document.querySelector('.webgl canvas')?.dataset.running);
-  if (phoneRunning !== '0') errors.push(`[mobile] still rendering below the hero (${phoneRunning})`);
   await page.context().close();
+  for (const [label, viewport] of COMPACT) {
+    const p = await newPage(browser, label, { viewport, mobile: true });
+    await compactChecks(p, label);
+    await shot(p, `${label}-hero`);
+    await scrollToId(p, 'career', 60);
+    await shot(p, `${label}-career`);
+    await p.context().close();
+  }
+}
+
+/**
+ * Phones, portrait tablets and short screens: the calm layout. No WebGL, no gate, still frames,
+ * nothing floating over the content (no dock, rail or floating resume button; Resume is in the nav).
+ */
+async function compactChecks(page, label) {
+  const r = await page.evaluate(() => {
+    const shown = (sel) => {
+      const el = document.querySelector(sel);
+      return !!el && getComputedStyle(el).display !== 'none';
+    };
+    return {
+      mode: document.documentElement.dataset.mode,
+      size: document.documentElement.dataset.size,
+      canvas: !!document.querySelector('.webgl canvas'),
+      gate: !!document.querySelector('.gate'),
+      frames: document.querySelectorAll('.act .frame img').length,
+      floating: ['.dock', '.rail', '.resume-fab'].filter(shown),
+      navResume: shown('.nav-resume'),
+      cursor: !!document.querySelector('.cur-ring'),
+      overflow: document.documentElement.scrollWidth > innerWidth + 1,
+    };
+  });
+  if (r.mode !== 'static' || r.size !== 'compact') errors.push(`[${label}] expected the compact static layout, got ${r.mode}/${r.size}`);
+  if (r.canvas) errors.push(`[${label}] WebGL canvas is mounted`);
+  if (r.gate) errors.push(`[${label}] the power-on gate is shown`);
+  if (r.frames !== 3) errors.push(`[${label}] ${r.frames} act frames shown, expected 3`);
+  if (r.floating.length) errors.push(`[${label}] floating over the content: ${r.floating.join(', ')}`);
+  if (!r.navResume) errors.push(`[${label}] no Resume link in the nav`);
+  if (r.cursor) errors.push(`[${label}] custom cursor is mounted`);
+  if (r.overflow) errors.push(`[${label}] page scrolls horizontally`);
+  notes.push(`${label}: compact, no canvas or gate, nothing floating, Resume in the nav`);
 }
 
 async function palette(browser) {
@@ -410,10 +443,7 @@ async function content(browser) {
 /** The power-on gate: holds the page, fills, focuses Power on, lifts on Enter and starts sound. */
 async function gateCheck(browser) {
   if (!want('gate')) return;
-  for (const [label, opts] of [
-    ['gate', {}],
-    ['gate-mobile', { viewport: MOBILE, mobile: true }],
-  ]) {
+  for (const [label, opts] of [['gate', {}]]) {
     const page = await newPage(browser, label, { ...opts, gate: false });
     const before = await page.evaluate(() => ({
       gate: !!document.querySelector('.gate'),
