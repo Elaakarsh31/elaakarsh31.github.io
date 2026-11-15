@@ -38,6 +38,7 @@ export function startSpy() {
         else a.removeAttribute('aria-current');
       });
       document.documentElement.dataset.section = now;
+      window.dispatchEvent(new CustomEvent('section', { detail: now }));
     }
 
     for (const id of ACTS) {
@@ -72,3 +73,6 @@ export function startSpy() {
 export function refreshSpy() {
   window.dispatchEvent(new Event('resize'));
 }
+
+/** The section currently in view (set by the spy). */
+export const currentSection = () => document.documentElement.dataset.section ?? 'top';

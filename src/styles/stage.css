@@ -8,8 +8,9 @@
   display: none;
 }
 
+/* One left edge for the stage copy and every section, clear of the rail. */
 html[data-mode='live'] {
-  --copy-left: calc(var(--gutter) + 26px);
+  --copy-left: max(calc(var(--gutter) + 26px), calc((100vw - var(--maxw)) / 2 + var(--gutter)));
 }
 
 html[data-mode='live'] .build {
@@ -280,4 +281,28 @@ html[data-mode='live'] .readouts {
 
 html[data-mode='live'] .hero-cue {
   bottom: 30px;
+}
+
+/* The scene fades out over the Log and the resume band, where rendering pauses. */
+.webgl {
+  transition: opacity 0.6s ease;
+}
+
+html[data-section='log'] .webgl,
+html[data-section='resume'] .webgl {
+  opacity: 0;
+}
+
+/* Projects: sheets on the left, the finished machine in the background on the right. */
+html[data-mode='live'] .projects {
+  max-width: none;
+  margin: 0;
+  padding-left: var(--copy-left);
+  padding-right: 24px;
+}
+
+html[data-mode='live'] .projects > .sheets,
+html[data-mode='live'] .projects > .more-github,
+html[data-mode='live'] .projects > .papers {
+  width: min(880px, 62vw);
 }

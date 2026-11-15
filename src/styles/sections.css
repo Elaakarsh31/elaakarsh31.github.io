@@ -51,7 +51,6 @@
   overflow: hidden;
   background: rgba(15, 16, 19, 0.7);
   border: 1px solid var(--rule);
-  min-height: 220px;
 }
 
 .sheet-preview img {
@@ -144,9 +143,13 @@
 
 @media (min-width: 900px) {
   .sheet {
-    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
-    padding: 36px;
+    padding: 32px 36px 36px;
   }
+}
+
+.sheet-preview .schematic {
+  max-width: 620px;
+  margin: 0 auto;
 }
 
 /* Papers strip */
@@ -444,4 +447,147 @@
   font-family: var(--font-mono);
   font-size: 14px;
   color: var(--ice);
+}
+
+/* Schematics: technical drawing in Ice and Holo, Molten for the one thing that matters. */
+.schematic {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.sch-gridline {
+  fill: none;
+  stroke: rgba(111, 211, 255, 0.05);
+  stroke-width: 1;
+}
+
+.sch-slab .sch-face {
+  fill: rgba(111, 211, 255, 0.05);
+  stroke: rgba(207, 227, 242, 0.7);
+  stroke-width: 1;
+}
+
+.sch-slab .sch-top,
+.sch-slab .sch-side {
+  fill: rgba(111, 211, 255, 0.1);
+  stroke: rgba(111, 211, 255, 0.5);
+  stroke-width: 1;
+}
+
+.sch-hot .sch-face {
+  stroke: var(--molten);
+  fill: rgba(255, 91, 31, 0.08);
+}
+
+.sch-hot .sch-top,
+.sch-hot .sch-side {
+  stroke: rgba(255, 91, 31, 0.6);
+  fill: rgba(255, 91, 31, 0.12);
+}
+
+.sch-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  fill: var(--ice);
+}
+
+.sch-sub {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  fill: var(--muted);
+}
+
+.sch-note {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  fill: var(--muted);
+}
+
+.sch-note-hot {
+  fill: #ff8a5c;
+}
+
+.sch-note-dim {
+  fill: var(--holo);
+}
+
+.sch-wire {
+  fill: none;
+  stroke: rgba(207, 227, 242, 0.55);
+  stroke-width: 1;
+}
+
+.sch-dashed {
+  stroke-dasharray: 4 4;
+}
+
+.sch-hot-line {
+  stroke: rgba(255, 91, 31, 0.8);
+}
+
+.sch-arrowhead {
+  fill: rgba(207, 227, 242, 0.7);
+}
+
+.sch-arrowhead-hot {
+  fill: var(--molten);
+}
+
+.sch-dim path {
+  fill: none;
+  stroke: var(--holo);
+  stroke-width: 1;
+}
+
+.sch-gate {
+  fill: rgba(255, 91, 31, 0.15);
+  stroke: var(--molten);
+  stroke-width: 1.2;
+}
+
+.sch-stop {
+  fill: rgba(255, 91, 31, 0.12);
+  stroke: var(--molten);
+  stroke-width: 1.2;
+}
+
+.sch-node {
+  fill: var(--graphite);
+  stroke: var(--holo);
+}
+
+.sch-film .sch-face {
+  fill: rgba(111, 211, 255, 0.04);
+  stroke: rgba(207, 227, 242, 0.5);
+}
+
+.sch-frame {
+  fill: rgba(111, 211, 255, 0.08);
+  stroke: rgba(111, 211, 255, 0.4);
+}
+
+.sch-frame-hot {
+  stroke: var(--molten);
+  fill: rgba(255, 91, 31, 0.15);
+}
+
+.sch-seg {
+  fill: rgba(111, 211, 255, 0.12);
+  stroke: var(--holo);
+}
+
+.sch-tick {
+  stroke: var(--holo);
+}
+
+.sch-token {
+  fill: none;
+  stroke: rgba(207, 227, 242, 0.55);
+}
+
+.sheet-preview {
+  display: grid;
+  place-items: center;
+  padding: 10px;
 }

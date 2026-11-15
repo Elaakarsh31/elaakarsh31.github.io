@@ -1,15 +1,32 @@
 import { portfolio, STAGES, type Project } from '../content/portfolio';
 import { findPublication, yearOf } from '../content/resume';
 import { projectImageUrl } from '../lib/assets';
+import { stage } from '../lib/stage';
 import { ExtLink } from './ExtLink';
 import { LinkRow } from './LinkRow';
 import { Schematic } from './Schematic';
+
+/** Lights the matching parts of the machine (and plate labels) while a sheet is hovered or focused. */
+function light(p: Project | null) {
+  stage.highlight = p ? { chips: p.chips, plates: p.plates ?? [] } : null;
+  document.querySelectorAll<HTMLElement>('.plate-tag').forEach((t) => {
+    const lit = !!p && (p.chips.includes('system') || (p.plates ?? []).includes(t.dataset.plate!));
+    if (lit) t.dataset.lit = '1';
+    else delete t.dataset.lit;
+  });
+}
 
 function SpecSheet({ p }: { p: Project }) {
   const img = projectImageUrl(p.id);
   return (
     <li>
       <article
+        onPointerEnter={() => light(p)}
+        onPointerLeave={() => light(null)}
+        onFocus={() => light(p)}
+        onBlur={(e) => {
+          if (!e.currentTarget.contains(e.relatedTarget as Node)) light(null);
+        }}
         id={`project-${p.id}`}
         className="sheet"
         data-chips={p.chips.join(' ')}

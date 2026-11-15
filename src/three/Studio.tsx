@@ -92,7 +92,8 @@ function Projector() {
   );
   useFrame(({ clock }) => {
     mat.uniforms.uTime.value = clock.elapsedTime;
-    mat.uniforms.uOn.value = 0.45 + 0.55 * blueprint(stage.p);
+    const lit = stage.highlight?.chips.includes('data') ? 0.7 : 0;
+    mat.uniforms.uOn.value = Math.min(1.4, 0.45 + 0.55 * blueprint(stage.p) + lit);
   });
   return (
     <mesh rotation-x={-Math.PI / 2} position-y={0.004} material={mat} renderOrder={1}>

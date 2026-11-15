@@ -405,7 +405,9 @@ export function buildMachine() {
     const hlModel = highlight?.chips.includes('model') ?? false;
     const hlSystem = highlight?.chips.includes('system') ?? false;
 
-    seamColor(baseSeamMat, 0, pulseAt(0.1));
+    const hlData = highlight?.chips.includes('data') ?? false;
+    if (hlData) baseSeamMat.color.copy(C.holo).multiplyScalar(1.1);
+    else seamColor(baseSeamMat, 0, pulseAt(0.1));
 
     layers.forEach((L, i) => {
       L.group.position.y = layerY(i) + ex * layerLift(i);

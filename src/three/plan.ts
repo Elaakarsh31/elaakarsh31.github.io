@@ -16,7 +16,7 @@ const A = new Vector3();
 const B = new Vector3();
 const point = new Vector3();
 
-export const HOVER_BESIDE = new Vector3(1.05, 1.42, 0.78);
+export const HOVER_BESIDE = new Vector3(0.82, 1.6, 0.7);
 const HERD_START = new Vector3(-3.05, 1.22, -0.25);
 const POWER_SPOT = new Vector3(-0.92, 1.3, 1.05);
 
