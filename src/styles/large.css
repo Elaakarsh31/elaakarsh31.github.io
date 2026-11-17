@@ -165,6 +165,12 @@
   .log-merge-text {
     font-size: calc(12.5px * var(--type));
   }
+  .log-entry[data-kind='degree'] .log-title {
+    font-size: calc(17px * var(--type));
+  }
+  .log-entry[data-kind='degree'] .log-org {
+    font-size: calc(14.5px * var(--type));
+  }
   .career-holo-role {
     font-size: calc(18px * var(--type));
   }

@@ -439,12 +439,42 @@
   margin-top: 12px;
 }
 
+/* Degrees are milestones, not chapters: a compact row with no notes. */
+.log-entry[data-kind='degree'] .log-body {
+  padding-bottom: 26px;
+}
+
+.log-entry[data-kind='degree'] .log-title {
+  margin-top: 4px;
+  font-size: 17px;
+}
+
+.log-entry[data-kind='degree'] .log-org {
+  font-size: 14.5px;
+}
+
 .log-merge-text {
   grid-column: 2;
   padding: 16px 0 30px;
   font-family: var(--font-mono);
   font-size: 12.5px;
   color: var(--muted);
+}
+
+/* Short windows: tighter rows so more of the timeline fits on one screen. */
+@media (max-height: 820px) {
+  .log-list {
+    margin-top: 40px;
+  }
+  .log-body {
+    padding-bottom: 30px;
+  }
+  .log-entry[data-kind='degree'] .log-body {
+    padding-bottom: 18px;
+  }
+  .log-merge-text {
+    padding-bottom: 20px;
+  }
 }
 
 /* Resume band */
